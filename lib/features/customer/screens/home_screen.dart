@@ -14,6 +14,7 @@ import 'package:goodwin/features/customer/screens/checkout_screen.dart';
 import 'package:goodwin/features/customer/screens/customer_orders_screen.dart';
 import 'package:goodwin/features/customer/screens/product_detail_screen.dart';
 import 'package:goodwin/features/customer/screens/profile_screen.dart';
+import 'package:goodwin/core/state/notification_controller.dart';
 import 'package:goodwin/models/cart_item.dart';
 import 'package:goodwin/models/demo_product.dart';
 import 'package:goodwin/models/filter_criteria.dart';
@@ -78,6 +79,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   Future<void> _initFirebaseData() async {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser != null) {
+      NotificationController().setUserId(firebaseUser.uid);
       // 1. Ensure user has a profile and unique 6-alphabet username in Firestore
       final user = await _userRepository.getOrCreateUser(firebaseUser);
       if (mounted) {
@@ -85,6 +87,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           currentUser = user;
           favoriteIds.addAll(user.favorites);
         });
+        NotificationController().syncFromUserData(user.notifications);
+        _checkLowStockFavorites();
       }
 
       // Listen for real-time user updates (profile changes, username changes)
@@ -95,7 +99,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             favoriteIds.clear();
             favoriteIds.addAll(user.favorites);
           });
+          NotificationController().syncFromUserData(user.notifications);
           _syncCartFromUserData(user.cart);
+          _checkLowStockFavorites();
         }
       });
     }
@@ -121,6 +127,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           if (currentUser != null && currentUser!.cart.isNotEmpty) {
             _syncCartFromUserData(currentUser!.cart);
           }
+          _checkLowStockFavorites();
         }
       },
       onError: (_) {
@@ -394,6 +401,72 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       }
     });
     _saveFavoritesToFirestore();
+    _checkLowStockFavorites();
+  }
+
+  void _checkLowStockFavorites() {
+    if (!mounted || products.isEmpty || favoriteIds.isEmpty) return;
+    NotificationController().setUserId(
+      currentUser?.id ?? FirebaseAuth.instance.currentUser?.uid,
+    );
+    NotificationController().checkFavoriteStockAlerts(
+      products: products,
+      favoriteIds: favoriteIds,
+      onNewAlert: (alert) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Color(0xFFFBBF24),
+                  size: 22,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        alert.title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        'Only ${alert.stockQuantity} units left in stock!',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            action: SnackBarAction(
+              label: 'View',
+              textColor: const Color(0xFF99F6E4),
+              onPressed: () {
+                final matched = products.firstWhere(
+                  (p) => p.id == alert.productId,
+                  orElse: () => products.first,
+                );
+                openProduct(matched);
+              },
+            ),
+            backgroundColor: const Color(0xFF0F172A),
+            duration: const Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void addToCart(
@@ -1914,6 +1987,30 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         ),
         centerTitle: true,
         actions: [
+          ListenableBuilder(
+            listenable: NotificationController(),
+            builder: (context, _) {
+              final unread = NotificationController().unreadCount;
+              return IconButton(
+                tooltip: 'Stock Alerts & Notifications',
+                icon: unread > 0
+                    ? Badge.count(
+                        count: unread,
+                        backgroundColor: const Color(0xFFDC2626),
+                        textColor: Colors.white,
+                        child: const Icon(
+                          Icons.notifications_outlined,
+                          color: Color(0xFF1E293B),
+                        ),
+                      )
+                    : const Icon(
+                        Icons.notifications_outlined,
+                        color: Color(0xFF1E293B),
+                      ),
+                onPressed: () => showNotificationsSheet(context),
+              );
+            },
+          ),
           if (isAdmin)
             Padding(
               padding: const EdgeInsets.only(right: 8),
@@ -1979,6 +2076,323 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void showNotificationsSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return ListenableBuilder(
+          listenable: NotificationController(),
+          builder: (context, _) {
+            final notifications = NotificationController().notifications;
+            final unreadCount = NotificationController().unreadCount;
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.75,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFEF3C7),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.notifications_active_rounded,
+                            color: Color(0xFFD97706),
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Stock & Order Alerts',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              ),
+                              Text(
+                                unreadCount > 0
+                                    ? '$unreadCount unread notification${unreadCount > 1 ? "s" : ""}'
+                                    : 'All notifications up to date',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: unreadCount > 0
+                                      ? const Color(0xFFD97706)
+                                      : const Color(0xFF64748B),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (notifications.isNotEmpty)
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert_rounded),
+                            onSelected: (val) {
+                              if (val == 'read') {
+                                NotificationController().markAllAsRead();
+                              } else if (val == 'clear') {
+                                NotificationController().clearAll();
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'read',
+                                child: Text('Mark all as read'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'clear',
+                                child: Text(
+                                  'Clear all',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: notifications.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFF1F5F9),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.notifications_none_rounded,
+                                    size: 40,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'No alerts right now',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF334155),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 40,
+                                  ),
+                                  child: Text(
+                                    'When favorited items drop below 100 units in stock, you will receive real-time alerts here.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.separated(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            itemCount: notifications.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (context, index) {
+                              final alert = notifications[index];
+                              return InkWell(
+                                onTap: () {
+                                  NotificationController().markAsRead(
+                                    alert.id,
+                                  );
+                                  final matched = products.firstWhere(
+                                    (p) => p.id == alert.productId,
+                                    orElse: () => products.first,
+                                  );
+                                  Navigator.pop(ctx);
+                                  openProduct(matched);
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: alert.isRead
+                                        ? const Color(0xFFF8FAFC)
+                                        : const Color(0xFFFFFBEB),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: alert.isRead
+                                          ? const Color(0xFFE2E8F0)
+                                          : const Color(0xFFFDE68A),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ProductImageWidget(
+                                        imageSrc: alert.productImage,
+                                        width: 50,
+                                        height: 50,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    alert.productName,
+                                                    style: TextStyle(
+                                                      fontWeight: alert.isRead
+                                                          ? FontWeight.w700
+                                                          : FontWeight.w900,
+                                                      fontSize: 14,
+                                                      color: const Color(
+                                                        0xFF0F172A,
+                                                      ),
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                    horizontal: 7,
+                                                    vertical: 2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xFFFEF2F2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                      6,
+                                                    ),
+                                                    border: Border.all(
+                                                      color:
+                                                          const Color(
+                                                        0xFFFCA5A5,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    '${alert.stockQuantity} left',
+                                                    style: const TextStyle(
+                                                      fontSize: 10.5,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      color: Color(0xFFDC2626),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              alert.message,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Color(0xFF475569),
+                                                height: 1.3,
+                                              ),
+                                              maxLines: 2,
+                                              overflow:
+                                                  TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  'Tap to view product',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight:
+                                                        FontWeight.w700,
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  icon: const Icon(
+                                                    Icons.close_rounded,
+                                                    size: 16,
+                                                    color: Color(0xFF94A3B8),
+                                                  ),
+                                                  onPressed: () {
+                                                    NotificationController()
+                                                        .removeNotification(
+                                                      alert.id,
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

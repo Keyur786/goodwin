@@ -66,6 +66,7 @@ class AppUser {
     this.totalPurchases = 0.0,
     this.favorites = const [],
     this.cart = const [],
+    this.notifications = const [],
   });
 
   final String id;
@@ -86,6 +87,7 @@ class AppUser {
   final double totalPurchases;
   final List<String> favorites;
   final List<Map<String, dynamic>> cart;
+  final List<Map<String, dynamic>> notifications;
 
   CustomerTier get tier => CustomerTier.fromSpend(totalPurchases);
 
@@ -123,6 +125,10 @@ class AppUser {
               ?.map((e) => Map<String, dynamic>.from(e as Map))
               .toList() ??
           const [],
+      notifications: (json['notifications'] as List<dynamic>?)
+              ?.map((e) => Map<String, dynamic>.from(e as Map))
+              .toList() ??
+          const [],
     );
   }
 
@@ -146,6 +152,7 @@ class AppUser {
       'totalPurchases': totalPurchases,
       'favorites': favorites,
       'cart': cart,
+      'notifications': notifications,
     };
   }
 
@@ -168,6 +175,7 @@ class AppUser {
     double? totalPurchases,
     List<String>? favorites,
     List<Map<String, dynamic>>? cart,
+    List<Map<String, dynamic>>? notifications,
   }) {
     return AppUser(
       id: id ?? this.id,
@@ -189,6 +197,7 @@ class AppUser {
       totalPurchases: totalPurchases ?? this.totalPurchases,
       favorites: favorites ?? this.favorites,
       cart: cart ?? this.cart,
+      notifications: notifications ?? this.notifications,
     );
   }
 }
