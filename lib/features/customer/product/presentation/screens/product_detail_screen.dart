@@ -180,9 +180,13 @@ class ProductDetailScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: currentProduct.availableQty > 0 ? Colors.white : const Color(0xFFFEF2F2),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFF99F6E4)),
+                            border: Border.all(
+                              color: currentProduct.availableQty > 0
+                                  ? const Color(0xFF99F6E4)
+                                  : const Color(0xFFFCA5A5),
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -190,7 +194,7 @@ class ProductDetailScreen extends ConsumerWidget {
                               Icon(
                                 currentProduct.availableQty > 0 ? Icons.check_circle_rounded : Icons.cancel_outlined,
                                 size: 16,
-                                color: currentProduct.availableQty > 0 ? const Color(0xFF16A34A) : Colors.red,
+                                color: currentProduct.availableQty > 0 ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
                               ),
                               const SizedBox(width: 5),
                               Text(
@@ -200,7 +204,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w800,
-                                  color: currentProduct.availableQty > 0 ? const Color(0xFF16A34A) : Colors.red,
+                                  color: currentProduct.availableQty > 0 ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
                                 ),
                               ),
                             ],

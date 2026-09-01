@@ -12,7 +12,7 @@ class DemoProduct {
     required this.subtitle,
     required this.description,
     required this.tags,
-    this.availableQty = 50,
+    this.availableQty = 0,
     this.variants = const [],
   });
 
@@ -30,6 +30,17 @@ class DemoProduct {
   final List<ProductVariantModel> variants;
 
   bool get hasVariants => variants.isNotEmpty;
+
+  /// Returns the total available quantity across all variants, or availableQty if no variants.
+  int get totalAvailableQty {
+    if (variants.isNotEmpty) {
+      return variants.fold<int>(
+        0,
+        (sum, v) => sum + (v.availableQty > 0 ? v.availableQty : 0),
+      );
+    }
+    return availableQty > 0 ? availableQty : 0;
+  }
 
   factory DemoProduct.fromProductModel(
     ProductModel p, [

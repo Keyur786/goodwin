@@ -303,25 +303,25 @@ class ModernProductCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: product.availableQty > 0
+                            color: product.totalAvailableQty > 0
                                 ? const Color(0xFFDCFCE7)
                                 : const Color(0xFFFEE2E2),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: product.availableQty > 0
+                              color: product.totalAvailableQty > 0
                                   ? const Color(0xFF86EFAC)
                                   : const Color(0xFFFCA5A5),
                               width: 1,
                             ),
                           ),
                           child: Text(
-                            product.availableQty > 0
-                                ? 'Qty: ${formatStockCount(product.availableQty, isAdmin: isAdmin)}'
+                            product.totalAvailableQty > 0
+                                ? 'Qty: ${formatStockCount(product.totalAvailableQty, isAdmin: isAdmin)}'
                                 : 'Out of stock',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: product.availableQty > 0
+                              color: product.totalAvailableQty > 0
                                   ? const Color(0xFF16A34A)
                                   : Colors.red.shade700,
                             ),
@@ -331,16 +331,16 @@ class ModernProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     QuantityAddControls(
-                      quantity: quantity <= 0 ? 1 : quantity.clamp(1, product.availableQty > 0 ? product.availableQty : 1),
-                      maxQuantity: product.availableQty,
-                      isOutOfStock: product.availableQty <= 0,
+                      quantity: quantity <= 0 ? 1 : quantity.clamp(1, product.totalAvailableQty > 0 ? product.totalAvailableQty : 1),
+                      maxQuantity: product.totalAvailableQty,
+                      isOutOfStock: product.totalAvailableQty <= 0,
                       onDecrease: () => onSetQuantity(quantity - 1),
-                      onIncrease: quantity < product.availableQty
+                      onIncrease: quantity < product.totalAvailableQty
                           ? () => onSetQuantity((quantity <= 0 ? 1 : quantity) + 1)
                           : null,
                       onSetQuantity: onSetQuantity,
                       productName: product.name,
-                      onAdd: product.availableQty > 0 ? onAddToCart : () {},
+                      onAdd: product.totalAvailableQty > 0 ? onAddToCart : () {},
                     ),
                   ],
                 ),

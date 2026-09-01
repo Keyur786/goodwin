@@ -108,18 +108,28 @@ class ProductCard extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text('₹${product.wholesalePrice}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20)),
                   const SizedBox(height: 8),
-                  Text('In Stock: ${product.availableQty > 100 ? "100+" : product.availableQty}', style: const TextStyle(color: Colors.green)),
+                  Text(
+                    product.availableQty > 0
+                        ? 'In Stock: ${product.availableQty > 100 ? "100+" : product.availableQty}'
+                        : 'Out of stock',
+                    style: TextStyle(
+                      color: product.availableQty > 0 ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       FilledButton(
-                        onPressed: () {
-                          ref.read(cartProvider.notifier).addProduct(product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${product.name} added to cart')),
-                          );
-                        },
-                        child: const Text('Add'),
+                        onPressed: product.availableQty > 0
+                            ? () {
+                                ref.read(cartProvider.notifier).addProduct(product);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('${product.name} added to cart')),
+                                );
+                              }
+                            : null,
+                        child: Text(product.availableQty > 0 ? 'Add' : 'Out of Stock'),
                       ),
                       const SizedBox(width: 8),
                       TextButton(

@@ -46,7 +46,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     super.initState();
     _imagePageController = PageController();
     if (widget.product.hasVariants) {
-      _selectedVariant = widget.product.variants.first;
+      _selectedVariant = widget.product.variants.firstWhere(
+        (v) => v.availableQty > 0,
+        orElse: () => widget.product.variants.first,
+      );
     }
   }
 
@@ -60,7 +63,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final product = widget.product;
     final activePrice = _selectedVariant?.wholesalePrice ?? product.price;
-    final activeStock = _selectedVariant?.availableQty ?? product.availableQty;
+    final activeStock = _selectedVariant != null
+        ? _selectedVariant!.availableQty
+        : product.totalAvailableQty;
 
     // Use variant-specific images if available; otherwise fall back to product main images
     final variantImages = _selectedVariant?.images.where((s) => s.trim().isNotEmpty).toList() ?? [];
@@ -500,15 +505,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                 : const Color(0xFF1E293B),
                                           ),
                                         ),
-                                        Text(
-                                          '₹${v.wholesalePrice.toStringAsFixed(0)}',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 12,
-                                            color: isSelected
-                                                ? const Color(0xFF0F766E)
-                                                : const Color(0xFF64748B),
-                                          ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '₹${v.wholesalePrice.toStringAsFixed(0)}',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 12,
+                                                color: isSelected
+                                                    ? const Color(0xFF0F766E)
+                                                    : const Color(0xFF64748B),
+                                              ),
+                                            ),
+                                            if (v.availableQty <= 0) ...[
+                                              const SizedBox(width: 4),
+                                              const Text(
+                                                '• Out of stock',
+                                                style: TextStyle(
+                                                  fontSize: 10.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFFDC2626),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -566,7 +586,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: activeStock > 0 ? Colors.white : const Color(0xFFFEF2F2),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: activeStock > 0
@@ -584,7 +604,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 size: 16,
                                 color: activeStock > 0
                                     ? const Color(0xFF16A34A)
-                                    : Colors.red.shade700,
+                                    : const Color(0xFFDC2626),
                               ),
                               const SizedBox(width: 5),
                               Text(
@@ -596,7 +616,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   fontWeight: FontWeight.w800,
                                   color: activeStock > 0
                                       ? const Color(0xFF16A34A)
-                                      : Colors.red.shade700,
+                                      : const Color(0xFFDC2626),
                                 ),
                               ),
                             ],
@@ -651,7 +671,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   fontWeight: FontWeight.w700,
                                   color: activeStock > 0
                                       ? const Color(0xFF16A34A)
-                                      : Colors.red.shade700,
+                                      : const Color(0xFFDC2626),
                                 ),
                               ),
                             ),
