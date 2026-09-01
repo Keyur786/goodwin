@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.phone_number == '+919904579700' ||
+        request.auth.token.phone_number == '9904579700' ||
+        (request.auth.token.keys().hasAny(['role']) && request.auth.token.role == 'superAdmin')
+      );
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Products Collection
+    // - Read: All authenticated users (buyers, resellers, admins)
+    // - Create/Update/Delete: Super Admin only
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Orders Collection
+    // - Read: Owner of order or Super Admin
+    // - Create: Authenticated buyer creating their own order
+    // - Update: Super Admin OR Buyer modifying their own non-delivered order without changing customerId
+    // - Delete: Super Admin OR Buyer deleting their own non-delivered order
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (
+        resource.data.customerId == request.auth.uid ||
+        isSuperAdmin()
+      );
+
+      allow create: if isAuthenticated() && (
+        request.resource.data.customerId == request.auth.uid ||
+        isSuperAdmin()
+      );
+
+      allow update: if isAuthenticated() && (
+        isSuperAdmin() ||
+        (
+          resource.data.customerId == request.auth.uid &&
+          request.resource.data.customerId == request.auth.uid &&
+          resource.data.orderStatus != 'delivered' &&
+          resource.data.orderStatus != 'pickedUp'
+        )
+      );
+
+      allow delete: if isAuthenticated() && (
+        isSuperAdmin() ||
+        (
+          resource.data.customerId == request.auth.uid &&
+          resource.data.orderStatus != 'delivered' &&
+          resource.data.orderStatus != 'pickedUp'
+        )
+      );
+    }
+
+    // Users Collection
+    // - Read: User themselves or Super Admin
+    // - Create: User themselves upon registration
+    // - Update: User themselves (without self-escalating role) or Super Admin
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isSuperAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isSuperAdmin() || (
+        isOwner(userId) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))
+      );
+      allow delete: if isSuperAdmin();
+    }
+
+    // Default deny for all unspecified collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
