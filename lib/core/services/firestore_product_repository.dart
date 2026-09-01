@@ -36,6 +36,7 @@ class FirestoreProductRepository {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) => ProductModel.fromJson({'id': doc.id, ...doc.data()}))
+          .where((p) => !p.isDeleted)
           .toList();
     });
   }
@@ -53,6 +54,7 @@ class FirestoreProductRepository {
       final snapshot = await _firestore.collection('products').get();
       return snapshot.docs
           .map((doc) => ProductModel.fromJson({'id': doc.id, ...doc.data()}))
+          .where((p) => !p.isDeleted && p.isActive)
           .toList();
     } catch (_) {
       return [];
@@ -98,8 +100,33 @@ class FirestoreProductRepository {
     }, SetOptions(merge: true));
   }
 
-  Future<void> deleteProduct(String id) async {
+  /// Soft deletes a product by moving it to the Recycle Bin
+  Future<void> moveToBin(String id) async {
+    await _firestore.collection('products').doc(id).update({
+      'isDeleted': true,
+      'isActive': false,
+      'deletedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  /// Restores a product from the Recycle Bin back to active catalog
+  Future<void> restoreFromBin(String id) async {
+    await _firestore.collection('products').doc(id).update({
+      'isDeleted': false,
+      'isActive': true,
+      'deletedAt': null,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  /// Permanently deletes a product document from Firestore
+  Future<void> permanentDeleteProduct(String id) async {
     await _firestore.collection('products').doc(id).delete();
+  }
+
+  Future<void> deleteProduct(String id) async {
+    await moveToBin(id);
   }
 
   Future<void> updateStock(String id, int newStock) async {

@@ -1,6 +1,8 @@
 import 'package:goodwin/models/category_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/constants/app_constants.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
@@ -176,8 +178,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           id: pId,
           name: 'Wholesale Product',
           category: 'General',
-          image:
-              'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=900&q=80',
+          image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=900&q=80',
           price: 50,
           originalPrice: 100,
           subtitle: 'Saved product',
@@ -308,16 +309,27 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           selectedCategory == 'All' ||
           product.category.toLowerCase() == selectedCategory.toLowerCase();
 
-      final matchesSearch = tokens.isEmpty ||
+      final matchesSearch =
+          tokens.isEmpty ||
           tokens.every((token) {
             final inName = product.name.toLowerCase().contains(token);
             final inCategory = product.category.toLowerCase().contains(token);
-            final inDescription = product.description.toLowerCase().contains(token);
-            final inTags = product.tags.any((tag) => tag.toLowerCase().contains(token));
-            final inVariants = product.variants.any((v) =>
-                v.name.toLowerCase().contains(token) ||
-                v.sku.toLowerCase().contains(token));
-            return inName || inCategory || inDescription || inTags || inVariants;
+            final inDescription = product.description.toLowerCase().contains(
+              token,
+            );
+            final inTags = product.tags.any(
+              (tag) => tag.toLowerCase().contains(token),
+            );
+            final inVariants = product.variants.any(
+              (v) =>
+                  v.name.toLowerCase().contains(token) ||
+                  v.sku.toLowerCase().contains(token),
+            );
+            return inName ||
+                inCategory ||
+                inDescription ||
+                inTags ||
+                inVariants;
           });
 
       final matchesMinPrice =
@@ -474,8 +486,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     int quantity = 1,
     ProductVariantModel? variant,
   }) {
-    final maxStock =
-        variant != null ? variant.availableQty : product.availableQty;
+    final maxStock = variant != null
+        ? variant.availableQty
+        : product.availableQty;
     if (maxStock <= 0) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -483,7 +496,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           content: Text('${product.name} is currently out of stock'),
           backgroundColor: Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
       return;
@@ -656,8 +671,11 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           cartItemCount: totalCartItemCount,
           isAdmin: isAdminUser,
           onOpenCart: () => setState(() => selectedIndex = 3),
-          onAddToCart: (product, {int quantity = 1, ProductVariantModel? variant}) =>
-              addToCart(product, quantity: quantity, variant: variant),
+          onAddToCart: (
+            product, {
+            int quantity = 1,
+            ProductVariantModel? variant,
+          }) => addToCart(product, quantity: quantity, variant: variant),
         ),
       ),
     );
@@ -996,13 +1014,25 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               tokens.isEmpty ||
               tokens.every((token) {
                 final inName = product.name.toLowerCase().contains(token);
-                final inCategory = product.category.toLowerCase().contains(token);
-                final inDescription = product.description.toLowerCase().contains(token);
-                final inTags = product.tags.any((tag) => tag.toLowerCase().contains(token));
-                final inVariants = product.variants.any((v) =>
-                    v.name.toLowerCase().contains(token) ||
-                    v.sku.toLowerCase().contains(token));
-                return inName || inCategory || inDescription || inTags || inVariants;
+                final inCategory = product.category.toLowerCase().contains(
+                  token,
+                );
+                final inDescription = product.description
+                    .toLowerCase()
+                    .contains(token);
+                final inTags = product.tags.any(
+                  (tag) => tag.toLowerCase().contains(token),
+                );
+                final inVariants = product.variants.any(
+                  (v) =>
+                      v.name.toLowerCase().contains(token) ||
+                      v.sku.toLowerCase().contains(token),
+                );
+                return inName ||
+                    inCategory ||
+                    inDescription ||
+                    inTags ||
+                    inVariants;
               }),
         )
         .toList();
@@ -1578,7 +1608,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                             context: context,
                                             initialQuantity: cartItem.quantity,
                                             productName: cartItem.displayName,
-                                            maxQuantity: cartItem.maxAvailableStock,
+                                            maxQuantity:
+                                                cartItem.maxAvailableStock,
                                           );
                                       if (newQty != null) {
                                         updateCartQuantity(cartItem, newQty);
@@ -1613,11 +1644,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                     ),
                                   ),
                                   InkWell(
-                                    onTap: cartItem.quantity < cartItem.maxAvailableStock
+                                    onTap:
+                                        cartItem.quantity <
+                                            cartItem.maxAvailableStock
                                         ? () => updateCartQuantity(
-                                              cartItem,
-                                              cartItem.quantity + 1,
-                                            )
+                                            cartItem,
+                                            cartItem.quantity + 1,
+                                          )
                                         : null,
                                     borderRadius: BorderRadius.circular(6),
                                     child: Padding(
@@ -1625,7 +1658,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                       child: Icon(
                                         Icons.add_rounded,
                                         size: 16,
-                                        color: cartItem.quantity < cartItem.maxAvailableStock
+                                        color:
+                                            cartItem.quantity <
+                                                cartItem.maxAvailableStock
                                             ? const Color(0xFF475569)
                                             : const Color(0xFFCBD5E1),
                                       ),
@@ -1902,13 +1937,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 ),
                 DrawerProfileItem(
                   icon: Icons.add_business_rounded,
-                  label: 'Add & Manage Products',
+                  label: 'Manage Products',
                   action: ProfileAction.manageProducts,
                   onSelected: handleProfileAction,
                 ),
                 DrawerProfileItem(
                   icon: Icons.assignment_rounded,
-                  label: 'All Placed Customer Orders',
+                  label: 'Customer Orders',
                   action: ProfileAction.allOrders,
                   onSelected: handleProfileAction,
                 ),
@@ -2212,9 +2247,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                 ),
                                 const SizedBox(height: 6),
                                 const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 40,
-                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 40),
                                   child: Text(
                                     'When favorited items drop below 100 units in stock, you will receive real-time alerts here.',
                                     textAlign: TextAlign.center,
@@ -2239,9 +2272,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                               final alert = notifications[index];
                               return InkWell(
                                 onTap: () {
-                                  NotificationController().markAsRead(
-                                    alert.id,
-                                  );
+                                  NotificationController().markAsRead(alert.id);
                                   final matched = products.firstWhere(
                                     (p) => p.id == alert.productId,
                                     orElse: () => products.first,
@@ -2300,21 +2331,20 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                                 ),
                                                 Container(
                                                   padding:
-                                                      const EdgeInsets
-                                                          .symmetric(
-                                                    horizontal: 7,
-                                                    vertical: 2,
-                                                  ),
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 7,
+                                                        vertical: 2,
+                                                      ),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFFFEF2F2),
+                                                    color: const Color(
+                                                      0xFFFEF2F2,
+                                                    ),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                      6,
-                                                    ),
+                                                          6,
+                                                        ),
                                                     border: Border.all(
-                                                      color:
-                                                          const Color(
+                                                      color: const Color(
                                                         0xFFFCA5A5,
                                                       ),
                                                     ),
@@ -2340,8 +2370,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                                 height: 1.3,
                                               ),
                                               maxLines: 2,
-                                              overflow:
-                                                  TextOverflow.ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                             const SizedBox(height: 8),
                                             Row(
@@ -2353,11 +2382,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                                   'Tap to view product',
                                                   style: TextStyle(
                                                     fontSize: 11,
-                                                    fontWeight:
-                                                        FontWeight.w700,
-                                                    color: Theme.of(
-                                                      context,
-                                                    ).primaryColor,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
                                                   ),
                                                 ),
                                                 IconButton(
@@ -2371,8 +2398,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                                   onPressed: () {
                                                     NotificationController()
                                                         .removeNotification(
-                                                      alert.id,
-                                                    );
+                                                          alert.id,
+                                                        );
                                                   },
                                                 ),
                                               ],
@@ -2396,5 +2423,3 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     );
   }
 }
-
-

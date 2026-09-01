@@ -65,6 +65,8 @@ class ProductModel {
     this.variantName,
     this.tags = const [],
     this.variants = const [],
+    this.isDeleted = false,
+    this.deletedAt,
   });
 
   final String id;
@@ -86,6 +88,8 @@ class ProductModel {
   final String? variantName;
   final List<String> tags;
   final List<ProductVariantModel> variants;
+  final bool isDeleted;
+  final DateTime? deletedAt;
 
   bool get hasVariants => variants.isNotEmpty;
   bool get isLowStock => availableQty <= lowStockThreshold;
@@ -120,6 +124,10 @@ class ProductModel {
       variantName: json['variantName'] as String?,
       tags: List<String>.from(json['tags'] as List? ?? const []),
       variants: parsedVariants,
+      isDeleted: json['isDeleted'] as bool? ?? false,
+      deletedAt: json['deletedAt'] != null
+          ? DateTime.tryParse(json['deletedAt'].toString())
+          : null,
     );
   }
 
@@ -144,6 +152,8 @@ class ProductModel {
       'variantName': variantName,
       'tags': tags,
       'variants': variants.map((v) => v.toJson()).toList(),
+      'isDeleted': isDeleted,
+      if (deletedAt != null) 'deletedAt': deletedAt!.toIso8601String(),
     };
   }
 }
