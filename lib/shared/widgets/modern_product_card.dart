@@ -65,24 +65,25 @@ class QuantityAddControls extends StatelessWidget {
             border: Border.all(color: const Color(0xFFE2E8F0)),
             borderRadius: BorderRadius.circular(10),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               InkWell(
                 onTap: quantity > 1 ? onDecrease : null,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(8),
                 child: Padding(
-                  padding: const EdgeInsets.all(3),
+                  padding: const EdgeInsets.all(5),
                   child: Icon(
                     Icons.remove_rounded,
-                    size: 16,
+                    size: 19,
                     color: quantity > 1
-                        ? const Color(0xFF475569)
+                        ? const Color(0xFF334155)
                         : const Color(0xFFCBD5E1),
                   ),
                 ),
               ),
+              const SizedBox(width: 2),
               InkWell(
                 onTap: () async {
                   if (onSetQuantity != null) {
@@ -97,42 +98,43 @@ class QuantityAddControls extends StatelessWidget {
                     }
                   }
                 },
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  constraints: const BoxConstraints(minWidth: 32),
+                  constraints: const BoxConstraints(minWidth: 40),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
+                    horizontal: 8,
+                    vertical: 3,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: const Color(0xFFCBD5E1),
-                      width: 0.8,
+                      width: 1,
                     ),
                   ),
                   child: Text(
                     '$quantity',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14.5,
                       color: Color(0xFF0F766E),
                     ),
                   ),
                 ),
               ),
+              const SizedBox(width: 2),
               InkWell(
                 onTap: canIncrease ? onIncrease : null,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(8),
                 child: Padding(
-                  padding: const EdgeInsets.all(3),
+                  padding: const EdgeInsets.all(5),
                   child: Icon(
                     Icons.add_rounded,
-                    size: 16,
+                    size: 19,
                     color: canIncrease
-                        ? const Color(0xFF475569)
+                        ? const Color(0xFF334155)
                         : const Color(0xFFCBD5E1),
                   ),
                 ),
@@ -144,14 +146,14 @@ class QuantityAddControls extends StatelessWidget {
         Expanded(
           child: FilledButton.icon(
             onPressed: onAdd,
-            icon: const Icon(Icons.add_shopping_cart_rounded, size: 14),
+            icon: const Icon(Icons.add_shopping_cart_rounded, size: 13),
             label: const Text(
               'Add',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
             ),
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 8),
-              minimumSize: const Size(0, 36),
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+              minimumSize: const Size(0, 34),
               backgroundColor: const Color(0xFF0F766E),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

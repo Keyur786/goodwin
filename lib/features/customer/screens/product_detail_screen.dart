@@ -856,14 +856,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 onPressed: _quantity > 1
                                     ? () => setState(() => _quantity--)
                                     : null,
-                                icon: const Icon(Icons.remove_rounded, size: 18),
+                                icon: const Icon(Icons.remove_rounded, size: 22),
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: const Color(0xFF0F766E),
-                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.all(8),
+                                  visualDensity: VisualDensity.standard,
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 8),
                               InkWell(
                                 onTap: () async {
                                   final newQty = await showQuantityInputDialog(
@@ -878,19 +879,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     );
                                   }
                                 },
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(10),
                                 child: Container(
-                                  constraints: const BoxConstraints(minWidth: 44),
+                                  constraints: const BoxConstraints(minWidth: 50),
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
+                                    horizontal: 12,
+                                    vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       color: const Color(0xFFCBD5E1),
-                                      width: 1,
+                                      width: 1.2,
                                     ),
                                   ),
                                   child: Text(
@@ -898,22 +899,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w900,
-                                      fontSize: 16,
+                                      fontSize: 18,
                                       color: Color(0xFF0F766E),
                                     ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 8),
                               IconButton.filledTonal(
                                 onPressed: _quantity < activeStock
                                     ? () => setState(() => _quantity++)
                                     : null,
-                                icon: const Icon(Icons.add_rounded, size: 18),
+                                icon: const Icon(Icons.add_rounded, size: 22),
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: const Color(0xFF0F766E),
-                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.all(8),
+                                  visualDensity: VisualDensity.standard,
                                 ),
                               ),
                             ],
@@ -934,19 +936,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         );
                         Navigator.of(context).pop();
                       },
-                      icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
+                      icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
                       label: Text(
                         'Add $_quantity ${_quantity == 1 ? "unit" : "units"} to Cart • ₹${(_quantity * activePrice).toStringAsFixed(0)}',
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
-                          fontSize: 15,
+                          fontSize: 14.5,
                         ),
                       ),
                       style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(52),
+                        minimumSize: const Size.fromHeight(48),
                         backgroundColor: const Color(0xFF0F766E),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
                     ),
