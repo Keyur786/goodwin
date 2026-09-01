@@ -23,4 +23,9 @@ class CartItem {
     }
     return product.image;
   }
+
+  int get maxAvailableStock =>
+      selectedVariant != null ? selectedVariant!.availableQty : product.availableQty;
+
+  bool get isOutOfStock => maxAvailableStock <= 0;
 }

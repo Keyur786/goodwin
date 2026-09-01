@@ -13,17 +13,50 @@ class QuantityAddControls extends StatelessWidget {
     required this.onAdd,
     this.onSetQuantity,
     this.productName = '',
+    this.maxQuantity = 99999,
+    this.isOutOfStock = false,
   });
 
   final int quantity;
   final VoidCallback onDecrease;
-  final VoidCallback onIncrease;
+  final VoidCallback? onIncrease;
   final VoidCallback onAdd;
   final ValueChanged<int>? onSetQuantity;
   final String productName;
+  final int maxQuantity;
+  final bool isOutOfStock;
 
   @override
   Widget build(BuildContext context) {
+    if (isOutOfStock || maxQuantity <= 0) {
+      return SizedBox(
+        width: double.infinity,
+        height: 36,
+        child: OutlinedButton.icon(
+          onPressed: null,
+          icon: const Icon(Icons.block_rounded, size: 14, color: Color(0xFF94A3B8)),
+          label: const Text(
+            'Out of Stock',
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF94A3B8),
+            ),
+          ),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Color(0xFFE2E8F0)),
+            backgroundColor: const Color(0xFFF8FAFC),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+        ),
+      );
+    }
+
+    final canIncrease = onIncrease != null && quantity < maxQuantity;
+
     return Row(
       children: [
         Container(
@@ -37,14 +70,16 @@ class QuantityAddControls extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               InkWell(
-                onTap: onDecrease,
+                onTap: quantity > 1 ? onDecrease : null,
                 borderRadius: BorderRadius.circular(6),
-                child: const Padding(
-                  padding: EdgeInsets.all(3),
+                child: Padding(
+                  padding: const EdgeInsets.all(3),
                   child: Icon(
                     Icons.remove_rounded,
                     size: 16,
-                    color: Color(0xFF475569),
+                    color: quantity > 1
+                        ? const Color(0xFF475569)
+                        : const Color(0xFFCBD5E1),
                   ),
                 ),
               ),
@@ -55,6 +90,7 @@ class QuantityAddControls extends StatelessWidget {
                       context: context,
                       initialQuantity: quantity,
                       productName: productName,
+                      maxQuantity: maxQuantity,
                     );
                     if (newQty != null) {
                       onSetQuantity!(newQty);
@@ -88,14 +124,16 @@ class QuantityAddControls extends StatelessWidget {
                 ),
               ),
               InkWell(
-                onTap: onIncrease,
+                onTap: canIncrease ? onIncrease : null,
                 borderRadius: BorderRadius.circular(6),
-                child: const Padding(
-                  padding: EdgeInsets.all(3),
+                child: Padding(
+                  padding: const EdgeInsets.all(3),
                   child: Icon(
                     Icons.add_rounded,
                     size: 16,
-                    color: Color(0xFF475569),
+                    color: canIncrease
+                        ? const Color(0xFF475569)
+                        : const Color(0xFFCBD5E1),
                   ),
                 ),
               ),
@@ -291,13 +329,16 @@ class ModernProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     QuantityAddControls(
-                      quantity: quantity <= 0 ? 1 : quantity,
+                      quantity: quantity <= 0 ? 1 : quantity.clamp(1, product.availableQty > 0 ? product.availableQty : 1),
+                      maxQuantity: product.availableQty,
+                      isOutOfStock: product.availableQty <= 0,
                       onDecrease: () => onSetQuantity(quantity - 1),
-                      onIncrease: () =>
-                          onSetQuantity((quantity <= 0 ? 1 : quantity) + 1),
+                      onIncrease: quantity < product.availableQty
+                          ? () => onSetQuantity((quantity <= 0 ? 1 : quantity) + 1)
+                          : null,
                       onSetQuantity: onSetQuantity,
                       productName: product.name,
-                      onAdd: onAddToCart,
+                      onAdd: product.availableQty > 0 ? onAddToCart : () {},
                     ),
                   ],
                 ),

@@ -253,6 +253,16 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   }
 
   void setQuantity(String productId, int quantity) {
+    DemoProduct? matchedProduct;
+    for (final p in products) {
+      if (p.id == productId) {
+        matchedProduct = p;
+        break;
+      }
+    }
+    final maxStock = matchedProduct?.availableQty ?? 99999;
+    final clampedQty = maxStock > 0 ? quantity.clamp(1, maxStock) : 1;
+
     setState(() {
       CartItem? existingItem;
       for (final item in cart) {
@@ -267,13 +277,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           cart.remove(existingItem);
           productQuantities.remove(productId);
         } else {
-          existingItem.quantity = quantity;
+          existingItem.quantity = clampedQty;
         }
       } else {
         if (quantity <= 0) {
           productQuantities.remove(productId);
         } else {
-          productQuantities[productId] = quantity;
+          productQuantities[productId] = clampedQty;
         }
       }
     });
@@ -391,6 +401,22 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     int quantity = 1,
     ProductVariantModel? variant,
   }) {
+    final maxStock =
+        variant != null ? variant.availableQty : product.availableQty;
+    if (maxStock <= 0) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${product.name} is currently out of stock'),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
+
+    bool hitStockLimit = false;
     setState(() {
       CartItem? existingItem;
       for (final item in cart) {
@@ -403,15 +429,20 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
 
       final addQty = quantity <= 0 ? 1 : quantity;
       if (existingItem == null) {
+        final finalQty = addQty.clamp(1, maxStock);
+        if (finalQty < addQty) hitStockLimit = true;
         cart.add(
           CartItem(
             product: product,
-            quantity: addQty,
+            quantity: finalQty,
             selectedVariant: variant,
           ),
         );
       } else {
-        existingItem.quantity += addQty;
+        final proposed = existingItem.quantity + addQty;
+        final finalQty = proposed.clamp(1, maxStock);
+        if (finalQty < proposed) hitStockLimit = true;
+        existingItem.quantity = finalQty;
       }
       productQuantities.remove(product.id);
     });
@@ -421,7 +452,11 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${product.name}$variantSuffix added to cart'),
+        content: Text(
+          hitStockLimit
+              ? '${product.name}$variantSuffix: Max stock limit ($maxStock units) reached'
+              : '${product.name}$variantSuffix added to cart',
+        ),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -434,7 +469,10 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       if (quantity <= 0) {
         cart.remove(item);
       } else {
-        item.quantity = quantity;
+        item.quantity = quantity.clamp(
+          1,
+          item.maxAvailableStock > 0 ? item.maxAvailableStock : 1,
+        );
       }
     });
     _saveCartToFirestore();
@@ -1467,6 +1505,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                             context: context,
                                             initialQuantity: cartItem.quantity,
                                             productName: cartItem.displayName,
+                                            maxQuantity: cartItem.maxAvailableStock,
                                           );
                                       if (newQty != null) {
                                         updateCartQuantity(cartItem, newQty);
@@ -1501,17 +1540,21 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                     ),
                                   ),
                                   InkWell(
-                                    onTap: () => updateCartQuantity(
-                                      cartItem,
-                                      cartItem.quantity + 1,
-                                    ),
+                                    onTap: cartItem.quantity < cartItem.maxAvailableStock
+                                        ? () => updateCartQuantity(
+                                              cartItem,
+                                              cartItem.quantity + 1,
+                                            )
+                                        : null,
                                     borderRadius: BorderRadius.circular(6),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(3),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3),
                                       child: Icon(
                                         Icons.add_rounded,
                                         size: 16,
-                                        color: Color(0xFF475569),
+                                        color: cartItem.quantity < cartItem.maxAvailableStock
+                                            ? const Color(0xFF475569)
+                                            : const Color(0xFFCBD5E1),
                                       ),
                                     ),
                                   ),

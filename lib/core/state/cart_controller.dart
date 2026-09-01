@@ -50,6 +50,10 @@ class CartController extends ChangeNotifier {
     if (userId != null) _currentUserId = userId;
     if (quantity <= 0) return;
 
+    final maxStock =
+        variant != null ? variant.availableQty : product.availableQty;
+    if (maxStock <= 0) return;
+
     final targetVariantId = variant?.id;
     final index = _items.indexWhere(
       (item) =>
@@ -58,12 +62,13 @@ class CartController extends ChangeNotifier {
     );
 
     if (index >= 0) {
-      _items[index].quantity += quantity;
+      _items[index].quantity =
+          (_items[index].quantity + quantity).clamp(1, maxStock);
     } else {
       _items.add(
         CartItem(
           product: product,
-          quantity: quantity,
+          quantity: quantity.clamp(1, maxStock),
           selectedVariant: variant,
         ),
       );
@@ -99,15 +104,20 @@ class CartController extends ChangeNotifier {
     }
 
     if (index >= 0) {
-      _items[index].quantity = quantity;
+      final maxStock = _items[index].maxAvailableStock;
+      _items[index].quantity = quantity.clamp(1, maxStock > 0 ? maxStock : 1);
     } else if (productFallback != null) {
-      _items.add(
-        CartItem(
-          product: productFallback,
-          quantity: quantity,
-          selectedVariant: variant,
-        ),
-      );
+      final maxStock =
+          variant != null ? variant.availableQty : productFallback.availableQty;
+      if (maxStock > 0) {
+        _items.add(
+          CartItem(
+            product: productFallback,
+            quantity: quantity.clamp(1, maxStock),
+            selectedVariant: variant,
+          ),
+        );
+      }
     }
 
     notifyListeners();

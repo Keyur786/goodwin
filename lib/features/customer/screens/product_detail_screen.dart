@@ -438,6 +438,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 setState(() {
                                   _selectedVariant = v;
                                   _currentImageIndex = 0;
+                                  if (_quantity > v.availableQty && v.availableQty > 0) {
+                                    _quantity = v.availableQty;
+                                  }
                                   if (_imagePageController.hasClients) {
                                     _imagePageController.jumpToPage(0);
                                   }
@@ -765,119 +768,189 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 20),
 
                   // Quantity Selector with Direct Type Input
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Select Quantity:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1E293B),
-                          ),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton.filledTonal(
-                              onPressed: _quantity > 1
-                                  ? () => setState(() => _quantity--)
-                                  : null,
-                              icon: const Icon(Icons.remove_rounded, size: 18),
-                              style: IconButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF0F766E),
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            InkWell(
-                              onTap: () async {
-                                final newQty = await showQuantityInputDialog(
-                                  context: context,
-                                  initialQuantity: _quantity,
-                                  productName: product.name,
-                                );
-                                if (newQty != null) {
-                                  setState(() => _quantity = newQty);
-                                }
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                constraints: const BoxConstraints(minWidth: 44),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: const Color(0xFFCBD5E1),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Text(
-                                  '$_quantity',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 16,
-                                    color: Color(0xFF0F766E),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            IconButton.filledTonal(
-                              onPressed: () => setState(() => _quantity++),
-                              icon: const Icon(Icons.add_rounded, size: 18),
-                              style: IconButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF0F766E),
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Add to Cart Button with dynamic quantity & total price
-                  FilledButton.icon(
-                    onPressed: () {
-                      widget.onAddToCart(
-                        product,
-                        quantity: _quantity,
-                        variant: _selectedVariant,
-                      );
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
-                    label: Text(
-                      'Add $_quantity ${_quantity == 1 ? "unit" : "units"} to Cart • ₹${(_quantity * activePrice).toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                      ),
-                    ),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(52),
-                      backgroundColor: const Color(0xFF0F766E),
-                      shape: RoundedRectangleBorder(
+                  if (activeStock <= 0) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF2F2),
                         borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFFCA5A5)),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.block_rounded,
+                            size: 18,
+                            color: Color(0xFFDC2626),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Currently Out of Stock',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFDC2626),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 14),
+                    FilledButton.icon(
+                      onPressed: null,
+                      icon: const Icon(Icons.remove_shopping_cart_rounded, size: 18),
+                      label: const Text(
+                        'Out of Stock',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        disabledBackgroundColor: const Color(0xFFE2E8F0),
+                        disabledForegroundColor: const Color(0xFF94A3B8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Select Quantity:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF1E293B),
+                                ),
+                              ),
+                              Text(
+                                'Max $activeStock available',
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton.filledTonal(
+                                onPressed: _quantity > 1
+                                    ? () => setState(() => _quantity--)
+                                    : null,
+                                icon: const Icon(Icons.remove_rounded, size: 18),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF0F766E),
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              InkWell(
+                                onTap: () async {
+                                  final newQty = await showQuantityInputDialog(
+                                    context: context,
+                                    initialQuantity: _quantity,
+                                    productName: product.name,
+                                    maxQuantity: activeStock,
+                                  );
+                                  if (newQty != null) {
+                                    setState(
+                                      () => _quantity = newQty.clamp(1, activeStock),
+                                    );
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  constraints: const BoxConstraints(minWidth: 44),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: const Color(0xFFCBD5E1),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '$_quantity',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 16,
+                                      color: Color(0xFF0F766E),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              IconButton.filledTonal(
+                                onPressed: _quantity < activeStock
+                                    ? () => setState(() => _quantity++)
+                                    : null,
+                                icon: const Icon(Icons.add_rounded, size: 18),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF0F766E),
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Add to Cart Button with dynamic quantity & total price
+                    FilledButton.icon(
+                      onPressed: () {
+                        final clampedQty = _quantity.clamp(1, activeStock);
+                        widget.onAddToCart(
+                          product,
+                          quantity: clampedQty,
+                          variant: _selectedVariant,
+                        );
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
+                      label: Text(
+                        'Add $_quantity ${_quantity == 1 ? "unit" : "units"} to Cart • ₹${(_quantity * activePrice).toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        backgroundColor: const Color(0xFF0F766E),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
