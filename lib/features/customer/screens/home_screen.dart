@@ -30,8 +30,13 @@ import 'package:goodwin/shared/widgets/profile_avatar_widget.dart';
 
 class DemoHomeScreen extends StatefulWidget {
   final VoidCallback onLogout;
+  final int initialIndex;
 
-  const DemoHomeScreen({super.key, required this.onLogout});
+  const DemoHomeScreen({
+    super.key,
+    required this.onLogout,
+    this.initialIndex = 0,
+  });
 
   @override
   State<DemoHomeScreen> createState() => _DemoHomeScreenState();
@@ -64,6 +69,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   @override
   void initState() {
     super.initState();
+    selectedIndex = widget.initialIndex;
     _initFirebaseData();
   }
 
@@ -79,88 +85,94 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   }
 
   Future<void> _initFirebaseData() async {
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-    if (firebaseUser != null) {
-      NotificationController().setUserId(firebaseUser.uid);
-      // 1. Ensure user has a profile and unique 6-alphabet username in Firestore
-      final user = await _userRepository.getOrCreateUser(firebaseUser);
-      if (mounted) {
-        setState(() {
-          currentUser = user;
-          favoriteIds.addAll(user.favorites);
-        });
-        NotificationController().syncFromUserData(user.notifications);
-        _checkLowStockFavorites();
-      }
-
-      // Listen for real-time user updates (profile changes, username changes)
-      _userSub = _userRepository.streamUser(firebaseUser.uid).listen((user) {
-        if (user != null && mounted) {
+    try {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser != null) {
+        NotificationController().setUserId(firebaseUser.uid);
+        // 1. Ensure user has a profile and unique 6-alphabet username in Firestore
+        final user = await _userRepository.getOrCreateUser(firebaseUser);
+        if (mounted) {
           setState(() {
             currentUser = user;
-            favoriteIds.clear();
             favoriteIds.addAll(user.favorites);
           });
           NotificationController().syncFromUserData(user.notifications);
-          _syncCartFromUserData(user.cart);
           _checkLowStockFavorites();
         }
-      });
-    }
 
-    // 2. Stream products from Firestore
-    _productsSub = _productRepository.streamProducts().listen(
-      (firestoreProducts) {
-        if (mounted) {
-          setState(() {
-            isLoadingProducts = false;
-            products = firestoreProducts
-                .map((p) => DemoProduct.fromProductModel(p))
-                .toList();
-
-            if (categoryTabs.length <= 1 && products.isNotEmpty) {
-              final dynamicCats = products
-                  .map((p) => p.category)
-                  .toSet()
-                  .toList();
-              categoryTabs = ['All', ...dynamicCats];
-            }
-          });
-          if (currentUser != null && currentUser!.cart.isNotEmpty) {
-            _syncCartFromUserData(currentUser!.cart);
+        // Listen for real-time user updates (profile changes, username changes)
+        _userSub = _userRepository.streamUser(firebaseUser.uid).listen((user) {
+          if (user != null && mounted) {
+            setState(() {
+              currentUser = user;
+              favoriteIds.clear();
+              favoriteIds.addAll(user.favorites);
+            });
+            NotificationController().syncFromUserData(user.notifications);
+            _syncCartFromUserData(user.cart);
+            _checkLowStockFavorites();
           }
-          _checkLowStockFavorites();
-        }
-      },
-      onError: (_) {
-        if (mounted) setState(() => isLoadingProducts = false);
-      },
-    );
-
-    // 3. Stream categories from Firestore
-    _categoriesSub = _productRepository.streamCategories().listen((
-      firestoreCategories,
-    ) {
-      if (firestoreCategories.isNotEmpty && mounted) {
-        setState(() {
-          final catNames = firestoreCategories
-              .map((c) => c.name)
-              .toSet()
-              .toList();
-          categoryTabs = ['All', ...catNames];
         });
       }
-    });
 
-    // 4. Timeout safeguard to never keep user stuck on loading spinner
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted && isLoadingProducts && products.isEmpty) {
+      // 2. Stream products from Firestore
+      _productsSub = _productRepository.streamProducts().listen(
+        (firestoreProducts) {
+          if (mounted) {
+            setState(() {
+              isLoadingProducts = false;
+              products = firestoreProducts
+                  .map((p) => DemoProduct.fromProductModel(p))
+                  .toList();
+
+              if (categoryTabs.length <= 1 && products.isNotEmpty) {
+                final dynamicCats = products
+                    .map((p) => p.category)
+                    .toSet()
+                    .toList();
+                categoryTabs = ['All', ...dynamicCats];
+              }
+            });
+            if (currentUser != null && currentUser!.cart.isNotEmpty) {
+              _syncCartFromUserData(currentUser!.cart);
+            }
+            _checkLowStockFavorites();
+          }
+        },
+        onError: (_) {
+          if (mounted) setState(() => isLoadingProducts = false);
+        },
+      );
+
+      // 3. Stream categories from Firestore
+      _categoriesSub = _productRepository.streamCategories().listen((
+        firestoreCategories,
+      ) {
+        if (firestoreCategories.isNotEmpty && mounted) {
+          setState(() {
+            final catNames = firestoreCategories
+                .map((c) => c.name)
+                .toSet()
+                .toList();
+            categoryTabs = ['All', ...catNames];
+          });
+        }
+      });
+
+      // 4. Timeout safeguard to never keep user stuck on loading spinner
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted && isLoadingProducts && products.isEmpty) {
+          setState(() => isLoadingProducts = false);
+        }
+      });
+
+      // 5. Ensure catalog is seeded to Firestore
+      unawaited(_productRepository.seedDemoDataIfNeeded());
+    } catch (_) {
+      if (mounted) {
         setState(() => isLoadingProducts = false);
       }
-    });
-
-    // 5. Ensure catalog is seeded to Firestore
-    unawaited(_productRepository.seedDemoDataIfNeeded());
+    }
   }
 
   void _syncCartFromUserData(List<Map<String, dynamic>> savedCart) {
@@ -552,16 +564,114 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     );
   }
 
-  void updateCartQuantity(CartItem item, int quantity) {
-    setState(() {
-      if (quantity <= 0) {
-        cart.remove(item);
-      } else {
-        item.quantity = quantity.clamp(
-          1,
-          item.maxAvailableStock > 0 ? item.maxAvailableStock : 1,
+  Future<bool> confirmRemoveFromCart(CartItem item) async {
+    final shouldRemove = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFFCA5A5)),
+              ),
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: Color(0xFFDC2626),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Remove from Cart?',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF0F172A),
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to remove "${item.displayName}" from your cart?',
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.4,
+            color: Color(0xFF475569),
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx, false),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+            child: const Text(
+              'Keep in Cart',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF64748B),
+              ),
+            ),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dialogCtx, true),
+            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+            label: const Text(
+              'Remove',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldRemove == true) {
+      removeFromCart(item);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Removed "${item.displayName}" from cart'),
+            action: SnackBarAction(
+              label: 'Undo',
+              textColor: const Color(0xFF99F6E4),
+              onPressed: () {
+                setState(() => cart.add(item));
+                _saveCartToFirestore();
+              },
+            ),
+            duration: const Duration(seconds: 4),
+          ),
         );
       }
+      return true;
+    }
+    return false;
+  }
+
+  void updateCartQuantity(CartItem item, int quantity) {
+    if (quantity <= 0) {
+      confirmRemoveFromCart(item);
+      return;
+    }
+    setState(() {
+      item.quantity = quantity.clamp(
+        1,
+        item.maxAvailableStock > 0 ? item.maxAvailableStock : 1,
+      );
     });
     _saveCartToFirestore();
   }
@@ -1577,30 +1687,37 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                 border: Border.all(
                                   color: const Color(0xFFE2E8F0),
                                 ),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 2,
-                                vertical: 1,
+                                horizontal: 5,
+                                vertical: 3,
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   InkWell(
-                                    onTap: () => updateCartQuantity(
-                                      cartItem,
-                                      cartItem.quantity - 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(3),
+                                    onTap: cartItem.quantity > 1
+                                        ? () => updateCartQuantity(
+                                            cartItem,
+                                            cartItem.quantity - 1,
+                                          )
+                                        : () => confirmRemoveFromCart(cartItem),
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5),
                                       child: Icon(
-                                        Icons.remove_rounded,
-                                        size: 16,
-                                        color: Color(0xFF475569),
+                                        cartItem.quantity > 1
+                                            ? Icons.remove_rounded
+                                            : Icons.delete_outline_rounded,
+                                        size: 19,
+                                        color: cartItem.quantity > 1
+                                            ? const Color(0xFF334155)
+                                            : const Color(0xFFDC2626),
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(width: 2),
                                   InkWell(
                                     onTap: () async {
                                       final newQty =
@@ -1612,24 +1729,28 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                                 cartItem.maxAvailableStock,
                                           );
                                       if (newQty != null) {
-                                        updateCartQuantity(cartItem, newQty);
+                                        if (newQty == 0) {
+                                          confirmRemoveFromCart(cartItem);
+                                        } else {
+                                          updateCartQuantity(cartItem, newQty);
+                                        }
                                       }
                                     },
-                                    borderRadius: BorderRadius.circular(6),
+                                    borderRadius: BorderRadius.circular(8),
                                     child: Container(
                                       constraints: const BoxConstraints(
-                                        minWidth: 28,
+                                        minWidth: 34,
                                       ),
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 1,
+                                        horizontal: 8,
+                                        vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(6),
+                                        borderRadius: BorderRadius.circular(8),
                                         border: Border.all(
                                           color: const Color(0xFFCBD5E1),
-                                          width: 0.8,
+                                          width: 1,
                                         ),
                                       ),
                                       child: Text(
@@ -1637,12 +1758,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w800,
-                                          fontSize: 14,
+                                          fontSize: 15,
                                           color: Color(0xFF0F766E),
                                         ),
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(width: 2),
                                   InkWell(
                                     onTap:
                                         cartItem.quantity <
@@ -1652,16 +1774,16 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                             cartItem.quantity + 1,
                                           )
                                         : null,
-                                    borderRadius: BorderRadius.circular(6),
+                                    borderRadius: BorderRadius.circular(8),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(3),
+                                      padding: const EdgeInsets.all(5),
                                       child: Icon(
                                         Icons.add_rounded,
-                                        size: 16,
+                                        size: 19,
                                         color:
                                             cartItem.quantity <
                                                 cartItem.maxAvailableStock
-                                            ? const Color(0xFF475569)
+                                            ? const Color(0xFF334155)
                                             : const Color(0xFFCBD5E1),
                                       ),
                                     ),
@@ -1682,17 +1804,17 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                             style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 16,
-                              color: Color(0xFF0F172A),
+                              color: Color(0xFF0F766E),
                             ),
                           ),
                           const SizedBox(height: 8),
                           IconButton(
-                            onPressed: () => removeFromCart(cartItem),
+                            onPressed: () => confirmRemoveFromCart(cartItem),
                             icon: const Icon(
                               Icons.delete_outline_rounded,
-                              size: 20,
+                              size: 22,
                             ),
-                            color: Colors.red.shade600,
+                            color: const Color(0xFFDC2626),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             tooltip: 'Remove item',
