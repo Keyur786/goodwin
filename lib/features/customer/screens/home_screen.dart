@@ -1303,55 +1303,67 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 10,
-            runSpacing: 8,
+          Row(
             children: [
-              FilledButton.icon(
-                onPressed: () => showBulkOrderInquiryDialog(
-                  context: context,
-                  currentUser: currentUser,
-                ),
-                icon: const Icon(LucideIcons.messageSquare, size: 16),
-                label: const Text(
-                  'Request Bulk Quote',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF2563EB),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => showBulkOrderInquiryDialog(
+                    context: context,
+                    currentUser: currentUser,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  icon: const Icon(LucideIcons.messageSquare, size: 15),
+                  label: const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'Request Bulk Quote',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF2563EB),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 11,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
-              OutlinedButton.icon(
-                onPressed: () => setState(() => selectedIndex = 1),
-                icon: const Icon(
-                  LucideIcons.layoutGrid,
-                  size: 16,
-                  color: Colors.white,
-                ),
-                label: const Text(
-                  'Explore Catalog',
-                  style: TextStyle(
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => setState(() => selectedIndex = 1),
+                  icon: const Icon(
+                    LucideIcons.layoutGrid,
+                    size: 15,
                     color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
                   ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF93C5FD), width: 1.2),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
+                  label: const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'Explore Catalog',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12.5,
+                      ),
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF93C5FD), width: 1.2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 11,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
