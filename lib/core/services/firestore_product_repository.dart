@@ -5,9 +5,12 @@ import 'package:goodwin/models/product_model.dart';
 
 class FirestoreProductRepository {
   FirestoreProductRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _customFirestore = firestore;
 
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _customFirestore;
+
+  FirebaseFirestore get _firestore =>
+      _customFirestore ?? FirebaseFirestore.instance;
 
   Stream<List<CategoryModel>> streamCategories() {
     return _firestore.collection('categories').snapshots().map((snapshot) {
@@ -133,6 +136,30 @@ class FirestoreProductRepository {
     await _firestore.collection('products').doc(id).update({
       'availableQty': newStock,
       'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> submitBulkInquiry({
+    required String contactName,
+    required String shopName,
+    required String phone,
+    required String categoryOrProduct,
+    required String quantityRange,
+    String notes = '',
+    String? userId,
+  }) async {
+    final inquiryId = 'inq_${DateTime.now().millisecondsSinceEpoch}';
+    await _firestore.collection('bulk_inquiries').doc(inquiryId).set({
+      'id': inquiryId,
+      'userId': userId ?? '',
+      'contactName': contactName.trim(),
+      'shopName': shopName.trim(),
+      'phone': phone.trim(),
+      'categoryOrProduct': categoryOrProduct.trim(),
+      'quantityRange': quantityRange.trim(),
+      'notes': notes.trim(),
+      'status': 'pending',
+      'createdAt': FieldValue.serverTimestamp(),
     });
   }
 

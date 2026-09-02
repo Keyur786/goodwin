@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 enum ProductSortOption {
   featured('Featured', Icons.auto_awesome_rounded),
+  categoryAZ('Category: A to Z', Icons.category_rounded),
   priceLowHigh('Price: Low to High', Icons.arrow_upward_rounded),
   priceHighLow('Price: High to Low', Icons.arrow_downward_rounded),
   discountHighLow('Highest Savings', Icons.percent_rounded),
