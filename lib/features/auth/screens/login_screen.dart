@@ -498,23 +498,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 76,
-          height: 76,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(8),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        // Logo
+        Center(
+          child: Image.asset(
+            'assets/goodwin_logo.png',
+            width: 160,
+            height: 100,
+            fit: BoxFit.contain,
           ),
-          child: Image.asset('assets/logo.png', fit: BoxFit.contain),
         ),
         const SizedBox(height: 20),
         const Text(
