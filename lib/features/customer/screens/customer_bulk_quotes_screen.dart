@@ -27,6 +27,18 @@ class CustomerBulkQuotesScreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Could not load inquiries.\n${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13),
+                ),
+              ),
+            );
+          }
           final inquiries = snapshot.data ?? [];
           if (inquiries.isEmpty) {
             return Center(

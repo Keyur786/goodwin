@@ -176,14 +176,25 @@ class FirestoreProductRepository {
         .map((snap) => snap.docs.map((d) => {'id': d.id, ...d.data()}).toList());
   }
 
-  // --- Customer: stream their own inquiries ---
+  // --- Customer: stream their own inquiries (sorted client-side to avoid index) ---
   Stream<List<Map<String, dynamic>>> streamMyBulkInquiries(String userId) {
     return _firestore
         .collection('bulk_inquiries')
         .where('userId', isEqualTo: userId)
-        .orderBy('lastMessageAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs.map((d) => {'id': d.id, ...d.data()}).toList());
+        .map((snap) {
+      final docs = snap.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+      docs.sort((a, b) {
+        final aTs = a['lastMessageAt'];
+        final bTs = b['lastMessageAt'];
+        if (aTs == null && bTs == null) return 0;
+        if (aTs == null) return 1;
+        if (bTs == null) return -1;
+        // Timestamp comparison: newer first
+        return (bTs as dynamic).compareTo(aTs as dynamic) as int;
+      });
+      return docs;
+    });
   }
 
   // --- Stream messages sub-collection ---
