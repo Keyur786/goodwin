@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:goodwin/core/services/firestore_user_repository.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/profile_avatar_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum _AuthStep { phone, otp, profile }
 
@@ -445,7 +446,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           child: Center(
             child: isDone
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                ? const Icon(LucideIcons.check, size: 16, color: Colors.white)
                 : Text(
                     '$stepNumber',
                     style: TextStyle(
@@ -550,7 +551,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: InputDecoration(
             hintText: '10-digit mobile number',
             prefixIcon: const Icon(
-              Icons.phone_iphone_rounded,
+              LucideIcons.smartphone,
               color: Color(0xFF2563EB),
             ),
             filled: true,
@@ -585,7 +586,7 @@ class _LoginScreenState extends State<LoginScreen> {
           width: double.infinity,
           child: FilledButton.icon(
             onPressed: !_isLoading ? _sendOtp : null,
-            icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+            icon: const Icon(LucideIcons.arrowRight, size: 18),
             label: _isLoading
                 ? const SizedBox(
                     height: 20,
@@ -642,7 +643,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
-                  Icons.arrow_back_rounded,
+                  LucideIcons.arrowLeft,
                   size: 18,
                   color: Color(0xFF2563EB),
                 ),
@@ -736,7 +737,7 @@ class _LoginScreenState extends State<LoginScreen> {
           width: double.infinity,
           child: FilledButton.icon(
             onPressed: !_isLoading ? _verifyOtp : null,
-            icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+            icon: const Icon(LucideIcons.circleCheck, size: 18),
             label: _isLoading
                 ? const SizedBox(
                     height: 20,
@@ -821,8 +822,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Icon(
                         _selectedPhotoUrl != null
-                            ? Icons.edit_rounded
-                            : Icons.add_a_photo_rounded,
+                            ? LucideIcons.pencil
+                            : LucideIcons.camera,
                         size: 15,
                         color: const Color(0xFF2563EB),
                       ),
@@ -861,7 +862,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: InputDecoration(
             hintText: 'e.g. First and Lastname',
             prefixIcon: const Icon(
-              Icons.person_outline_rounded,
+              LucideIcons.user,
               color: Color(0xFF2563EB),
             ),
             filled: true,
@@ -917,7 +918,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: InputDecoration(
             hintText: 'e.g. abc@gmail.com (optional)',
             prefixIcon: const Icon(
-              Icons.email_outlined,
+              LucideIcons.mail,
               color: Color(0xFF2563EB),
             ),
             filled: true,
@@ -952,7 +953,7 @@ class _LoginScreenState extends State<LoginScreen> {
           width: double.infinity,
           child: FilledButton.icon(
             onPressed: !_isLoading ? _completeProfile : null,
-            icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+            icon: const Icon(LucideIcons.arrowRight, size: 18),
             label: _isLoading
                 ? const SizedBox(
                     height: 20,

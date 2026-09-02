@@ -4,6 +4,7 @@ import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
 import 'package:goodwin/shared/widgets/wholesale_invoice_sheet.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminAllOrdersScreen extends StatefulWidget {
   const AdminAllOrdersScreen({super.key});
@@ -119,11 +120,11 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
             labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
             tabs: [
               Tab(
-                icon: Icon(Icons.storefront_rounded, size: 20),
+                icon: Icon(LucideIcons.store, size: 20),
                 text: 'Warehouse Orders',
               ),
               Tab(
-                icon: Icon(Icons.local_shipping_rounded, size: 20),
+                icon: Icon(LucideIcons.truck, size: 20),
                 text: 'Online Orders',
               ),
             ],
@@ -151,7 +152,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search warehouse orders, phone, code...',
                   prefixIcon: const Icon(
-                    Icons.search_rounded,
+                    LucideIcons.search,
                     color: Color(0xFF2563EB),
                   ),
                   filled: true,
@@ -194,7 +195,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
               }
 
               var orders = (snapshot.data ?? [])
-                  .where((o) => o.isWarehouseOrder)
+                  .where((o) => !o.isOnlineOrder)
                   .toList();
 
               // Status Filter
@@ -232,7 +233,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.storefront_outlined,
+                          LucideIcons.store,
                           size: 64,
                           color: Colors.grey,
                         ),
@@ -409,8 +410,8 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                   children: [
                                     Icon(
                                       isDelivered
-                                          ? Icons.check_circle_rounded
-                                          : Icons.storefront_rounded,
+                                          ? LucideIcons.circleCheck
+                                          : LucideIcons.store,
                                       size: 13,
                                       color: isDelivered
                                           ? const Color(0xFF16A34A)
@@ -537,7 +538,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                             width: double.infinity,
                             child: OutlinedButton.icon(
                               onPressed: () => showWholesaleInvoiceModal(context, order),
-                              icon: const Icon(Icons.receipt_long_rounded, size: 16),
+                              icon: const Icon(LucideIcons.receipt, size: 16),
                               label: const Text('View Wholesale Invoice / PO'),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: const Color(0xFF2563EB),
@@ -630,7 +631,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                                 right: 5,
                                               ),
                                               child: Icon(
-                                                Icons.check_circle_rounded,
+                                                LucideIcons.circleCheck,
                                                 size: 14,
                                                 color: Colors.white,
                                               ),
@@ -695,7 +696,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search online orders, address, payment ID...',
                   prefixIcon: const Icon(
-                    Icons.search_rounded,
+                    LucideIcons.search,
                     color: Color(0xFF2563EB),
                   ),
                   filled: true,
@@ -781,7 +782,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.local_shipping_outlined,
+                          LucideIcons.truck,
                           size: 64,
                           color: Colors.grey,
                         ),
@@ -895,19 +896,19 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                     badgeText = const Color(0xFF16A34A);
                     badgeBorder = const Color(0xFF86EFAC);
                     badgeLabel = 'DELIVERED';
-                    badgeIcon = Icons.check_circle_rounded;
+                    badgeIcon = LucideIcons.circleCheck;
                   } else if (isInDelivery) {
                     badgeBg = const Color(0xFFFEF3C7);
                     badgeText = const Color(0xFFD97706);
                     badgeBorder = const Color(0xFFFCD34D);
                     badgeLabel = 'IN DELIVERY';
-                    badgeIcon = Icons.local_shipping_rounded;
+                    badgeIcon = LucideIcons.truck;
                   } else {
                     badgeBg = const Color(0xFFDBEAFE);
                     badgeText = const Color(0xFF2563EB);
                     badgeBorder = const Color(0xFF93C5FD);
                     badgeLabel = 'CONFIRMED';
-                    badgeIcon = Icons.inventory_2_rounded;
+                    badgeIcon = LucideIcons.package;
                   }
 
                   return Card(
@@ -1049,7 +1050,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Icon(
-                                      Icons.location_on_rounded,
+                                      LucideIcons.mapPin,
                                       color: Color(0xFF2563EB),
                                       size: 15,
                                     ),
@@ -1219,7 +1220,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                                 right: 3,
                                               ),
                                               child: Icon(
-                                                Icons.local_shipping_rounded,
+                                                LucideIcons.truck,
                                                 size: 13,
                                                 color: Colors.white,
                                               ),
@@ -1273,7 +1274,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                                 right: 3,
                                               ),
                                               child: Icon(
-                                                Icons.check_circle_rounded,
+                                                LucideIcons.circleCheck,
                                                 size: 13,
                                                 color: Colors.white,
                                               ),

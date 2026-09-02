@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
 import 'package:goodwin/models/user_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 Future<void> showBulkOrderInquiryDialog({
   required BuildContext context,
@@ -144,7 +145,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.check_circle_rounded,
+              LucideIcons.checkCircle,
               color: Color(0xFF2563EB),
               size: 54,
             ),
@@ -181,7 +182,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
             ),
             child: const Row(
               children: [
-                Icon(Icons.headset_mic_rounded, color: Color(0xFF2563EB), size: 24),
+                Icon(LucideIcons.headphones, color: Color(0xFF2563EB), size: 24),
                 SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -250,7 +251,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.inventory_2_rounded,
+                    LucideIcons.boxes,
                     color: Color(0xFF2563EB),
                     size: 24,
                   ),
@@ -280,7 +281,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: const Icon(LucideIcons.x),
                   color: const Color(0xFF64748B),
                 ),
               ],
@@ -416,7 +417,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
               keyboardType: TextInputType.phone,
               decoration: InputDecoration(
                 hintText: 'e.g. 9876543210',
-                prefixIcon: const Icon(Icons.phone_rounded, size: 20),
+                prefixIcon: const Icon(LucideIcons.phone, size: 18),
                 filled: true,
                 fillColor: const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(

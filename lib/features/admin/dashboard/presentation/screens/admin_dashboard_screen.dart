@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goodwin/features/admin/dashboard/providers/dashboard_provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
@@ -69,7 +70,7 @@ class AdminDashboardScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Card(
                 child: ListTile(
-                  leading: const Icon(Icons.qr_code_scanner),
+                  leading: const Icon(LucideIcons.scanLine),
                   title: const Text('Scan Pickup'),
                   onTap: () => context.push('/admin/pickup'),
                 ),
@@ -77,7 +78,7 @@ class AdminDashboardScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               Card(
                 child: ListTile(
-                  leading: const Icon(Icons.receipt_long_outlined),
+                  leading: const Icon(LucideIcons.receiptText),
                   title: const Text('Orders'),
                   onTap: () => context.push('/admin/orders'),
                 ),
@@ -85,7 +86,7 @@ class AdminDashboardScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               Card(
                 child: ListTile(
-                  leading: const Icon(Icons.inventory_2_outlined),
+                  leading: const Icon(LucideIcons.package),
                   title: const Text('Inventory'),
                   onTap: () => context.push('/admin/inventory'),
                 ),

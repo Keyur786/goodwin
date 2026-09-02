@@ -3,6 +3,7 @@ import 'package:goodwin/core/utils/quantity_dialog.dart';
 import 'package:goodwin/core/utils/stock_formatter.dart';
 import 'package:goodwin/models/demo_product.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class QuantityAddControls extends StatelessWidget {
   const QuantityAddControls({
@@ -34,7 +35,7 @@ class QuantityAddControls extends StatelessWidget {
         height: 36,
         child: OutlinedButton.icon(
           onPressed: null,
-          icon: const Icon(Icons.block_rounded, size: 14, color: Color(0xFF94A3B8)),
+          icon: const Icon(LucideIcons.ban, size: 14, color: Color(0xFF94A3B8)),
           label: const Text(
             'Out of Stock',
             style: TextStyle(
@@ -75,8 +76,8 @@ class QuantityAddControls extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(5),
                   child: Icon(
-                    Icons.remove_rounded,
-                    size: 19,
+                    LucideIcons.minus,
+                    size: 17,
                     color: quantity > 1
                         ? const Color(0xFF334155)
                         : const Color(0xFFCBD5E1),
@@ -131,8 +132,8 @@ class QuantityAddControls extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(5),
                   child: Icon(
-                    Icons.add_rounded,
-                    size: 19,
+                    LucideIcons.plus,
+                    size: 17,
                     color: canIncrease
                         ? const Color(0xFF334155)
                         : const Color(0xFFCBD5E1),
@@ -146,7 +147,7 @@ class QuantityAddControls extends StatelessWidget {
         Expanded(
           child: FilledButton.icon(
             onPressed: onAdd,
-            icon: const Icon(Icons.add_shopping_cart_rounded, size: 13),
+            icon: const Icon(LucideIcons.plus, size: 14),
             label: const Text(
               'Add',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
@@ -272,13 +273,11 @@ class ModernProductCard extends StatelessWidget {
                         IconButton(
                           onPressed: onToggleFavorite,
                           icon: Icon(
-                            isFavorite
-                                ? Icons.favorite_rounded
-                                : Icons.favorite_border_rounded,
+                            LucideIcons.heart,
                             color: isFavorite
                                 ? Colors.red.shade600
                                 : const Color(0xFF94A3B8),
-                            size: 22,
+                            size: 20,
                           ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),

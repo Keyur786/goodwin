@@ -4,6 +4,7 @@ import 'package:goodwin/features/admin/dialogs/add_edit_product_dialog.dart';
 import 'package:goodwin/features/admin/dialogs/admin_pin_dialog.dart';
 import 'package:goodwin/models/product_model.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminProductManagerScreen extends StatefulWidget {
   const AdminProductManagerScreen({super.key});
@@ -56,7 +57,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
-                  Icons.add_rounded,
+                  LucideIcons.plus,
                   color: Colors.white,
                   size: 20,
                 ),
@@ -217,7 +218,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.inventory_2_outlined,
+                                  LucideIcons.package,
                                   size: 16,
                                   color: _currentTab == 0
                                       ? const Color(0xFF2563EB)
@@ -266,7 +267,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.delete_outline_rounded,
+                                  LucideIcons.trash2,
                                   size: 16,
                                   color: _currentTab == 1
                                       ? const Color(0xFFDC2626)
@@ -309,7 +310,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                             ? 'Search active products by name, SKU, tags...'
                             : 'Search deleted listings in recycle bin...',
                         prefixIcon: const Icon(
-                          Icons.search_rounded,
+                          LucideIcons.search,
                           color: Color(0xFF2563EB),
                         ),
                         filled: true,
@@ -353,7 +354,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                     children: [
                                       if (_adminSort == opt)
                                         const Icon(
-                                          Icons.check_rounded,
+                                          LucideIcons.check,
                                           size: 16,
                                           color: Color(0xFF2563EB),
                                         )
@@ -395,7 +396,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      Icons.sort_rounded,
+                                      LucideIcons.arrowUpDown,
                                       size: 16,
                                       color: _adminSort != 'Default'
                                           ? const Color(0xFF2563EB)
@@ -415,7 +416,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                       ),
                                     ),
                                     const Icon(
-                                      Icons.arrow_drop_down_rounded,
+                                      LucideIcons.chevronDown,
                                       size: 18,
                                     ),
                                   ],
@@ -444,7 +445,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                     children: [
                                       if (_stockFilter == opt)
                                         const Icon(
-                                          Icons.check_rounded,
+                                          LucideIcons.check,
                                           size: 16,
                                           color: Color(0xFF2563EB),
                                         )
@@ -486,7 +487,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      Icons.inventory_2_outlined,
+                                      LucideIcons.package,
                                       size: 16,
                                       color: _stockFilter != 'All'
                                           ? const Color(0xFFB45309)
@@ -506,7 +507,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                       ),
                                     ),
                                     const Icon(
-                                      Icons.arrow_drop_down_rounded,
+                                      LucideIcons.chevronDown,
                                       size: 18,
                                     ),
                                   ],
@@ -577,8 +578,8 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                               ),
                               child: Icon(
                                 _currentTab == 0
-                                    ? Icons.inventory_2_outlined
-                                    : Icons.delete_sweep_outlined,
+                                    ? LucideIcons.package
+                                    : LucideIcons.trash2,
                                 size: 44,
                                 color: const Color(0xFF94A3B8),
                               ),
@@ -750,7 +751,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                       IconButton.filledTonal(
                                         tooltip: 'Restore to Active Catalog',
                                         icon: const Icon(
-                                          Icons.restore_from_trash_rounded,
+                                          LucideIcons.archiveRestore,
                                           size: 18,
                                           color: Color(0xFF2563EB),
                                         ),
@@ -765,7 +766,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                       IconButton(
                                         tooltip: 'Delete Permanently',
                                         icon: Icon(
-                                          Icons.delete_forever_rounded,
+                                          LucideIcons.trash2,
                                           size: 18,
                                           color: Colors.red.shade700,
                                         ),
@@ -785,7 +786,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                       IconButton(
                                         tooltip: 'Edit Product',
                                         icon: const Icon(
-                                          Icons.edit_outlined,
+                                          LucideIcons.pencil,
                                           size: 20,
                                           color: Color(0xFF2563EB),
                                         ),
@@ -798,7 +799,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                       IconButton(
                                         tooltip: 'Move to Recycle Bin',
                                         icon: Icon(
-                                          Icons.delete_outline_rounded,
+                                          LucideIcons.trash2,
                                           size: 20,
                                           color: Colors.red.shade700,
                                         ),
@@ -843,7 +844,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Color(0xFFDC2626)),
+            Icon(LucideIcons.triangleAlert, color: Color(0xFFDC2626)),
             SizedBox(width: 10),
             Text('Move to Recycle Bin?'),
           ],
@@ -946,7 +947,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.delete_forever_rounded, color: Color(0xFFDC2626)),
+            Icon(LucideIcons.trash2, color: Color(0xFFDC2626)),
             SizedBox(width: 10),
             Text('Permanently Delete?'),
           ],

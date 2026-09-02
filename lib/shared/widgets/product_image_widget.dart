@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Helper widget to render cached URLs, base64 data URIs, and asset images with loading skeletons
 class ProductImageWidget extends StatelessWidget {
@@ -76,7 +77,7 @@ class ProductImageWidget extends StatelessWidget {
       color: const Color(0xFFF1F5F9),
       child: const Center(
         child: Icon(
-          Icons.image_outlined,
+          LucideIcons.image,
           color: Color(0xFFCBD5E1),
           size: 20,
         ),
@@ -91,7 +92,7 @@ class ProductImageWidget extends StatelessWidget {
       color: const Color(0xFFF1F5F9),
       child: const Center(
         child: Icon(
-          Icons.inventory_2_outlined,
+          LucideIcons.package,
           color: Color(0xFF94A3B8),
           size: 24,
         ),

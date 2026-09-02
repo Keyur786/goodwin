@@ -5,6 +5,7 @@ import 'package:goodwin/core/utils/quantity_dialog.dart';
 import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/product_model.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class EditOrderDialog extends StatefulWidget {
   final OrderModel order;
@@ -46,32 +47,25 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
 
   Future<void> _loadCatalog() async {
     try {
-      final products = await _productRepo.getProducts();
+      final prods = await _productRepo.getProducts();
       if (mounted) {
         setState(() {
-          _catalogProducts = products;
+          _catalogProducts = prods;
         });
       }
     } catch (_) {}
   }
 
-  double get _totalAmount =>
-      _items.fold(0.0, (sum, item) => sum + item.totalPrice);
+  double get _totalAmount {
+    return _items.fold(0, (sum, item) => sum + item.totalPrice);
+  }
 
   void _updateQuantity(int index, int newQty) {
     setState(() {
       if (newQty <= 0) {
         _items.removeAt(index);
       } else {
-        final current = _items[index];
-        _items[index] = OrderItemModel(
-          productId: current.productId,
-          productName: current.productName,
-          sku: current.sku,
-          variant: current.variant,
-          unitPrice: current.unitPrice,
-          quantity: newQty,
-        );
+        _items[index] = _items[index].copyWith(quantity: newQty);
       }
     });
   }
@@ -81,15 +75,9 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
       final existingIndex = _items.indexWhere(
         (item) => item.productId == product.id,
       );
-      if (existingIndex >= 0) {
-        final current = _items[existingIndex];
-        _items[existingIndex] = OrderItemModel(
-          productId: current.productId,
-          productName: current.productName,
-          sku: current.sku,
-          variant: current.variant,
-          unitPrice: current.unitPrice,
-          quantity: current.quantity + 1,
+      if (existingIndex != -1) {
+        _items[existingIndex] = _items[existingIndex].copyWith(
+          quantity: _items[existingIndex].quantity + 1,
         );
       } else {
         _items.add(
@@ -106,13 +94,18 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
   }
 
   Future<void> _saveChanges() async {
+    if (_isSaving) return;
+
     if (_items.isEmpty) {
-      final confirm = await showDialog<bool>(
+      final confirmDelete = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Cancel Order?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: const Text('Delete Order?'),
           content: const Text(
-            'All items have been removed. Would you like to cancel this order?',
+            'You have removed all items. This will cancel and permanently delete this order.',
           ),
           actions: [
             TextButton(
@@ -120,27 +113,37 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
               child: const Text('Keep Editing'),
             ),
             FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.red.shade700,
+              ),
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Cancel Order'),
+              child: const Text('Delete Order'),
             ),
           ],
         ),
       );
-      if (confirm == true) {
-        setState(() => _isSaving = true);
-        await FirestoreOrderRepository().cancelOrder(widget.order.id);
+
+      if (confirmDelete != true) return;
+
+      setState(() => _isSaving = true);
+      try {
+        await FirestoreOrderRepository().deleteOrder(widget.order.id);
         if (mounted) {
           Navigator.pop(context);
           widget.onOrderUpdated();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'Order #${widget.order.orderNumber} has been cancelled.',
-              ),
+              content: Text('Order #${widget.order.orderNumber} cancelled.'),
               backgroundColor: Colors.red.shade700,
             ),
           );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to delete order: $e')));
         }
       }
       return;
@@ -153,13 +156,14 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
         items: _items,
         totalAmount: _totalAmount,
       );
+
       if (mounted) {
         Navigator.pop(context);
         widget.onOrderUpdated();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Order #${widget.order.orderNumber} updated successfully!',
+              'Order #${widget.order.orderNumber} updated successfully.',
             ),
             backgroundColor: const Color(0xFF2563EB),
           ),
@@ -189,7 +193,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.delete_forever_rounded,
+                LucideIcons.trash2,
                 color: Colors.red.shade700,
                 size: 24,
               ),
@@ -287,7 +291,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                           ),
                           IconButton(
                             onPressed: () => Navigator.pop(ctx),
-                            icon: const Icon(Icons.close),
+                            icon: const Icon(LucideIcons.x),
                           ),
                         ],
                       ),
@@ -312,7 +316,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                             color: Color(0xFF94A3B8),
                           ),
                           prefixIcon: const Icon(
-                            Icons.search_rounded,
+                            LucideIcons.search,
                             color: Color(0xFF2563EB),
                             size: 22,
                           ),
@@ -326,7 +330,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                     });
                                   },
                                   icon: const Icon(
-                                    Icons.clear_rounded,
+                                    LucideIcons.x,
                                     size: 18,
                                   ),
                                 ),
@@ -366,7 +370,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Icon(
-                                    Icons.search_off_rounded,
+                                    LucideIcons.searchX,
                                     size: 48,
                                     color: Colors.grey,
                                   ),
@@ -435,7 +439,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                         ),
                                       );
                                     },
-                                    icon: const Icon(Icons.add, size: 16),
+                                    icon: const Icon(LucideIcons.plus, size: 16),
                                     label: const Text('Add'),
                                     style: FilledButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(
@@ -495,7 +499,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: const Icon(LucideIcons.x),
                 ),
               ],
             ),
@@ -509,7 +513,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16, color: Color(0xFF2563EB)),
+                  Icon(LucideIcons.info, size: 16, color: Color(0xFF2563EB)),
                   SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -532,7 +536,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(
-                            Icons.remove_shopping_cart_outlined,
+                            LucideIcons.shoppingBag,
                             size: 48,
                             color: Colors.grey,
                           ),
@@ -600,8 +604,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                     ),
                                     icon: Icon(
                                       item.quantity == 1
-                                          ? Icons.delete_outline_rounded
-                                          : Icons.remove_rounded,
+                                          ? LucideIcons.trash2
+                                          : LucideIcons.minus,
                                       size: 18,
                                       color: item.quantity == 1
                                           ? Colors.red
@@ -660,7 +664,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                       item.quantity + 1,
                                     ),
                                     icon: const Icon(
-                                      Icons.add_rounded,
+                                      LucideIcons.plus,
                                       size: 18,
                                       color: Color(0xFF2563EB),
                                     ),
@@ -682,7 +686,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: _showAddProductPicker,
-              icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
+              icon: const Icon(LucideIcons.circlePlus, size: 18),
               label: const Text('Add More Products'),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 42),
@@ -722,7 +726,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                   tooltip: 'Delete Order',
                   onPressed: _isSaving ? null : _deleteOrder,
                   icon: Icon(
-                    Icons.delete_forever_rounded,
+                    LucideIcons.trash2,
                     color: Colors.red.shade700,
                   ),
                   style: IconButton.styleFrom(

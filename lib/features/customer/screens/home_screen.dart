@@ -1,13 +1,10 @@
-import 'package:goodwin/models/category_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:goodwin/core/constants/app_constants.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
 import 'package:goodwin/core/services/firestore_user_repository.dart';
+import 'package:goodwin/core/state/notification_controller.dart';
 import 'package:goodwin/core/utils/quantity_dialog.dart';
 import 'package:goodwin/features/admin/dialogs/add_edit_product_dialog.dart';
 import 'package:goodwin/features/admin/screens/admin_all_orders_screen.dart';
@@ -18,8 +15,8 @@ import 'package:goodwin/features/customer/screens/checkout_screen.dart';
 import 'package:goodwin/features/customer/screens/customer_orders_screen.dart';
 import 'package:goodwin/features/customer/screens/product_detail_screen.dart';
 import 'package:goodwin/features/customer/screens/profile_screen.dart';
-import 'package:goodwin/core/state/notification_controller.dart';
 import 'package:goodwin/models/cart_item.dart';
+import 'package:goodwin/models/category_model.dart';
 import 'package:goodwin/models/demo_product.dart';
 import 'package:goodwin/models/filter_criteria.dart';
 import 'package:goodwin/models/product_model.dart';
@@ -29,6 +26,8 @@ import 'package:goodwin/shared/widgets/empty_state_view.dart';
 import 'package:goodwin/shared/widgets/modern_product_card.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
 import 'package:goodwin/shared/widgets/profile_avatar_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class DemoHomeScreen extends StatefulWidget {
   final VoidCallback onLogout;
@@ -658,9 +657,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 border: Border.all(color: const Color(0xFFFCA5A5)),
               ),
               child: const Icon(
-                Icons.delete_outline_rounded,
+                LucideIcons.trash2,
                 color: Color(0xFFDC2626),
-                size: 22,
+                size: 20,
               ),
             ),
             const SizedBox(width: 12),
@@ -701,7 +700,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           ),
           FilledButton.icon(
             onPressed: () => Navigator.pop(dialogCtx, true),
-            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+            icon: const Icon(LucideIcons.trash2, size: 16),
             label: const Text(
               'Remove',
               style: TextStyle(fontWeight: FontWeight.w800),
@@ -913,7 +912,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         ),
                         IconButton(
                           onPressed: () => Navigator.pop(sheetCtx),
-                          icon: const Icon(Icons.close_rounded),
+                          icon: const Icon(LucideIcons.x),
                         ),
                       ],
                     ),
@@ -940,8 +939,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         ),
                         trailing: isSelected
                             ? const Icon(
-                                Icons.check_circle_rounded,
+                                LucideIcons.check,
                                 color: Color(0xFF2563EB),
+                                size: 18,
                               )
                             : null,
                         shape: RoundedRectangleBorder(
@@ -1261,7 +1261,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.verified_rounded, size: 14, color: Colors.white),
+                    Icon(LucideIcons.shieldCheck, size: 14, color: Colors.white),
                     SizedBox(width: 4),
                     Text(
                       'WHOLESALE TRADE SUPPLY',
@@ -1277,7 +1277,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               ),
               const Spacer(),
               const Icon(
-                Icons.local_shipping_outlined,
+                LucideIcons.truck,
                 color: Color(0xFFBFDBFE),
                 size: 22,
               ),
@@ -1312,7 +1312,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   context: context,
                   currentUser: currentUser,
                 ),
-                icon: const Icon(Icons.request_quote_rounded, size: 16),
+                icon: const Icon(LucideIcons.messageSquare, size: 16),
                 label: const Text(
                   'Request Bulk Quote',
                   style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
@@ -1332,7 +1332,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               OutlinedButton.icon(
                 onPressed: () => setState(() => selectedIndex = 1),
                 icon: const Icon(
-                  Icons.grid_view_rounded,
+                  LucideIcons.layoutGrid,
                   size: 16,
                   color: Colors.white,
                 ),
@@ -1398,7 +1398,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       ),
                     ),
                     Icon(
-                      Icons.chevron_right_rounded,
+                      LucideIcons.chevronRight,
                       size: 18,
                       color: Color(0xFF2563EB),
                     ),
@@ -1509,7 +1509,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           children: [
             Expanded(
               child: _ActionCardItem(
-                icon: Icons.grid_view_rounded,
+                icon: LucideIcons.layoutGrid,
                 iconBg: const Color(0xFFDBEAFE),
                 iconColor: const Color(0xFF2563EB),
                 title: 'Full Catalog',
@@ -1520,7 +1520,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _ActionCardItem(
-                icon: Icons.receipt_long_rounded,
+                icon: LucideIcons.receiptText,
                 iconBg: const Color(0xFFDBEAFE),
                 iconColor: const Color(0xFF2563EB),
                 title: 'Past Orders',
@@ -1535,7 +1535,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           children: [
             Expanded(
               child: _ActionCardItem(
-                icon: Icons.favorite_rounded,
+                icon: LucideIcons.heart,
                 iconBg: const Color(0xFFFFE4E6),
                 iconColor: const Color(0xFFE11D48),
                 title: 'Saved Items',
@@ -1546,7 +1546,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _ActionCardItem(
-                icon: Icons.support_agent_rounded,
+                icon: LucideIcons.headphones,
                 iconBg: const Color(0xFFDCFCE7),
                 iconColor: const Color(0xFF16A34A),
                 title: 'Trade Desk',
@@ -1588,7 +1588,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
-                  Icons.warehouse_rounded,
+                  LucideIcons.warehouse,
                   color: Color(0xFF2563EB),
                   size: 24,
                 ),
@@ -1661,19 +1661,19 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             child: const Column(
               children: [
                 _WarehouseDetailRow(
-                  icon: Icons.access_time_rounded,
+                  icon: LucideIcons.clock,
                   label: 'Operating Hours',
                   value: '9:00 AM - 8:00 PM (Mon - Sat)',
                 ),
                 SizedBox(height: 8),
                 _WarehouseDetailRow(
-                  icon: Icons.local_shipping_rounded,
+                  icon: LucideIcons.truck,
                   label: 'Transport Options',
                   value: 'Self-Pickup & Gujarat Freight Dispatch',
                 ),
                 SizedBox(height: 8),
                 _WarehouseDetailRow(
-                  icon: Icons.phone_in_talk_rounded,
+                  icon: LucideIcons.phoneCall,
                   label: 'Warehouse Desk',
                   value: '+91 99045 79700',
                 ),
@@ -1709,7 +1709,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
-                  Icons.verified_user_rounded,
+                  LucideIcons.shieldCheck,
                   color: Color(0xFFD97706),
                   size: 22,
                 ),
@@ -1830,7 +1830,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             children: [
               Expanded(
                 child: _AssuranceFeatureCard(
-                  icon: Icons.shield_rounded,
+                  icon: LucideIcons.shieldCheck,
                   iconColor: Color(0xFF2563EB),
                   title: 'Grade-A Inspection',
                   description: 'Laboratory moisture & grade testing',
@@ -1839,7 +1839,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               SizedBox(width: 12),
               Expanded(
                 child: _AssuranceFeatureCard(
-                  icon: Icons.receipt_long_rounded,
+                  icon: LucideIcons.receiptText,
                   iconColor: Color(0xFF2563EB),
                   title: '100% Tax Compliant',
                   description: 'Instant computerized GST invoices',
@@ -1852,7 +1852,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             children: [
               Expanded(
                 child: _AssuranceFeatureCard(
-                  icon: Icons.scale_rounded,
+                  icon: LucideIcons.scale,
                   iconColor: Color(0xFF7C3AED),
                   title: 'Certified Net Weight',
                   description: 'Calibrated digital scale weighing',
@@ -1861,7 +1861,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               SizedBox(width: 12),
               Expanded(
                 child: _AssuranceFeatureCard(
-                  icon: Icons.inventory_2_rounded,
+                  icon: LucideIcons.packageCheck,
                   iconColor: Color(0xFFD97706),
                   title: 'Wholesale Packing',
                   description: 'Multi-layer moisture lock cartons',
@@ -1892,7 +1892,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.headset_mic_rounded,
+              LucideIcons.headphones,
               color: Color(0xFF16A34A),
               size: 24,
             ),
@@ -1948,7 +1948,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.headset_mic_rounded, color: Color(0xFF2563EB)),
+            Icon(LucideIcons.headphones, color: Color(0xFF2563EB)),
             SizedBox(width: 10),
             Text('Trade Support Desk'),
           ],
@@ -1983,29 +1983,49 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
 
   IconData _getCategoryIcon(String category) {
     final lower = category.toLowerCase();
+    if (lower.contains('cloth') || lower.contains('apparel')) {
+      return LucideIcons.shirt;
+    }
+    if (lower.contains('elec') ||
+        lower.contains('phone') ||
+        lower.contains('device')) {
+      return LucideIcons.smartphone;
+    }
+    if (lower.contains('home') || lower.contains('kitchen')) {
+      return LucideIcons.house;
+    }
+    if (lower.contains('beauty') || lower.contains('cosmetic')) {
+      return LucideIcons.sparkles;
+    }
+    if (lower.contains('toy') || lower.contains('game')) {
+      return LucideIcons.gamepad2;
+    }
+    if (lower.contains('access') || lower.contains('watch')) {
+      return LucideIcons.watch;
+    }
     if (lower.contains('dry') || lower.contains('nut')) {
-      return Icons.eco_rounded;
+      return LucideIcons.leaf;
     }
     if (lower.contains('spice')) {
-      return Icons.local_fire_department_rounded;
+      return LucideIcons.flame;
     }
     if (lower.contains('bev') ||
         lower.contains('tea') ||
         lower.contains('coffee')) {
-      return Icons.coffee_rounded;
+      return LucideIcons.coffee;
     }
     if (lower.contains('snack')) {
-      return Icons.cookie_rounded;
+      return LucideIcons.cookie;
     }
     if (lower.contains('groc') ||
         lower.contains('staple') ||
         lower.contains('grain')) {
-      return Icons.shopping_basket_rounded;
+      return LucideIcons.wheat;
     }
     if (lower.contains('sweet') || lower.contains('conf')) {
-      return Icons.cake_rounded;
+      return LucideIcons.cake;
     }
-    return Icons.category_rounded;
+    return LucideIcons.layoutGrid;
   }
 
   Widget _buildCatalogSearchField() {
@@ -2027,9 +2047,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         hintText: 'Search catalog by name, category, SKU...',
         hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
         prefixIcon: const Icon(
-          Icons.search_rounded,
+          LucideIcons.search,
           color: Color(0xFF2563EB),
-          size: 20,
+          size: 18,
         ),
         suffixIcon: homeSearchQuery.isEmpty
             ? null
@@ -2042,7 +2062,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     _displayedProductCount = _batchSize;
                   });
                 },
-                icon: const Icon(Icons.clear_rounded, size: 18),
+                icon: const Icon(LucideIcons.x, size: 18),
                 tooltip: 'Clear search',
               ),
         filled: true,
@@ -2127,7 +2147,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       activeFilters.add(
         _buildRemovableFilterChip(
           label: '"$homeSearchQuery"',
-          icon: Icons.search_rounded,
+          icon: LucideIcons.search,
           onRemove: () {
             _searchDebounceTimer?.cancel();
             _catalogSearchController.clear();
@@ -2157,7 +2177,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       activeFilters.add(
         _buildRemovableFilterChip(
           label: 'In Stock Only',
-          icon: Icons.inventory_2_outlined,
+          icon: LucideIcons.boxes,
           onRemove: () => setState(() {
             filterCriteria = ProductFilterCriteria(
               minPrice: filterCriteria.minPrice,
@@ -2182,7 +2202,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       activeFilters.add(
         _buildRemovableFilterChip(
           label: '$min - $max',
-          icon: Icons.currency_rupee_rounded,
+          icon: LucideIcons.indianRupee,
           onRemove: () => setState(() {
             filterCriteria = ProductFilterCriteria(
               minPrice: null,
@@ -2271,7 +2291,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             child: const Padding(
               padding: EdgeInsets.all(2),
               child: Icon(
-                Icons.close_rounded,
+                LucideIcons.x,
                 size: 13,
                 color: Color(0xFF2563EB),
               ),
@@ -2415,7 +2435,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                       ),
                                       const SizedBox(width: 2),
                                       const Icon(
-                                        Icons.arrow_drop_down,
+                                        LucideIcons.chevronDown,
                                         size: 14,
                                         color: Color(0xFF64748B),
                                       ),
@@ -2449,7 +2469,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        Icons.tune_rounded,
+                                        LucideIcons.slidersHorizontal,
                                         size: 13,
                                         color: !filterCriteria.isDefault
                                             ? const Color(0xFF2563EB)
@@ -2613,7 +2633,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
-                              Icons.search_off_rounded,
+                              LucideIcons.searchX,
                               size: 36,
                               color: Color(0xFF94A3B8),
                             ),
@@ -2670,7 +2690,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                   vertical: 10,
                                 ),
                               ),
-                              icon: const Icon(Icons.refresh_rounded, size: 16),
+                              icon: const Icon(LucideIcons.rotateCcw, size: 16),
                               label: const Text(
                                 'Clear Filters & Show All',
                                 style: TextStyle(
@@ -2688,7 +2708,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                               style: FilledButton.styleFrom(
                                 backgroundColor: const Color(0xFF2563EB),
                               ),
-                              icon: const Icon(Icons.cloud_upload_outlined),
+                              icon: const Icon(LucideIcons.uploadCloud),
                               label: const Text('Seed Products to Firebase'),
                             ),
                         ],
@@ -2792,9 +2812,10 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
 
     if (favoriteProducts.isEmpty) {
       return EmptyStateView(
-        icon: Icons.favorite_border_rounded,
+        icon: LucideIcons.heart,
         title: 'No Favorites Yet',
-        description: 'Tap the heart icon on any wholesale product to save it. You can easily compare and reorder your favorites anytime.',
+        description:
+            'Tap the heart icon on any wholesale product to save it. You can easily compare and reorder your favorites anytime.',
         buttonText: 'Explore Catalog',
         themeColor: const Color(0xFFE11D48),
         onAction: () => setState(() => selectedIndex = 0),
@@ -2832,9 +2853,10 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   Widget buildCartTab() {
     if (cart.isEmpty) {
       return EmptyStateView(
-        icon: Icons.shopping_bag_outlined,
+        icon: LucideIcons.shoppingBag,
         title: 'Your Cart is Empty',
-        description: 'Add wholesale items from the catalog. They will stay saved in your account across all your devices.',
+        description:
+            'Add wholesale items from the catalog. They will stay saved in your account across all your devices.',
         buttonText: 'Start Shopping',
         themeColor: const Color(0xFF2563EB),
         onAction: () => setState(() => selectedIndex = 0),
@@ -2918,9 +2940,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                       padding: const EdgeInsets.all(5),
                                       child: Icon(
                                         cartItem.quantity > 1
-                                            ? Icons.remove_rounded
-                                            : Icons.delete_outline_rounded,
-                                        size: 19,
+                                            ? LucideIcons.minus
+                                            : LucideIcons.trash2,
+                                        size: 17,
                                         color: cartItem.quantity > 1
                                             ? const Color(0xFF334155)
                                             : const Color(0xFFDC2626),
@@ -2988,8 +3010,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(5),
                                       child: Icon(
-                                        Icons.add_rounded,
-                                        size: 19,
+                                        LucideIcons.plus,
+                                        size: 17,
                                         color:
                                             cartItem.quantity <
                                                 cartItem.maxAvailableStock
@@ -3021,8 +3043,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                           IconButton(
                             onPressed: () => confirmRemoveFromCart(cartItem),
                             icon: const Icon(
-                              Icons.delete_outline_rounded,
-                              size: 22,
+                              LucideIcons.trash2,
+                              size: 20,
                             ),
                             color: const Color(0xFFDC2626),
                             padding: EdgeInsets.zero,
@@ -3116,7 +3138,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       }
                     }
                   },
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                  icon: const Icon(LucideIcons.arrowRight, size: 18),
                   label: const Text('Proceed to Checkout'),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
@@ -3146,10 +3168,6 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         currentUser?.role == UserRole.superAdmin ||
         currentUser?.role == UserRole.manager ||
         FirestoreUserRepository.isSuperAdminPhone(currentUser?.phone);
-
-    final usernameDisplay = currentUser?.username != null
-        ? '@${currentUser!.username}'
-        : (isAdmin ? '@admin' : 'Goodwin Reseller');
 
     return Scaffold(
       drawer: Drawer(
@@ -3202,38 +3220,27 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  if (!isAdmin) ...[
-                                    const SizedBox(width: 6),
-                                    CustomerTierBadge(
-                                      tier:
-                                          currentUser?.tier ??
-                                          CustomerTier.silver,
-                                    ),
-                                  ],
+                                  const SizedBox(width: 6),
+                                  CustomerTierBadge(
+                                    tier:
+                                        currentUser?.tier ??
+                                        CustomerTier.silver,
+                                    isCompact: true,
+                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isAdmin
-                                      ? const Color(0xFFFEF08A)
-                                      : Colors.white.withAlpha(50),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  isAdmin ? '🛡️ STORE ADMIN' : usernameDisplay,
-                                  style: TextStyle(
-                                    color: isAdmin
-                                        ? const Color(0xFF854D0E)
-                                        : Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 11,
-                                    letterSpacing: 0.8,
-                                  ),
+                              const SizedBox(height: 3),
+                              Text(
+                                currentUser?.shopName != null &&
+                                        currentUser!.shopName!.isNotEmpty
+                                    ? currentUser!.shopName!
+                                    : (isAdmin
+                                          ? 'Central Administrator'
+                                          : 'Wholesale Partner'),
+                                style: const TextStyle(
+                                  color: Color(0xFFDBEAFE),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
@@ -3268,13 +3275,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   ),
                 ),
                 DrawerProfileItem(
-                  icon: Icons.add_business_rounded,
+                  icon: LucideIcons.packagePlus,
                   label: 'Manage Products',
                   action: ProfileAction.manageProducts,
                   onSelected: handleProfileAction,
                 ),
                 DrawerProfileItem(
-                  icon: Icons.assignment_rounded,
+                  icon: LucideIcons.clipboardList,
                   label: 'Customer Orders',
                   action: ProfileAction.allOrders,
                   onSelected: handleProfileAction,
@@ -3286,25 +3293,25 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               ],
               const SizedBox(height: 4),
               DrawerProfileItem(
-                icon: Icons.person_rounded,
+                icon: LucideIcons.user,
                 label: 'My profile',
                 action: ProfileAction.profile,
                 onSelected: handleProfileAction,
               ),
               DrawerProfileItem(
-                icon: Icons.receipt_long_rounded,
+                icon: LucideIcons.receiptText,
                 label: 'My orders',
                 action: ProfileAction.orders,
                 onSelected: handleProfileAction,
               ),
               DrawerProfileItem(
-                icon: Icons.location_on_rounded,
+                icon: LucideIcons.mapPin,
                 label: 'Pickup location',
                 action: ProfileAction.addresses,
                 onSelected: handleProfileAction,
               ),
               DrawerProfileItem(
-                icon: Icons.headset_mic_rounded,
+                icon: LucideIcons.headphones,
                 label: 'Help & support',
                 action: ProfileAction.help,
                 onSelected: handleProfileAction,
@@ -3314,7 +3321,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 child: Divider(height: 1),
               ),
               DrawerProfileItem(
-                icon: Icons.logout_rounded,
+                icon: LucideIcons.logOut,
                 label: 'Sign out',
                 action: ProfileAction.signOut,
                 isDestructive: true,
@@ -3335,7 +3342,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
-                Icons.storefront_rounded,
+                LucideIcons.store,
                 color: Color(0xFF2563EB),
                 size: 19,
               ),
@@ -3366,12 +3373,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         backgroundColor: const Color(0xFFDC2626),
                         textColor: Colors.white,
                         child: const Icon(
-                          Icons.notifications_outlined,
+                          LucideIcons.bell,
                           color: Color(0xFF1E293B),
                         ),
                       )
                     : const Icon(
-                        Icons.notifications_outlined,
+                        LucideIcons.bell,
                         color: Color(0xFF1E293B),
                       ),
                 onPressed: () => showNotificationsSheet(context),
@@ -3390,9 +3397,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
-                    Icons.add_rounded,
+                    LucideIcons.plus,
                     color: Colors.white,
-                    size: 20,
+                    size: 18,
                   ),
                 ),
                 onPressed: () {
@@ -3411,15 +3418,15 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         onDestinationSelected: (value) => setState(() => selectedIndex = value),
         destinations: [
           const NavigationDestination(
-            icon: Icon(Icons.home_rounded),
+            icon: Icon(LucideIcons.house),
             label: 'Home',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.grid_view_rounded),
+            icon: Icon(LucideIcons.layoutGrid),
             label: 'Catalog',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.favorite_rounded),
+            icon: Icon(LucideIcons.heart),
             label: 'Favorites',
           ),
           NavigationDestination(
@@ -3428,17 +3435,9 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     count: totalCartItemCount,
                     backgroundColor: const Color(0xFF2563EB),
                     textColor: Colors.white,
-                    child: const Icon(Icons.shopping_bag_outlined),
+                    child: const Icon(LucideIcons.shoppingBag),
                   )
-                : const Icon(Icons.shopping_bag_outlined),
-            selectedIcon: totalCartItemCount > 0
-                ? Badge.count(
-                    count: totalCartItemCount,
-                    backgroundColor: const Color(0xFF2563EB),
-                    textColor: Colors.white,
-                    child: const Icon(Icons.shopping_bag_rounded),
-                  )
-                : const Icon(Icons.shopping_bag_rounded),
+                : const Icon(LucideIcons.shoppingBag),
             label: 'Cart',
           ),
         ],
@@ -3489,7 +3488,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
-                            Icons.notifications_active_rounded,
+                            LucideIcons.bellRing,
                             color: Color(0xFFD97706),
                             size: 20,
                           ),
@@ -3524,7 +3523,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         ),
                         if (notifications.isNotEmpty)
                           PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert_rounded),
+                            icon: const Icon(LucideIcons.ellipsisVertical),
                             onSelected: (val) {
                               if (val == 'read') {
                                 NotificationController().markAllAsRead();
@@ -3563,7 +3562,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(
-                                    Icons.notifications_none_rounded,
+                                    LucideIcons.bell,
                                     size: 40,
                                     color: Color(0xFF94A3B8),
                                   ),
@@ -3723,7 +3722,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                                   visualDensity:
                                                       VisualDensity.compact,
                                                   icon: const Icon(
-                                                    Icons.close_rounded,
+                                                    LucideIcons.x,
                                                     size: 16,
                                                     color: Color(0xFF94A3B8),
                                                   ),

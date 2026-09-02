@@ -5,6 +5,7 @@ import 'package:goodwin/models/demo_product.dart';
 import 'package:goodwin/models/product_model.dart';
 import 'package:goodwin/shared/widgets/full_screen_image_viewer.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
@@ -83,9 +84,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           IconButton(
             onPressed: () => widget.onToggleFavorite(product.id),
             icon: Icon(
-              widget.isFavorite
-                  ? Icons.favorite_rounded
-                  : Icons.favorite_border_rounded,
+              LucideIcons.heart,
               color: widget.isFavorite
                   ? Colors.red.shade600
                   : const Color(0xFF475569),
@@ -103,12 +102,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       backgroundColor: const Color(0xFF2563EB),
                       textColor: Colors.white,
                       child: const Icon(
-                        Icons.shopping_bag_rounded,
+                        LucideIcons.shoppingBag,
                         color: Color(0xFF2563EB),
                       ),
                     )
                   : const Icon(
-                      Icons.shopping_bag_outlined,
+                      LucideIcons.shoppingBag,
                       color: Color(0xFF475569),
                     ),
             ),
@@ -190,9 +189,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      Icons.fullscreen_rounded,
+                                      LucideIcons.maximize2,
                                       color: Colors.white,
-                                      size: 15,
+                                      size: 14,
                                     ),
                                     SizedBox(width: 4),
                                     Text(
@@ -321,9 +320,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      Icons.fullscreen_rounded,
+                                      LucideIcons.maximize2,
                                       color: Colors.white,
-                                      size: 15,
+                                      size: 14,
                                     ),
                                     SizedBox(width: 4),
                                     Text(
@@ -599,8 +598,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             children: [
                               Icon(
                                 activeStock > 0
-                                    ? Icons.check_circle_rounded
-                                    : Icons.cancel_outlined,
+                                    ? LucideIcons.checkCircle
+                                    : LucideIcons.circleX,
                                 size: 16,
                                 color: activeStock > 0
                                     ? const Color(0xFF16A34A)
@@ -801,7 +800,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.block_rounded,
+                            LucideIcons.ban,
                             size: 18,
                             color: Color(0xFFDC2626),
                           ),
@@ -820,7 +819,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     const SizedBox(height: 14),
                     FilledButton.icon(
                       onPressed: null,
-                      icon: const Icon(Icons.remove_shopping_cart_rounded, size: 18),
+                      icon: const Icon(LucideIcons.shoppingBag, size: 18),
                       label: const Text(
                         'Out of Stock',
                         style: TextStyle(
@@ -876,7 +875,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 onPressed: _quantity > 1
                                     ? () => setState(() => _quantity--)
                                     : null,
-                                icon: const Icon(Icons.remove_rounded, size: 22),
+                                icon: const Icon(LucideIcons.minus, size: 20),
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: const Color(0xFF2563EB),
@@ -930,7 +929,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 onPressed: _quantity < activeStock
                                     ? () => setState(() => _quantity++)
                                     : null,
-                                icon: const Icon(Icons.add_rounded, size: 22),
+                                icon: const Icon(LucideIcons.plus, size: 20),
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: const Color(0xFF2563EB),
@@ -956,7 +955,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         );
                         Navigator.of(context).pop();
                       },
-                      icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
+                      icon: const Icon(LucideIcons.shoppingBag, size: 16),
                       label: Text(
                         'Add $_quantity ${_quantity == 1 ? "unit" : "units"} to Cart • ₹${(_quantity * activePrice).toStringAsFixed(0)}',
                         style: const TextStyle(

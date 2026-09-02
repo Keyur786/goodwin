@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:goodwin/core/constants/app_constants.dart';
 import 'package:goodwin/shared/widgets/photo_option_button.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ProfileAvatarWidget extends StatelessWidget {
   const ProfileAvatarWidget({
@@ -115,8 +116,8 @@ class ProfileAvatarWidget extends StatelessWidget {
                 ],
               ),
               child: const Icon(
-                Icons.camera_alt_rounded,
-                size: 14,
+                LucideIcons.camera,
+                size: 13,
                 color: Colors.white,
               ),
             ),
@@ -231,7 +232,7 @@ Future<void> showProfilePhotoPickerSheet({
                 children: [
                   Expanded(
                     child: PhotoOptionButton(
-                      icon: Icons.camera_alt_rounded,
+                      icon: LucideIcons.camera,
                       label: 'Camera',
                       color: const Color(0xFF2563EB),
                       onTap: () async {
@@ -243,7 +244,7 @@ Future<void> showProfilePhotoPickerSheet({
                   const SizedBox(width: 12),
                   Expanded(
                     child: PhotoOptionButton(
-                      icon: Icons.photo_library_rounded,
+                      icon: LucideIcons.image,
                       label: 'Gallery',
                       color: const Color(0xFF2563EB),
                       onTap: () async {
@@ -301,7 +302,7 @@ Future<void> showProfilePhotoPickerSheet({
                             errorWidget: (context, error, stackTrace) =>
                                 const CircleAvatar(
                                   radius: 27,
-                                  child: Icon(Icons.person),
+                                  child: Icon(LucideIcons.user),
                                 ),
                           ),
                         ),
@@ -315,7 +316,7 @@ Future<void> showProfilePhotoPickerSheet({
                 const Divider(),
                 ListTile(
                   leading: const Icon(
-                    Icons.delete_outline_rounded,
+                    LucideIcons.trash2,
                     color: Colors.red,
                   ),
                   title: const Text(

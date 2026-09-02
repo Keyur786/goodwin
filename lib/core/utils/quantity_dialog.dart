@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Interactive dialog that allows direct numeric typing of quantity (e.g. 30 units)
 Future<int?> showQuantityInputDialog({
@@ -48,9 +49,9 @@ Future<int?> showQuantityInputDialog({
                     border: Border.all(color: const Color(0xFFBFDBFE)),
                   ),
                   child: const Icon(
-                    Icons.edit_note_rounded,
+                    LucideIcons.penLine,
                     color: Color(0xFF2563EB),
-                    size: 22,
+                    size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -98,7 +99,7 @@ Future<int?> showQuantityInputDialog({
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
-                          Icons.inventory_2_outlined,
+                          LucideIcons.boxes,
                           size: 14,
                           color: Color(0xFF2563EB),
                         ),
@@ -134,7 +135,7 @@ Future<int?> showQuantityInputDialog({
                       borderRadius: BorderRadius.circular(14),
                     ),
                     prefixIcon: IconButton(
-                      icon: const Icon(Icons.remove_circle_outline_rounded),
+                      icon: const Icon(LucideIcons.circleMinus),
                       onPressed: currentVal > minQuantity
                           ? () {
                               final next = (currentVal - 1).clamp(
@@ -147,7 +148,7 @@ Future<int?> showQuantityInputDialog({
                           : null,
                     ),
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.add_circle_outline_rounded),
+                      icon: const Icon(LucideIcons.circlePlus),
                       onPressed: currentVal < effectiveMax
                           ? () {
                               final next = (currentVal + 1).clamp(

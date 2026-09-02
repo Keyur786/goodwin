@@ -7,6 +7,7 @@ import 'package:goodwin/core/services/firestore_order_repository.dart';
 import 'package:goodwin/core/services/firestore_user_repository.dart';
 import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/user_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class _RazorpayCheckoutModal extends StatefulWidget {
   const _RazorpayCheckoutModal({
@@ -75,7 +76,7 @@ class _RazorpayCheckoutModalState extends State<_RazorpayCheckoutModal> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
-                          Icons.flash_on_rounded,
+                          LucideIcons.zap,
                           color: Colors.white,
                           size: 16,
                         ),
@@ -104,7 +105,7 @@ class _RazorpayCheckoutModalState extends State<_RazorpayCheckoutModal> {
                     child: const Row(
                       children: [
                         Icon(
-                          Icons.lock_rounded,
+                          LucideIcons.lock,
                           size: 11,
                           color: Colors.white70,
                         ),
@@ -156,7 +157,7 @@ class _RazorpayCheckoutModalState extends State<_RazorpayCheckoutModal> {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.check_rounded,
+                  LucideIcons.check,
                   color: Color(0xFF16A34A),
                   size: 40,
                 ),
@@ -351,7 +352,7 @@ class _PrepaidDeliveryRazorpayPageState
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         icon: const Icon(
-          Icons.check_circle_rounded,
+          LucideIcons.checkCircle,
           color: Color(0xFF2563EB),
           size: 52,
         ),
@@ -373,7 +374,7 @@ class _PrepaidDeliveryRazorpayPageState
               child: Row(
                 children: [
                   const Icon(
-                    Icons.verified_rounded,
+                    LucideIcons.shieldCheck,
                     color: Color(0xFF16A34A),
                     size: 20,
                   ),
@@ -487,9 +488,9 @@ class _PrepaidDeliveryRazorpayPageState
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
-                              Icons.payment_rounded,
+                              LucideIcons.creditCard,
                               color: Colors.white,
-                              size: 26,
+                              size: 24,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -541,7 +542,7 @@ class _PrepaidDeliveryRazorpayPageState
                             const Row(
                               children: [
                                 Icon(
-                                  Icons.location_on_rounded,
+                                  LucideIcons.mapPin,
                                   color: Color(0xFF2563EB),
                                   size: 20,
                                 ),
@@ -561,7 +562,7 @@ class _PrepaidDeliveryRazorpayPageState
                               controller: _nameController,
                               decoration: const InputDecoration(
                                 labelText: 'Contact / Business Name *',
-                                prefixIcon: Icon(Icons.person_outline),
+                                prefixIcon: Icon(LucideIcons.user, size: 18),
                                 border: OutlineInputBorder(),
                               ),
                               validator: (v) => v == null || v.trim().isEmpty
@@ -574,7 +575,7 @@ class _PrepaidDeliveryRazorpayPageState
                               keyboardType: TextInputType.phone,
                               decoration: const InputDecoration(
                                 labelText: 'Contact Phone Number *',
-                                prefixIcon: Icon(Icons.phone_outlined),
+                                prefixIcon: Icon(LucideIcons.phone, size: 18),
                                 border: OutlineInputBorder(),
                               ),
                               validator: (v) => v == null || v.trim().isEmpty
@@ -587,7 +588,7 @@ class _PrepaidDeliveryRazorpayPageState
                               maxLines: 2,
                               decoration: const InputDecoration(
                                 labelText: 'Street Address / Shop Location *',
-                                prefixIcon: Icon(Icons.business_outlined),
+                                prefixIcon: Icon(LucideIcons.building, size: 18),
                                 border: OutlineInputBorder(),
                               ),
                               validator: (v) => v == null || v.trim().isEmpty
@@ -654,7 +655,7 @@ class _PrepaidDeliveryRazorpayPageState
                             const Row(
                               children: [
                                 Icon(
-                                  Icons.account_balance_wallet_rounded,
+                                  LucideIcons.wallet,
                                   color: Color(0xFF2563EB),
                                   size: 20,
                                 ),
@@ -704,12 +705,12 @@ class _PrepaidDeliveryRazorpayPageState
                                     children: [
                                       Icon(
                                         isSelected
-                                            ? Icons.radio_button_checked
-                                            : Icons.radio_button_off,
+                                            ? LucideIcons.circleDot
+                                            : LucideIcons.circle,
                                         color: isSelected
                                             ? const Color(0xFF2563EB)
                                             : Colors.grey,
-                                        size: 20,
+                                        size: 18,
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
@@ -833,7 +834,7 @@ class _PrepaidDeliveryRazorpayPageState
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: _isProcessing ? null : _processRazorpayPayment,
-                  icon: const Icon(Icons.lock_outline_rounded, size: 18),
+                  icon: const Icon(LucideIcons.lock, size: 18),
                   label: _isProcessing
                       ? const SizedBox(
                           height: 20,

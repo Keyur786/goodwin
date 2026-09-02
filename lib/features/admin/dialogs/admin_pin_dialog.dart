@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Authorized Admin Security PINs
 const Set<String> _authorizedAdminPins = {'9904', '7860', '1234'};
@@ -88,7 +89,7 @@ class _AdminPinDialogWidgetState extends State<_AdminPinDialogWidget> {
               border: Border.all(color: const Color(0xFFFCA5A5)),
             ),
             child: const Icon(
-              Icons.lock_outline_rounded,
+              LucideIcons.lock,
               color: Color(0xFFDC2626),
               size: 24,
             ),
@@ -210,7 +211,7 @@ class _AdminPinDialogWidgetState extends State<_AdminPinDialogWidget> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(
-                    Icons.error_outline_rounded,
+                    LucideIcons.circleAlert,
                     size: 16,
                     color: Color(0xFFDC2626),
                   ),

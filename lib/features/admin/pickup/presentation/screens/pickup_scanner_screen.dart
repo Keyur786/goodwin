@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goodwin/features/admin/pickup/providers/pickup_verification_provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class PickupScannerScreen extends ConsumerStatefulWidget {
   const PickupScannerScreen({super.key});
@@ -38,7 +39,7 @@ class _PickupScannerScreenState extends ConsumerState<PickupScannerScreen> {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        const Icon(Icons.error_outline, color: Colors.red),
+                        const Icon(LucideIcons.circleAlert, color: Colors.red),
                         const SizedBox(height: 8),
                         Text(state.error ?? '', style: const TextStyle(color: Colors.red)),
                       ],
@@ -55,7 +56,7 @@ class _PickupScannerScreenState extends ConsumerState<PickupScannerScreen> {
               controller: _codeController,
               decoration: const InputDecoration(
                 labelText: 'Pickup Code',
-                prefixIcon: Icon(Icons.qr_code_2),
+                prefixIcon: Icon(LucideIcons.qrCode),
                 hintText: 'e.g., 123456',
               ),
               keyboardType: TextInputType.number,
@@ -70,7 +71,7 @@ class _PickupScannerScreenState extends ConsumerState<PickupScannerScreen> {
                             'katargam',
                           );
                     },
-              icon: const Icon(Icons.search),
+              icon: const Icon(LucideIcons.search),
               label: state.isLoading ? const Text('Searching...') : const Text('Verify Pickup Code'),
             ),
             if (state.order != null) ...[
@@ -104,7 +105,7 @@ class _PickupScannerScreenState extends ConsumerState<PickupScannerScreen> {
                                 pickupCode: _codeController.text,
                               );
                         },
-                  icon: const Icon(Icons.check_circle),
+                  icon: const Icon(LucideIcons.checkCircle),
                   label: const Text('Confirm Pickup'),
                 ),
                 const SizedBox(height: 12),
@@ -117,7 +118,7 @@ class _PickupScannerScreenState extends ConsumerState<PickupScannerScreen> {
                                 amount: state.order!.totalAmount,
                               );
                         },
-                  icon: const Icon(Icons.payments),
+                  icon: const Icon(LucideIcons.banknote),
                   label: const Text('Confirm Payment & Complete'),
                 ),
               ] else
@@ -125,7 +126,7 @@ class _PickupScannerScreenState extends ConsumerState<PickupScannerScreen> {
                   padding: EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 48),
+                      Icon(LucideIcons.checkCircle, color: Colors.green, size: 48),
                       SizedBox(height: 8),
                       Text('Pickup complete', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.green)),
                     ],

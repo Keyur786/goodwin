@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/services/demo_repository.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CustomersScreen extends StatelessWidget {
   const CustomersScreen({super.key});
@@ -20,7 +21,7 @@ class CustomersScreen extends StatelessWidget {
             child: ListTile(
               title: Text(customer.shopName ?? customer.name),
               subtitle: Text('${customer.name} • ${customer.phone}'),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded),
+              trailing: const Icon(LucideIcons.chevronRight),
             ),
           );
         },

@@ -7,6 +7,7 @@ import 'package:goodwin/models/cart_item.dart';
 import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key, required this.items, this.currentUser});
@@ -95,7 +96,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         icon: const Icon(
-          Icons.check_circle_rounded,
+          LucideIcons.checkCircle,
           color: Color(0xFF2563EB),
           size: 48,
         ),
@@ -255,7 +256,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.storefront_rounded,
+                              LucideIcons.store,
                               size: 16,
                               color: Color(0xFF2563EB),
                             ),
@@ -321,7 +322,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         const Row(
                           children: [
                             Icon(
-                              Icons.info_outline_rounded,
+                              LucideIcons.info,
                               size: 14,
                               color: Color(0xFF64748B),
                             ),
@@ -347,7 +348,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: _isSubmitting ? null : confirmOrder,
-                  icon: const Icon(Icons.check_rounded, size: 20),
+                  icon: const Icon(LucideIcons.check, size: 20),
                   label: _isSubmitting
                       ? const SizedBox(
                           height: 20,
@@ -447,7 +448,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
-                          Icons.warehouse_rounded,
+                          LucideIcons.warehouse,
                           color: Colors.white,
                           size: 24,
                         ),
@@ -478,7 +479,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                         ),
                       ),
                       const Icon(
-                        Icons.arrow_forward_ios_rounded,
+                        LucideIcons.chevronRight,
                         size: 16,
                         color: Color(0xFF2563EB),
                       ),
@@ -524,7 +525,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                           border: Border.all(color: const Color(0xFFE2E8F0)),
                         ),
                         child: const Icon(
-                          Icons.local_shipping_outlined,
+                          LucideIcons.truck,
                           color: Color(0xFF94A3B8),
                           size: 24,
                         ),
@@ -582,7 +583,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                         ),
                       ),
                       const Icon(
-                        Icons.lock_outline_rounded,
+                        LucideIcons.lock,
                         size: 16,
                         color: Color(0xFF94A3B8),
                       ),

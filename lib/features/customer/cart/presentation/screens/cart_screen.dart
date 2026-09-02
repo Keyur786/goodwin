@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goodwin/features/customer/cart/providers/cart_provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -17,7 +18,7 @@ class CartScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.shopping_cart_outlined, size: 80),
+              Icon(LucideIcons.shoppingBag, size: 80),
               SizedBox(height: 16),
               Text('Your cart is empty', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ],
@@ -60,7 +61,7 @@ class CartScreen extends ConsumerWidget {
                               errorBuilder: (context, error, stackTrace) => const SizedBox(
                                 width: 68,
                                 height: 68,
-                                child: Center(child: Icon(Icons.image_not_supported_outlined)),
+                                child: Center(child: Icon(LucideIcons.imageOff)),
                               ),
                             ),
                           ),
@@ -135,7 +136,7 @@ class CartScreen extends ConsumerWidget {
                                         child: Padding(
                                           padding: const EdgeInsets.all(5),
                                           child: Icon(
-                                            item.quantity > 1 ? Icons.remove_rounded : Icons.delete_outline_rounded,
+                                            item.quantity > 1 ? LucideIcons.minus : LucideIcons.trash2,
                                             size: 19,
                                             color: item.quantity > 1 ? const Color(0xFF334155) : const Color(0xFFDC2626),
                                           ),
@@ -169,7 +170,7 @@ class CartScreen extends ConsumerWidget {
                                         child: const Padding(
                                           padding: EdgeInsets.all(5),
                                           child: Icon(
-                                            Icons.add_rounded,
+                                            LucideIcons.plus,
                                             size: 19,
                                             color: Color(0xFF334155),
                                           ),
@@ -220,7 +221,7 @@ class CartScreen extends ConsumerWidget {
                                     ref.read(cartProvider.notifier).removeProduct(item.product.id);
                                   }
                                 },
-                                icon: const Icon(Icons.delete_outline_rounded, size: 22),
+                                icon: const Icon(LucideIcons.trash2, size: 20),
                                 color: const Color(0xFFDC2626),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),

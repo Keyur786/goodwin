@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goodwin/features/customer/cart/providers/cart_provider.dart';
 import 'package:goodwin/models/product_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   const ProductDetailScreen({super.key, this.product});
@@ -42,9 +43,9 @@ class ProductDetailScreen extends ConsumerWidget {
                     count: cartItemCount,
                     backgroundColor: const Color(0xFF2563EB),
                     textColor: Colors.white,
-                    child: const Icon(Icons.shopping_bag_rounded),
+                    child: const Icon(LucideIcons.shoppingBag),
                   )
-                : const Icon(Icons.shopping_bag_outlined),
+                : const Icon(LucideIcons.shoppingBag),
           ),
           const SizedBox(width: 4),
         ],
@@ -84,13 +85,13 @@ class ProductDetailScreen extends ConsumerWidget {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) => const SizedBox(
                               height: 250,
-                              child: Center(child: Icon(Icons.image_not_supported_outlined, size: 48)),
+                              child: Center(child: Icon(LucideIcons.imageOff, size: 48)),
                             ),
                           )
                         : const SizedBox(
                             height: 250,
                             child: Center(
-                              child: Icon(Icons.shopping_bag_outlined, size: 64),
+                              child: Icon(LucideIcons.shoppingBag, size: 64),
                             ),
                           ),
                   ),
@@ -192,7 +193,7 @@ class ProductDetailScreen extends ConsumerWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                currentProduct.availableQty > 0 ? Icons.check_circle_rounded : Icons.cancel_outlined,
+                                currentProduct.availableQty > 0 ? LucideIcons.checkCircle : LucideIcons.circleX,
                                 size: 16,
                                 color: currentProduct.availableQty > 0 ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
                               ),
@@ -307,7 +308,7 @@ class ProductDetailScreen extends ConsumerWidget {
                               ),
                             );
                           },
-                    icon: const Icon(Icons.shopping_cart_outlined),
+                    icon: const Icon(LucideIcons.shoppingBag),
                     label: const Text('Add to Cart', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(52),

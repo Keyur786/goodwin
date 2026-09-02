@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,7 +12,7 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: const [
           ListTile(
-            leading: CircleAvatar(child: Icon(Icons.person)),
+            leading: CircleAvatar(child: Icon(LucideIcons.user)),
             title: Text('Riya Traders'),
             subtitle: Text('+91 9876543210'),
           ),

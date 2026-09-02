@@ -7,6 +7,7 @@ import 'package:goodwin/core/services/firestore_user_repository.dart';
 import 'package:goodwin/models/product_model.dart';
 import 'package:goodwin/shared/widgets/photo_option_button.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class VariantEditItem {
   final String id;
@@ -398,7 +399,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                 children: [
                   Expanded(
                     child: PhotoOptionButton(
-                      icon: Icons.camera_alt_rounded,
+                      icon: LucideIcons.camera,
                       label: 'Camera',
                       color: const Color(0xFF2563EB),
                       onTap: () async {
@@ -410,7 +411,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: PhotoOptionButton(
-                      icon: Icons.photo_library_rounded,
+                      icon: LucideIcons.images,
                       label: 'Gallery (Multi)',
                       color: const Color(0xFF2563EB),
                       onTap: () async {
@@ -473,7 +474,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                 children: [
                   Expanded(
                     child: PhotoOptionButton(
-                      icon: Icons.camera_alt_rounded,
+                      icon: LucideIcons.camera,
                       label: 'Camera',
                       color: const Color(0xFF2563EB),
                       onTap: () async {
@@ -485,7 +486,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: PhotoOptionButton(
-                      icon: Icons.photo_library_rounded,
+                      icon: LucideIcons.images,
                       label: 'Gallery (Multi)',
                       color: const Color(0xFF2563EB),
                       onTap: () async {
@@ -606,7 +607,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: const Icon(LucideIcons.x),
                   ),
                 ],
               ),
@@ -655,7 +656,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                           TextButton.icon(
                             onPressed: _openPhotoSourcePicker,
                             icon: const Icon(
-                              Icons.add_photo_alternate_outlined,
+                              LucideIcons.imagePlus,
                               size: 16,
                             ),
                             label: const Text(
@@ -739,7 +740,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                         MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.add_photo_alternate_rounded,
+                                        LucideIcons.imagePlus,
                                         size: 26,
                                         color: Color(0xFF2563EB),
                                       ),
@@ -823,7 +824,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
-                                        Icons.close_rounded,
+                                        LucideIcons.x,
                                         size: 14,
                                         color: Colors.white,
                                       ),
@@ -866,7 +867,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.add_photo_alternate_rounded,
+                                LucideIcons.imagePlus,
                                 size: 38,
                                 color: Color(0xFF2563EB),
                               ),
@@ -920,13 +921,13 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                             hintText:
                                 'Enter category manually (e.g. Dry Fruits, Spices, Bakery...)',
                             prefixIcon: const Icon(
-                              Icons.category_outlined,
+                              LucideIcons.tag,
                               size: 20,
                             ),
                             suffixIcon: _categoryController.text.isNotEmpty
                                 ? IconButton(
                                     icon: const Icon(
-                                      Icons.clear_rounded,
+                                      LucideIcons.x,
                                       size: 18,
                                     ),
                                     onPressed: () {
@@ -1094,7 +1095,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                 child: Row(
                                   children: [
                                     const Icon(
-                                      Icons.style_outlined,
+                                      LucideIcons.layers,
                                       color: Color(0xFF2563EB),
                                       size: 18,
                                     ),
@@ -1137,7 +1138,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                               ),
                               TextButton.icon(
                                 onPressed: _addVariant,
-                                icon: const Icon(Icons.add_rounded, size: 16),
+                                icon: const Icon(LucideIcons.plus, size: 16),
                                 label: const Text(
                                   '+ Add Variation',
                                   style: TextStyle(
@@ -1232,7 +1233,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                         ),
                                         IconButton(
                                           icon: const Icon(
-                                            Icons.delete_outline_rounded,
+                                            LucideIcons.trash2,
                                             size: 18,
                                             color: Colors.red,
                                           ),
@@ -1304,7 +1305,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                                 variant,
                                               ),
                                           icon: const Icon(
-                                            Icons.add_a_photo_outlined,
+                                            LucideIcons.imagePlus,
                                             size: 14,
                                           ),
                                           label: const Text(
@@ -1362,8 +1363,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                                     ),
                                                   ),
                                                   child: const Icon(
-                                                    Icons
-                                                        .add_photo_alternate_rounded,
+                                                    LucideIcons.imagePlus,
                                                     size: 20,
                                                     color: Color(0xFF2563EB),
                                                   ),
@@ -1420,7 +1420,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                                                 BoxShape.circle,
                                                           ),
                                                       child: const Icon(
-                                                        Icons.close_rounded,
+                                                        LucideIcons.x,
                                                         size: 12,
                                                         color: Colors.white,
                                                       ),

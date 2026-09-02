@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goodwin/features/customer/catalog/providers/catalog_provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CustomerHomeScreen extends ConsumerWidget {
   const CustomerHomeScreen({super.key});
@@ -22,7 +23,7 @@ class CustomerHomeScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           TextField(
             decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: Icon(LucideIcons.search),
               hintText: 'Search in thousands of products',
             ),
           ),
@@ -55,7 +56,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                                 key: ValueKey('favorite-toggle-${product.id}'),
                                 onPressed: () => ref.read(favoriteProductIdsProvider.notifier).toggle(product.id),
                                 icon: Icon(
-                                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                                  LucideIcons.heart,
                                   color: isFavorite ? Colors.red : null,
                                 ),
                                 padding: EdgeInsets.zero,
@@ -70,7 +71,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                               height: 70,
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => const SizedBox(height: 70, child: Center(child: Icon(Icons.image_not_supported_outlined, size: 24))),
+                              errorBuilder: (context, error, stackTrace) => const SizedBox(height: 70, child: Center(child: Icon(LucideIcons.imageOff, size: 24))),
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -98,7 +99,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                   width: 52,
                   height: 52,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported_outlined),
+                  errorBuilder: (context, error, stackTrace) => const Icon(LucideIcons.imageOff),
                 ),
                 title: Text(product.name),
                 subtitle: Text('SKU: ${product.sku}'),
@@ -111,7 +112,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                       key: ValueKey('favorite-toggle-${product.id}'),
                       onPressed: () => ref.read(favoriteProductIdsProvider.notifier).toggle(product.id),
                       icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        LucideIcons.heart,
                         color: isFavorite ? Colors.red : null,
                       ),
                     ),
@@ -124,11 +125,11 @@ class CustomerHomeScreen extends ConsumerWidget {
       ),
       bottomNavigationBar: NavigationBar(
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.category_outlined), label: 'Categories'),
-          NavigationDestination(icon: Icon(Icons.list_alt_outlined), label: 'Orders'),
-          NavigationDestination(icon: Icon(Icons.shopping_cart_outlined), label: 'Cart'),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          NavigationDestination(icon: Icon(LucideIcons.house), label: 'Home'),
+          NavigationDestination(icon: Icon(LucideIcons.layoutGrid), label: 'Categories'),
+          NavigationDestination(icon: Icon(LucideIcons.clipboardList), label: 'Orders'),
+          NavigationDestination(icon: Icon(LucideIcons.shoppingBag), label: 'Cart'),
+          NavigationDestination(icon: Icon(LucideIcons.user), label: 'Profile'),
         ],
         onDestinationSelected: (index) {
           switch (index) {

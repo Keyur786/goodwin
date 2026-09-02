@@ -5,6 +5,7 @@ import 'package:goodwin/core/services/order_service.dart';
 import 'package:goodwin/features/customer/cart/providers/cart_provider.dart';
 import 'package:goodwin/features/customer/checkout/providers/order_submission_provider.dart';
 import 'package:goodwin/models/order_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -95,7 +96,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   Card(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     child: ListTile(
-                      leading: const Icon(Icons.confirmation_number_outlined),
+                      leading: const Icon(LucideIcons.ticket),
                       title: const Text('Show this code at the warehouse'),
                       subtitle: Text(
                         _pickupCode,
@@ -127,7 +128,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   const SizedBox(height: 8),
                   const ListTile(
-                    leading: Icon(Icons.money_rounded),
+                    leading: Icon(LucideIcons.banknote),
                     title: Text('Cash at Warehouse'),
                     subtitle: Text(
                       'Payment is due when you collect the order.',

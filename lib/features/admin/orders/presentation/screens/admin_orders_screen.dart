@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goodwin/features/customer/orders/providers/orders_provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminOrdersScreen extends ConsumerWidget {
   const AdminOrdersScreen({super.key});
@@ -22,7 +23,7 @@ class AdminOrdersScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
+                  Icon(LucideIcons.inbox, size: 64, color: Colors.grey),
                   SizedBox(height: 16),
                   Text('No orders found'),
                 ],

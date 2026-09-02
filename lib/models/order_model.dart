@@ -30,6 +30,24 @@ class OrderItemModel {
 
   double get totalPrice => unitPrice * quantity;
 
+  OrderItemModel copyWith({
+    String? productId,
+    String? productName,
+    String? sku,
+    String? variant,
+    double? unitPrice,
+    int? quantity,
+  }) {
+    return OrderItemModel(
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      sku: sku ?? this.sku,
+      variant: variant ?? this.variant,
+      unitPrice: unitPrice ?? this.unitPrice,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'productId': productId,
         'productName': productName,

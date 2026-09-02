@@ -7,6 +7,7 @@ import 'package:goodwin/features/customer/screens/customer_orders_screen.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
 import 'package:goodwin/shared/widgets/profile_avatar_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class DrawerProfileItem extends StatelessWidget {
   const DrawerProfileItem({
@@ -45,7 +46,7 @@ class DrawerProfileItem extends StatelessWidget {
           ),
         ),
         trailing: const Icon(
-          Icons.arrow_forward_ios_rounded,
+          LucideIcons.chevronRight,
           size: 14,
           color: Color(0xFF94A3B8),
         ),
@@ -462,7 +463,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.workspace_premium_rounded,
+                              LucideIcons.award,
                               color: Color(0xFF2563EB),
                               size: 22,
                             ),
@@ -608,19 +609,19 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 8),
 
           _ProfileOption(
-            icon: Icons.alternate_email_rounded,
+            icon: LucideIcons.atSign,
             title: 'Reseller username',
             subtitle: '@$username (Tap to change username)',
             onTap: _showEditUsernameDialog,
           ),
           _ProfileOption(
-            icon: Icons.person_outline,
+            icon: LucideIcons.user,
             title: 'Personal details',
             subtitle: 'Name: $name\nShop: $shopName\nEmail: $email',
             onTap: _showEditProfileDialog,
           ),
           _ProfileOption(
-            icon: Icons.location_on_outlined,
+            icon: LucideIcons.mapPin,
             title: 'Pickup location',
             subtitle: 'Katargam Branch, Surat (Ready for pickup)',
             onTap: () {
@@ -634,7 +635,7 @@ class _ProfilePageState extends State<ProfilePage> {
             },
           ),
           _ProfileOption(
-            icon: Icons.receipt_long_outlined,
+            icon: LucideIcons.receiptText,
             title: 'Order history',
             subtitle: 'View your cloud-synced orders and receipts',
             onTap: () {
@@ -655,7 +656,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 8),
           _ProfileOption(
-            icon: Icons.help_outline,
+            icon: LucideIcons.helpCircle,
             title: 'Help & support',
             subtitle: 'Contact wholesale support team: support@goodwin.com',
             onTap: () {
@@ -701,7 +702,7 @@ class ProfileOption extends StatelessWidget {
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
         subtitle: Text(subtitle),
         trailing: const Icon(
-          Icons.arrow_forward_ios_rounded,
+          LucideIcons.chevronRight,
           size: 14,
           color: Color(0xFF94A3B8),
         ),

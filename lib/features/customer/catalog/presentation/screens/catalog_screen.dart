@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:goodwin/features/customer/cart/providers/cart_provider.dart';
 import 'package:goodwin/features/customer/catalog/providers/catalog_provider.dart';
 import 'package:goodwin/models/product_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CatalogScreen extends ConsumerWidget {
   const CatalogScreen({super.key});
@@ -23,9 +24,9 @@ class CatalogScreen extends ConsumerWidget {
                     count: ref.watch(cartItemCountProvider),
                     backgroundColor: const Color(0xFF2563EB),
                     textColor: Colors.white,
-                    child: const Icon(Icons.shopping_bag_rounded),
+                    child: const Icon(LucideIcons.shoppingBag),
                   )
-                : const Icon(Icons.shopping_bag_outlined),
+                : const Icon(LucideIcons.shoppingBag),
           ),
         ],
       ),
@@ -76,7 +77,7 @@ class ProductCard extends ConsumerWidget {
                 errorBuilder: (context, error, stackTrace) => const SizedBox(
                   width: 100,
                   height: 100,
-                  child: Center(child: Icon(Icons.image_not_supported_outlined)),
+                  child: Center(child: Icon(LucideIcons.imageOff)),
                 ),
               ),
             ),
@@ -97,7 +98,7 @@ class ProductCard extends ConsumerWidget {
                         key: ValueKey('favorite-toggle-${product.id}'),
                         onPressed: () => ref.read(favoriteProductIdsProvider.notifier).toggle(product.id),
                         icon: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          LucideIcons.heart,
                           color: isFavorite ? Colors.red : null,
                         ),
                       ),

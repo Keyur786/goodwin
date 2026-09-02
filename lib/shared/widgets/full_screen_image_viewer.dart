@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Full-screen zoomable photo gallery dialog
 class FullScreenImageViewerDialog extends StatefulWidget {
@@ -87,9 +88,9 @@ class _FullScreenImageViewerDialogState
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
-                        Icons.close_rounded,
+                        LucideIcons.x,
                         color: Colors.white,
-                        size: 22,
+                        size: 20,
                       ),
                     ),
                     onPressed: () => Navigator.of(context).pop(),
@@ -133,7 +134,7 @@ class _FullScreenImageViewerDialogState
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
-                            Icons.arrow_back_ios_new_rounded,
+                            LucideIcons.chevronLeft,
                             color: Colors.white,
                             size: 18,
                           ),
@@ -158,7 +159,7 @@ class _FullScreenImageViewerDialogState
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
-                            Icons.arrow_forward_ios_rounded,
+                            LucideIcons.chevronRight,
                             color: Colors.white,
                             size: 18,
                           ),

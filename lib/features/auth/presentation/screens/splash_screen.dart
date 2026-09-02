@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goodwin/features/auth/providers/auth_provider.dart';
 import 'package:goodwin/models/user_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -49,7 +50,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             Image.asset(
               'assets/images/logo.png',
               width: 220,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.storefront, size: 120),
+              errorBuilder: (context, error, stackTrace) => const Icon(LucideIcons.store, size: 120),
             ),
             const SizedBox(height: 24),
             const CircularProgressIndicator(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Decorated, beautifully aligned empty state view for Favorites and Cart tabs
 class EmptyStateView extends StatelessWidget {
@@ -107,7 +108,7 @@ class EmptyStateView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.cloud_done_rounded,
+                          LucideIcons.checkCheck,
                           size: 14,
                           color: themeColor,
                         ),
@@ -134,7 +135,7 @@ class EmptyStateView extends StatelessWidget {
             // Action Button to Explore Catalog
             FilledButton.icon(
               onPressed: onAction,
-              icon: const Icon(Icons.storefront_rounded, size: 18),
+              icon: const Icon(LucideIcons.store, size: 18),
               label: Text(
                 buttonText,
                 style: const TextStyle(
