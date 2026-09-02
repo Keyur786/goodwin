@@ -159,7 +159,102 @@ class FirestoreProductRepository {
       'quantityRange': quantityRange.trim(),
       'notes': notes.trim(),
       'status': 'pending',
+      'unreadByAdmin': true,
+      'unreadByUser': false,
+      'lastMessageAt': FieldValue.serverTimestamp(),
+      'lastMessagePreview': 'New inquiry submitted',
       'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // --- Admin: stream all inquiries ---
+  Stream<List<Map<String, dynamic>>> streamAllBulkInquiries() {
+    return _firestore
+        .collection('bulk_inquiries')
+        .orderBy('lastMessageAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => {'id': d.id, ...d.data()}).toList());
+  }
+
+  // --- Customer: stream their own inquiries ---
+  Stream<List<Map<String, dynamic>>> streamMyBulkInquiries(String userId) {
+    return _firestore
+        .collection('bulk_inquiries')
+        .where('userId', isEqualTo: userId)
+        .orderBy('lastMessageAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => {'id': d.id, ...d.data()}).toList());
+  }
+
+  // --- Stream messages sub-collection ---
+  Stream<List<Map<String, dynamic>>> streamInquiryMessages(String inquiryId) {
+    return _firestore
+        .collection('bulk_inquiries')
+        .doc(inquiryId)
+        .collection('messages')
+        .orderBy('sentAt', descending: false)
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => {'id': d.id, ...d.data()}).toList());
+  }
+
+  // --- Send a message (admin or customer) ---
+  Future<void> sendInquiryMessage({
+    required String inquiryId,
+    required String senderId,
+    required String senderName,
+    required String text,
+    required bool isAdmin,
+  }) async {
+    final msgId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
+    final batch = _firestore.batch();
+
+    // Write message doc
+    final msgRef = _firestore
+        .collection('bulk_inquiries')
+        .doc(inquiryId)
+        .collection('messages')
+        .doc(msgId);
+    batch.set(msgRef, {
+      'id': msgId,
+      'senderId': senderId,
+      'senderName': senderName,
+      'text': text.trim(),
+      'sentAt': FieldValue.serverTimestamp(),
+    });
+
+    // Update parent inquiry
+    final inquiryRef = _firestore.collection('bulk_inquiries').doc(inquiryId);
+    batch.update(inquiryRef, {
+      'lastMessageAt': FieldValue.serverTimestamp(),
+      'lastMessagePreview': text.trim().length > 60
+          ? '${text.trim().substring(0, 60)}…'
+          : text.trim(),
+      'status': isAdmin ? 'replied' : 'pending',
+      'unreadByAdmin': !isAdmin,
+      'unreadByUser': isAdmin,
+    });
+
+    await batch.commit();
+  }
+
+  // --- Mark read by admin ---
+  Future<void> markInquiryReadByAdmin(String inquiryId) async {
+    await _firestore.collection('bulk_inquiries').doc(inquiryId).update({
+      'unreadByAdmin': false,
+    });
+  }
+
+  // --- Mark read by user ---
+  Future<void> markInquiryReadByUser(String inquiryId) async {
+    await _firestore.collection('bulk_inquiries').doc(inquiryId).update({
+      'unreadByUser': false,
+    });
+  }
+
+  // --- Update status ---
+  Future<void> updateInquiryStatus(String inquiryId, String status) async {
+    await _firestore.collection('bulk_inquiries').doc(inquiryId).update({
+      'status': status,
     });
   }
 

@@ -3,8 +3,10 @@ enum AppScreen { splash, login, home }
 enum ProfileAction {
   profile,
   orders,
+  bulkQuotes,
   manageProducts,
   allOrders,
+  adminBulkQuotes,
   addresses,
   help,
   signOut,

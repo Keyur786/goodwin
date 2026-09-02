@@ -8,7 +8,9 @@ import 'package:goodwin/core/state/notification_controller.dart';
 import 'package:goodwin/core/utils/quantity_dialog.dart';
 import 'package:goodwin/features/admin/dialogs/add_edit_product_dialog.dart';
 import 'package:goodwin/features/admin/screens/admin_all_orders_screen.dart';
+import 'package:goodwin/features/admin/screens/admin_bulk_quotes_screen.dart';
 import 'package:goodwin/features/admin/screens/admin_product_manager_screen.dart';
+import 'package:goodwin/features/customer/screens/customer_bulk_quotes_screen.dart';
 import 'package:goodwin/features/customer/dialogs/bulk_inquiry_dialog.dart';
 import 'package:goodwin/features/customer/payment/prepaid_razorpay_screen.dart';
 import 'package:goodwin/features/customer/screens/checkout_screen.dart';
@@ -797,6 +799,26 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     if (action == ProfileAction.allOrders) {
       await Navigator.of(context).push<void>(
         MaterialPageRoute<void>(builder: (_) => const AdminAllOrdersScreen()),
+      );
+      return;
+    }
+
+    if (action == ProfileAction.adminBulkQuotes) {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(builder: (_) => const AdminBulkQuotesScreen()),
+      );
+      return;
+    }
+
+    if (action == ProfileAction.bulkQuotes) {
+      final uid = currentUser?.id ?? FirebaseAuth.instance.currentUser?.uid ?? '';
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => CustomerBulkQuotesScreen(
+            userId: uid,
+            userName: currentUser?.name ?? '',
+          ),
+        ),
       );
       return;
     }
@@ -3298,6 +3320,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   action: ProfileAction.allOrders,
                   onSelected: handleProfileAction,
                 ),
+                DrawerProfileItem(
+                  icon: LucideIcons.messageSquare,
+                  label: 'Bulk Quotes',
+                  action: ProfileAction.adminBulkQuotes,
+                  onSelected: handleProfileAction,
+                ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Divider(height: 1),
@@ -3314,6 +3342,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 icon: LucideIcons.receiptText,
                 label: 'My orders',
                 action: ProfileAction.orders,
+                onSelected: handleProfileAction,
+              ),
+              DrawerProfileItem(
+                icon: LucideIcons.messageSquare,
+                label: 'My Bulk Quotes',
+                action: ProfileAction.bulkQuotes,
                 onSelected: handleProfileAction,
               ),
               DrawerProfileItem(
