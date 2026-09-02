@@ -366,7 +366,7 @@ class _LoginScreenState extends State<LoginScreen> {
             isActive: false,
             isDone: true,
           ),
-          Expanded(child: Container(height: 2, color: const Color(0xFF0F766E))),
+          Expanded(child: Container(height: 2, color: const Color(0xFF2563EB))),
           _buildStepBadge(
             stepNumber: 2,
             title: 'Code',
@@ -390,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(
             height: 2,
             color: _currentStep != _AuthStep.phone
-                ? const Color(0xFF0F766E)
+                ? const Color(0xFF2563EB)
                 : const Color(0xFFE2E8F0),
           ),
         ),
@@ -404,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(
             height: 2,
             color: _currentStep == _AuthStep.profile
-                ? const Color(0xFF0F766E)
+                ? const Color(0xFF2563EB)
                 : const Color(0xFFE2E8F0),
           ),
         ),
@@ -425,12 +425,12 @@ class _LoginScreenState extends State<LoginScreen> {
     required bool isDone,
   }) {
     final color = isDone || isActive
-        ? const Color(0xFF0F766E)
+        ? const Color(0xFF2563EB)
         : const Color(0xFF94A3B8);
     final bgColor = isDone
-        ? const Color(0xFF0F766E)
+        ? const Color(0xFF2563EB)
         : (isActive
-              ? const Color(0xFF0F766E).withAlpha(25)
+              ? const Color(0xFF2563EB).withAlpha(25)
               : const Color(0xFFF1F5F9));
 
     return Column(
@@ -551,7 +551,7 @@ class _LoginScreenState extends State<LoginScreen> {
             hintText: '10-digit mobile number',
             prefixIcon: const Icon(
               Icons.phone_iphone_rounded,
-              color: Color(0xFF0F766E),
+              color: Color(0xFF2563EB),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
@@ -565,7 +565,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFF0F766E), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
             ),
           ),
         ),
@@ -644,13 +644,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Icon(
                   Icons.arrow_back_rounded,
                   size: 18,
-                  color: Color(0xFF0F766E),
+                  color: Color(0xFF2563EB),
                 ),
                 const SizedBox(width: 6),
                 Text(
                   'Change Number (${_phoneController.text})',
                   style: const TextStyle(
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                   ),
@@ -716,7 +716,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFF0F766E), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
             ),
           ),
         ),
@@ -824,7 +824,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Icons.edit_rounded
                             : Icons.add_a_photo_rounded,
                         size: 15,
-                        color: const Color(0xFF0F766E),
+                        color: const Color(0xFF2563EB),
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -834,7 +834,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F766E),
+                          color: Color(0xFF2563EB),
                         ),
                       ),
                     ],
@@ -862,7 +862,7 @@ class _LoginScreenState extends State<LoginScreen> {
             hintText: 'e.g. First and Lastname',
             prefixIcon: const Icon(
               Icons.person_outline_rounded,
-              color: Color(0xFF0F766E),
+              color: Color(0xFF2563EB),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
@@ -876,7 +876,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFF0F766E), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
             ),
           ),
         ),
@@ -918,7 +918,7 @@ class _LoginScreenState extends State<LoginScreen> {
             hintText: 'e.g. abc@gmail.com (optional)',
             prefixIcon: const Icon(
               Icons.email_outlined,
-              color: Color(0xFF0F766E),
+              color: Color(0xFF2563EB),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
@@ -932,7 +932,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFF0F766E), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
             ),
           ),
         ),

@@ -150,14 +150,14 @@ class _AdminPinDialogWidgetState extends State<_AdminPinDialogWidget> {
                       margin: const EdgeInsets.symmetric(horizontal: 6),
                       decoration: BoxDecoration(
                         color: hasDigit
-                            ? const Color(0xFFF0FDFA)
+                            ? const Color(0xFFEFF6FF)
                             : const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: _errorMessage != null
                               ? const Color(0xFFDC2626)
                               : hasDigit
-                                  ? const Color(0xFF0F766E)
+                                  ? const Color(0xFF2563EB)
                                   : const Color(0xFFCBD5E1),
                           width: hasDigit ? 2 : 1,
                         ),
@@ -168,7 +168,7 @@ class _AdminPinDialogWidgetState extends State<_AdminPinDialogWidget> {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F766E),
+                          color: Color(0xFF2563EB),
                         ),
                       ),
                     );

@@ -16,8 +16,8 @@ class GoodwinDemoApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0F766E),
-          primary: const Color(0xFF0F766E),
+          seedColor: const Color(0xFF2563EB),
+          primary: const Color(0xFF2563EB),
           secondary: const Color(0xFF16A34A),
           surface: Colors.white,
           surfaceTint: Colors.transparent,
@@ -25,12 +25,12 @@ class GoodwinDemoApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF8FAFC),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
-          foregroundColor: Color(0xFF0F172A),
+          foregroundColor: Color(0xFF111827),
           elevation: 0,
           scrolledUnderElevation: 1,
           centerTitle: true,
           titleTextStyle: TextStyle(
-            color: Color(0xFF0F172A),
+            color: Color(0xFF111827),
             fontSize: 18,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.3,
@@ -41,7 +41,7 @@ class GoodwinDemoApp extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
-            side: const BorderSide(color: Color(0xFFF1F5F9), width: 1.2),
+            side: const BorderSide(color: Color(0xFFE5E7EB), width: 1.2),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
@@ -49,20 +49,20 @@ class GoodwinDemoApp extends StatelessWidget {
           fillColor: const Color(0xFFF8FAFC),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF0F766E), width: 1.8),
+            borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.8),
           ),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF0F766E),
+            backgroundColor: const Color(0xFF2563EB),
             foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),

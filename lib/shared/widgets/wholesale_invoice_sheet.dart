@@ -50,7 +50,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Invoice details copied to clipboard!'),
-        backgroundColor: Color(0xFF0F766E),
+        backgroundColor: Color(0xFF2563EB),
         duration: Duration(seconds: 2),
       ),
     );
@@ -119,7 +119,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 child: Row(
                   children: [
-                    const Icon(Icons.receipt_long_rounded, color: Color(0xFF0F766E), size: 24),
+                    const Icon(Icons.receipt_long_rounded, color: Color(0xFF2563EB), size: 24),
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
@@ -128,12 +128,12 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.print_rounded, color: Color(0xFF0F766E), size: 22),
+                      icon: const Icon(Icons.print_rounded, color: Color(0xFF2563EB), size: 22),
                       tooltip: 'Print / Save PDF',
                       onPressed: () => _handleDownloadPdf(context),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.share_rounded, color: Color(0xFF0F766E), size: 20),
+                      icon: const Icon(Icons.share_rounded, color: Color(0xFF2563EB), size: 20),
                       tooltip: 'Share PDF',
                       onPressed: () => _handleSharePdf(context),
                     ),
@@ -174,7 +174,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 16,
-                                      color: Color(0xFF0F766E),
+                                      color: Color(0xFF2563EB),
                                       letterSpacing: 0.5,
                                     ),
                                   ),
@@ -236,13 +236,13 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF0F766E).withValues(alpha: 0.1),
+                                    color: const Color(0xFF2563EB).withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
                                     'Pickup Code: ${order.pickupCode}',
                                     style: const TextStyle(
-                                      color: Color(0xFF0F766E),
+                                      color: Color(0xFF2563EB),
                                       fontWeight: FontWeight.w800,
                                       fontSize: 12,
                                     ),
@@ -290,13 +290,13 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF0F766E).withValues(alpha: 0.08),
+                                          color: const Color(0xFF2563EB).withValues(alpha: 0.08),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
                                           item.variant!,
                                           style: const TextStyle(
-                                            color: Color(0xFF0F766E),
+                                            color: Color(0xFF2563EB),
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -360,7 +360,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF0F766E),
+                            color: Color(0xFF2563EB),
                           ),
                         ),
                       ],
@@ -374,7 +374,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                       label: const Text('Download / Print PDF Invoice'),
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: const Color(0xFF0F766E),
+                        backgroundColor: const Color(0xFF2563EB),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -391,8 +391,8 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                             icon: const Icon(Icons.share_rounded, size: 16),
                             label: const Text('Share PDF'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF0F766E),
-                              side: const BorderSide(color: Color(0xFF0F766E)),
+                              foregroundColor: const Color(0xFF2563EB),
+                              side: const BorderSide(color: Color(0xFF2563EB)),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),

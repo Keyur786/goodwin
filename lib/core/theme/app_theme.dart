@@ -4,13 +4,13 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF0B3D91),
+      seedColor: const Color(0xFF2563EB),
       brightness: Brightness.light,
-      primary: const Color(0xFF0B3D91),
-      secondary: const Color(0xFF4DB6AC),
-      tertiary: const Color(0xFFFFA726),
+      primary: const Color(0xFF2563EB),
+      secondary: const Color(0xFF16A34A),
+      tertiary: const Color(0xFFF59E0B),
     ),
-    scaffoldBackgroundColor: const Color(0xFFF7F7F7),
+    scaffoldBackgroundColor: const Color(0xFFF8FAFC),
     appBarTheme: const AppBarTheme(
       elevation: 0,
       scrolledUnderElevation: 0,
@@ -28,15 +28,15 @@ class AppTheme {
       fillColor: Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(color: Colors.blue.shade700, width: 2),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(18)),
+        borderSide: BorderSide(color: Color(0xFF2563EB), width: 2),
       ),
     ),
     textTheme: const TextTheme(
@@ -52,7 +52,7 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF0B3D91),
+      seedColor: const Color(0xFF2563EB),
       brightness: Brightness.dark,
     ),
   );

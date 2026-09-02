@@ -400,7 +400,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                     child: PhotoOptionButton(
                       icon: Icons.camera_alt_rounded,
                       label: 'Camera',
-                      color: const Color(0xFF0F766E),
+                      color: const Color(0xFF2563EB),
                       onTap: () async {
                         Navigator.pop(sheetCtx);
                         await _pickVariantImage(variant, ImageSource.camera);
@@ -475,7 +475,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                     child: PhotoOptionButton(
                       icon: Icons.camera_alt_rounded,
                       label: 'Camera',
-                      color: const Color(0xFF0F766E),
+                      color: const Color(0xFF2563EB),
                       onTap: () async {
                         Navigator.pop(sheetCtx);
                         await _pickImageFromDevice(ImageSource.camera);
@@ -564,7 +564,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                   ? 'Product "${product.name}" added to catalog!'
                   : 'Product updated!',
             ),
-            backgroundColor: const Color(0xFF0F766E),
+            backgroundColor: const Color(0xFF2563EB),
           ),
         );
       }
@@ -636,7 +636,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFCCFBF1),
+                                  color: const Color(0xFFDBEAFE),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
@@ -644,7 +644,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                   style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800,
-                                    color: Color(0xFF0F766E),
+                                    color: Color(0xFF2563EB),
                                   ),
                                 ),
                               ),
@@ -666,7 +666,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                               ),
                             ),
                             style: TextButton.styleFrom(
-                              foregroundColor: const Color(0xFF0F766E),
+                              foregroundColor: const Color(0xFF2563EB),
                               visualDensity: VisualDensity.compact,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -727,10 +727,10 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                   width: 90,
                                   height: 100,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF0FDFA),
+                                    color: const Color(0xFFEFF6FF),
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                      color: const Color(0xFF99F6E4),
+                                      color: const Color(0xFFBFDBFE),
                                       width: 1.5,
                                     ),
                                   ),
@@ -741,7 +741,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                       Icon(
                                         Icons.add_photo_alternate_rounded,
                                         size: 26,
-                                        color: Color(0xFF0F766E),
+                                        color: Color(0xFF2563EB),
                                       ),
                                       SizedBox(height: 4),
                                       Text(
@@ -749,7 +749,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF0F766E),
+                                          color: Color(0xFF2563EB),
                                         ),
                                       ),
                                     ],
@@ -769,7 +769,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
                                       color: isCover
-                                          ? const Color(0xFF0F766E)
+                                          ? const Color(0xFF2563EB)
                                           : const Color(0xFFE2E8F0),
                                       width: isCover ? 2 : 1,
                                     ),
@@ -792,7 +792,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF0F766E),
+                                        color: const Color(0xFF2563EB),
                                         borderRadius:
                                             BorderRadius.circular(6),
                                       ),
@@ -855,10 +855,10 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                             horizontal: 16,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF0FDFA),
+                            color: const Color(0xFFEFF6FF),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(0xFF99F6E4),
+                              color: const Color(0xFFBFDBFE),
                               width: 1.5,
                             ),
                           ),
@@ -868,7 +868,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                               Icon(
                                 Icons.add_photo_alternate_rounded,
                                 size: 38,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                               ),
                               SizedBox(height: 8),
                               Text(
@@ -876,7 +876,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 14,
-                                  color: Color(0xFF0F766E),
+                                  color: Color(0xFF2563EB),
                                 ),
                               ),
                               SizedBox(height: 4),
@@ -968,11 +968,11 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                   child: ActionChip(
                                     label: Text(cat),
                                     backgroundColor: isSelected
-                                        ? const Color(0xFFCCFBF1)
+                                        ? const Color(0xFFDBEAFE)
                                         : const Color(0xFFF1F5F9),
                                     side: BorderSide(
                                       color: isSelected
-                                          ? const Color(0xFF0F766E)
+                                          ? const Color(0xFF2563EB)
                                           : const Color(0xFFE2E8F0),
                                     ),
                                     labelStyle: TextStyle(
@@ -981,7 +981,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                           ? FontWeight.w800
                                           : FontWeight.w500,
                                       color: isSelected
-                                          ? const Color(0xFF0F766E)
+                                          ? const Color(0xFF2563EB)
                                           : const Color(0xFF334155),
                                     ),
                                     onPressed: () {
@@ -1095,7 +1095,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                   children: [
                                     const Icon(
                                       Icons.style_outlined,
-                                      color: Color(0xFF0F766E),
+                                      color: Color(0xFF2563EB),
                                       size: 18,
                                     ),
                                     const SizedBox(width: 6),
@@ -1118,7 +1118,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                           vertical: 1.5,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFCCFBF1),
+                                          color: const Color(0xFFDBEAFE),
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
@@ -1127,7 +1127,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                           style: const TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w800,
-                                            color: Color(0xFF0F766E),
+                                            color: Color(0xFF2563EB),
                                           ),
                                         ),
                                       ),
@@ -1146,7 +1146,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                   ),
                                 ),
                                 style: TextButton.styleFrom(
-                                  foregroundColor: const Color(0xFF0F766E),
+                                  foregroundColor: const Color(0xFF2563EB),
                                   visualDensity: VisualDensity.compact,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 6,
@@ -1217,7 +1217,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                             vertical: 3,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFF0F766E),
+                                            color: const Color(0xFF2563EB),
                                             borderRadius:
                                                 BorderRadius.circular(6),
                                           ),
@@ -1313,7 +1313,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                           ),
                                           style: TextButton.styleFrom(
                                             foregroundColor: const Color(
-                                              0xFF0F766E,
+                                              0xFF2563EB,
                                             ),
                                             visualDensity:
                                                 VisualDensity.compact,
@@ -1349,7 +1349,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                                   height: 60,
                                                   decoration: BoxDecoration(
                                                     color: const Color(
-                                                      0xFFF0FDFA,
+                                                      0xFFEFF6FF,
                                                     ),
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -1357,7 +1357,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                                         ),
                                                     border: Border.all(
                                                       color: const Color(
-                                                        0xFF99F6E4,
+                                                        0xFFBFDBFE,
                                                       ),
                                                     ),
                                                   ),
@@ -1365,7 +1365,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                                     Icons
                                                         .add_photo_alternate_rounded,
                                                     size: 20,
-                                                    color: Color(0xFF0F766E),
+                                                    color: Color(0xFF2563EB),
                                                   ),
                                                 ),
                                               );
@@ -1472,7 +1472,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                     child: FilledButton(
                       onPressed: _isSaving ? null : _saveProduct,
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF0F766E),
+                        backgroundColor: const Color(0xFF2563EB),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

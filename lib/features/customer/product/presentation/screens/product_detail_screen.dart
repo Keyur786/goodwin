@@ -40,7 +40,7 @@ class ProductDetailScreen extends ConsumerWidget {
             icon: cartItemCount > 0
                 ? Badge.count(
                     count: cartItemCount,
-                    backgroundColor: const Color(0xFF0F766E),
+                    backgroundColor: const Color(0xFF2563EB),
                     textColor: Colors.white,
                     child: const Icon(Icons.shopping_bag_rounded),
                   )
@@ -101,16 +101,16 @@ class ProductDetailScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF0FDFA),
+                          color: const Color(0xFFEFF6FF),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFF99F6E4), width: 1),
+                          border: Border.all(color: const Color(0xFFBFDBFE), width: 1),
                         ),
                         child: Text(
                           (currentProduct.categoryId.isNotEmpty ? currentProduct.categoryId : 'WHOLESALE').toUpperCase(),
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF0F766E),
+                            color: Color(0xFF2563EB),
                             letterSpacing: 0.8,
                           ),
                         ),
@@ -148,9 +148,9 @@ class ProductDetailScreen extends ConsumerWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0FDFA),
+                      color: const Color(0xFFEFF6FF),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF99F6E4), width: 1.2),
+                      border: Border.all(color: const Color(0xFFBFDBFE), width: 1.2),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -163,7 +163,7 @@ class ProductDetailScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -172,7 +172,7 @@ class ProductDetailScreen extends ConsumerWidget {
                               style: const TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                               ),
                             ),
                           ],
@@ -184,7 +184,7 @@ class ProductDetailScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: currentProduct.availableQty > 0
-                                  ? const Color(0xFF99F6E4)
+                                  ? const Color(0xFFBFDBFE)
                                   : const Color(0xFFFCA5A5),
                             ),
                           ),
@@ -303,7 +303,7 @@ class ProductDetailScreen extends ConsumerWidget {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('${currentProduct.name} added to cart'),
-                                backgroundColor: const Color(0xFF0F766E),
+                                backgroundColor: const Color(0xFF2563EB),
                               ),
                             );
                           },
@@ -311,7 +311,7 @@ class ProductDetailScreen extends ConsumerWidget {
                     label: const Text('Add to Cart', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(52),
-                      backgroundColor: const Color(0xFF0F766E),
+                      backgroundColor: const Color(0xFF2563EB),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),

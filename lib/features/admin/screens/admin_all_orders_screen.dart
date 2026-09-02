@@ -67,7 +67,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
               ? const Color(0xFF16A34A)
               : (newStatus == OrderStatus.inDelivery
                     ? const Color(0xFFD97706)
-                    : const Color(0xFF0F766E)),
+                    : const Color(0xFF2563EB)),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -92,9 +92,9 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
       child: FilterChip(
         label: Text(st),
         selected: isSelected,
-        selectedColor: const Color(0xFFCCFBF1),
+        selectedColor: const Color(0xFFDBEAFE),
         labelStyle: TextStyle(
-          color: isSelected ? const Color(0xFF0F766E) : const Color(0xFF475569),
+          color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF475569),
           fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
           fontSize: 12,
         ),
@@ -112,9 +112,9 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
         appBar: AppBar(
           title: const Text('All Placed Orders'),
           bottom: const TabBar(
-            indicatorColor: Color(0xFF0F766E),
+            indicatorColor: Color(0xFF2563EB),
             indicatorWeight: 3,
-            labelColor: Color(0xFF0F766E),
+            labelColor: Color(0xFF2563EB),
             unselectedLabelColor: Color(0xFF64748B),
             labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
             tabs: [
@@ -152,7 +152,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                   hintText: 'Search warehouse orders, phone, code...',
                   prefixIcon: const Icon(
                     Icons.search_rounded,
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                   ),
                   filled: true,
                   fillColor: const Color(0xFFF1F5F9),
@@ -269,7 +269,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF0F766E), Color(0xFF115E59)],
+                            colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
                           ),
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -464,7 +464,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFCCFBF1),
+                                    color: const Color(0xFFDBEAFE),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -472,7 +472,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 13,
-                                      color: Color(0xFF0F766E),
+                                      color: Color(0xFF2563EB),
                                     ),
                                   ),
                                 ),
@@ -527,7 +527,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
-                                  color: Color(0xFF0F766E),
+                                  color: Color(0xFF2563EB),
                                 ),
                               ),
                             ],
@@ -540,8 +540,8 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                               icon: const Icon(Icons.receipt_long_rounded, size: 16),
                               label: const Text('View Wholesale Invoice / PO'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFF0F766E),
-                                side: const BorderSide(color: Color(0xFF0F766E)),
+                                foregroundColor: const Color(0xFF2563EB),
+                                side: const BorderSide(color: Color(0xFF2563EB)),
                                 padding: const EdgeInsets.symmetric(vertical: 8),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -1131,7 +1131,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
-                                  color: Color(0xFF0F766E),
+                                  color: Color(0xFF2563EB),
                                 ),
                               ),
                             ],

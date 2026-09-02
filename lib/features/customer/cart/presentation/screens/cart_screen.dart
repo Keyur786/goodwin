@@ -83,7 +83,7 @@ class CartScreen extends ConsumerWidget {
                                 Text(
                                   '₹${item.unitPrice.toStringAsFixed(0)} / unit',
                                   style: const TextStyle(
-                                    color: Color(0xFF0F766E),
+                                    color: Color(0xFF2563EB),
                                     fontWeight: FontWeight.w700,
                                     fontSize: 12,
                                   ),
@@ -156,7 +156,7 @@ class CartScreen extends ConsumerWidget {
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w800,
                                             fontSize: 15,
-                                            color: Color(0xFF0F766E),
+                                            color: Color(0xFF2563EB),
                                           ),
                                         ),
                                       ),
@@ -191,7 +191,7 @@ class CartScreen extends ConsumerWidget {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 16,
-                                  color: Color(0xFF0F766E),
+                                  color: Color(0xFF2563EB),
                                 ),
                               ),
                               const SizedBox(height: 8),

@@ -161,7 +161,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
             content: Text(
               'Order #${widget.order.orderNumber} updated successfully!',
             ),
-            backgroundColor: const Color(0xFF0F766E),
+            backgroundColor: const Color(0xFF2563EB),
           ),
         );
       }
@@ -313,7 +313,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                           ),
                           prefixIcon: const Icon(
                             Icons.search_rounded,
-                            color: Color(0xFF0F766E),
+                            color: Color(0xFF2563EB),
                             size: 22,
                           ),
                           suffixIcon: searchQuery.isEmpty
@@ -351,7 +351,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFF0F766E),
+                              color: Color(0xFF2563EB),
                               width: 1.5,
                             ),
                           ),
@@ -413,7 +413,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                     '₹${prod.wholesalePrice.toStringAsFixed(0)} • Stock: ${prod.availableQty}',
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Color(0xFF0F766E),
+                                      color: Color(0xFF2563EB),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -430,7 +430,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                           ),
                                           duration: const Duration(seconds: 1),
                                           backgroundColor: const Color(
-                                            0xFF0F766E,
+                                            0xFF2563EB,
                                           ),
                                         ),
                                       );
@@ -503,20 +503,20 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFFF0FDFA),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFCCFBF1)),
+                color: const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFDBEAFE)),
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16, color: Color(0xFF0F766E)),
+                  Icon(Icons.info_outline, size: 16, color: Color(0xFF2563EB)),
                   SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'You can edit item quantities until order is delivered / picked up.',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF0F766E),
+                        color: Color(0xFF2563EB),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -605,7 +605,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                       size: 18,
                                       color: item.quantity == 1
                                           ? Colors.red
-                                          : const Color(0xFF0F766E),
+                                          : const Color(0xFF2563EB),
                                     ),
                                     visualDensity: VisualDensity.compact,
                                     padding: EdgeInsets.zero,
@@ -649,7 +649,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 14,
-                                          color: Color(0xFF0F766E),
+                                          color: Color(0xFF2563EB),
                                         ),
                                       ),
                                     ),
@@ -662,7 +662,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                                     icon: const Icon(
                                       Icons.add_rounded,
                                       size: 18,
-                                      color: Color(0xFF0F766E),
+                                      color: Color(0xFF2563EB),
                                     ),
                                     visualDensity: VisualDensity.compact,
                                     padding: EdgeInsets.zero,
@@ -686,8 +686,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
               label: const Text('Add More Products'),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 42),
-                foregroundColor: const Color(0xFF0F766E),
-                side: const BorderSide(color: Color(0xFF0F766E)),
+                foregroundColor: const Color(0xFF2563EB),
+                side: const BorderSide(color: Color(0xFF2563EB)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -710,7 +710,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                   ),
                 ),
               ],
@@ -743,7 +743,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> {
                   child: FilledButton(
                     onPressed: _isSaving ? null : _saveChanges,
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF0F766E),
+                      backgroundColor: const Color(0xFF2563EB),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

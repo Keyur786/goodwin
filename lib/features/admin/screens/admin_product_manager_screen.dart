@@ -52,7 +52,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0F766E),
+                  color: const Color(0xFF2563EB),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -220,7 +220,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                   Icons.inventory_2_outlined,
                                   size: 16,
                                   color: _currentTab == 0
-                                      ? const Color(0xFF0F766E)
+                                      ? const Color(0xFF2563EB)
                                       : const Color(0xFF64748B),
                                 ),
                                 const SizedBox(width: 6),
@@ -232,7 +232,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                         : FontWeight.w600,
                                     fontSize: 13,
                                     color: _currentTab == 0
-                                        ? const Color(0xFF0F766E)
+                                        ? const Color(0xFF2563EB)
                                         : const Color(0xFF64748B),
                                   ),
                                 ),
@@ -310,7 +310,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                             : 'Search deleted listings in recycle bin...',
                         prefixIcon: const Icon(
                           Icons.search_rounded,
-                          color: Color(0xFF0F766E),
+                          color: Color(0xFF2563EB),
                         ),
                         filled: true,
                         fillColor: const Color(0xFFF1F5F9),
@@ -355,7 +355,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                         const Icon(
                                           Icons.check_rounded,
                                           size: 16,
-                                          color: Color(0xFF0F766E),
+                                          color: Color(0xFF2563EB),
                                         )
                                       else
                                         const SizedBox(width: 16),
@@ -367,7 +367,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                               ? FontWeight.w800
                                               : FontWeight.w500,
                                           color: _adminSort == opt
-                                              ? const Color(0xFF0F766E)
+                                              ? const Color(0xFF2563EB)
                                               : const Color(0xFF1E293B),
                                         ),
                                       ),
@@ -382,12 +382,12 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: _adminSort != 'Default'
-                                      ? const Color(0xFFCCFBF1)
+                                      ? const Color(0xFFDBEAFE)
                                       : const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
                                     color: _adminSort != 'Default'
-                                        ? const Color(0xFF0F766E)
+                                        ? const Color(0xFF2563EB)
                                         : const Color(0xFFCBD5E1),
                                   ),
                                 ),
@@ -398,7 +398,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                       Icons.sort_rounded,
                                       size: 16,
                                       color: _adminSort != 'Default'
-                                          ? const Color(0xFF0F766E)
+                                          ? const Color(0xFF2563EB)
                                           : const Color(0xFF64748B),
                                     ),
                                     const SizedBox(width: 4),
@@ -410,7 +410,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
                                         color: _adminSort != 'Default'
-                                            ? const Color(0xFF0F766E)
+                                            ? const Color(0xFF2563EB)
                                             : const Color(0xFF334155),
                                       ),
                                     ),
@@ -446,7 +446,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                         const Icon(
                                           Icons.check_rounded,
                                           size: 16,
-                                          color: Color(0xFF0F766E),
+                                          color: Color(0xFF2563EB),
                                         )
                                       else
                                         const SizedBox(width: 16),
@@ -458,7 +458,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                               ? FontWeight.w800
                                               : FontWeight.w500,
                                           color: _stockFilter == opt
-                                              ? const Color(0xFF0F766E)
+                                              ? const Color(0xFF2563EB)
                                               : const Color(0xFF1E293B),
                                         ),
                                       ),
@@ -534,7 +534,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                     _selectedCategory = category;
                                   });
                                 },
-                                selectedColor: const Color(0xFF0F766E),
+                                selectedColor: const Color(0xFF2563EB),
                                 labelStyle: TextStyle(
                                   color: isSelected
                                       ? Colors.white
@@ -548,7 +548,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                   side: BorderSide(
                                     color: isSelected
-                                        ? const Color(0xFF0F766E)
+                                        ? const Color(0xFF2563EB)
                                         : Colors.transparent,
                                   ),
                                 ),
@@ -708,7 +708,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w900,
                                               fontSize: 15,
-                                              color: Color(0xFF0F766E),
+                                              color: Color(0xFF2563EB),
                                             ),
                                           ),
                                           const SizedBox(width: 10),
@@ -752,11 +752,11 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                         icon: const Icon(
                                           Icons.restore_from_trash_rounded,
                                           size: 18,
-                                          color: Color(0xFF0F766E),
+                                          color: Color(0xFF2563EB),
                                         ),
                                         style: IconButton.styleFrom(
                                           backgroundColor:
-                                              const Color(0xFFF0FDFA),
+                                              const Color(0xFFEFF6FF),
                                           visualDensity: VisualDensity.compact,
                                         ),
                                         onPressed: () =>
@@ -787,7 +787,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                                         icon: const Icon(
                                           Icons.edit_outlined,
                                           size: 20,
-                                          color: Color(0xFF0F766E),
+                                          color: Color(0xFF2563EB),
                                         ),
                                         onPressed: () =>
                                             _openAddEditProductModal(
@@ -885,7 +885,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
               content: Text('Moved "${product.name}" to Recycle Bin'),
               action: SnackBarAction(
                 label: 'Undo',
-                textColor: const Color(0xFF99F6E4),
+                textColor: const Color(0xFFBFDBFE),
                 onPressed: () => _productRepo.restoreFromBin(product.id),
               ),
               behavior: SnackBarBehavior.floating,
@@ -916,7 +916,7 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
         messenger.showSnackBar(
           SnackBar(
             content: Text('Restored "${product.name}" to active catalog'),
-            backgroundColor: const Color(0xFF0F766E),
+            backgroundColor: const Color(0xFF2563EB),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),

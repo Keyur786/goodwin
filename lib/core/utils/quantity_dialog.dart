@@ -43,13 +43,13 @@ Future<int?> showQuantityInputDialog({
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDFA),
+                    color: const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFF99F6E4)),
+                    border: Border.all(color: const Color(0xFFBFDBFE)),
                   ),
                   child: const Icon(
                     Icons.edit_note_rounded,
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                     size: 22,
                   ),
                 ),
@@ -60,7 +60,7 @@ Future<int?> showQuantityInputDialog({
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A),
+                      color: Color(0xFF111827),
                     ),
                   ),
                 ),
@@ -100,7 +100,7 @@ Future<int?> showQuantityInputDialog({
                         const Icon(
                           Icons.inventory_2_outlined,
                           size: 14,
-                          color: Color(0xFF0F766E),
+                          color: Color(0xFF2563EB),
                         ),
                         const SizedBox(width: 5),
                         Text(
@@ -125,7 +125,7 @@ Future<int?> showQuantityInputDialog({
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                   ),
                   decoration: InputDecoration(
                     hintText: 'e.g. 30',
@@ -214,7 +214,7 @@ Future<int?> showQuantityInputDialog({
               ),
               FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0F766E),
+                  backgroundColor: const Color(0xFF2563EB),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

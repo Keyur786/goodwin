@@ -6,11 +6,11 @@ import 'package:printing/printing.dart';
 import 'package:goodwin/models/order_model.dart';
 
 class PdfInvoiceService {
-  static const PdfColor _primaryTeal = PdfColor.fromInt(0xFF0F766E);
-  static const PdfColor _darkSlate = PdfColor.fromInt(0xFF0F172A);
-  static const PdfColor _mutedSlate = PdfColor.fromInt(0xFF64748B);
+  static const PdfColor _primaryTeal = PdfColor.fromInt(0xFF2563EB);
+  static const PdfColor _darkSlate = PdfColor.fromInt(0xFF111827);
+  static const PdfColor _mutedSlate = PdfColor.fromInt(0xFF6B7280);
   static const PdfColor _lightBg = PdfColor.fromInt(0xFFF8FAFC);
-  static const PdfColor _borderSlate = PdfColor.fromInt(0xFFE2E8F0);
+  static const PdfColor _borderSlate = PdfColor.fromInt(0xFFE5E7EB);
 
   static Future<Uint8List> generateInvoicePdf(OrderModel order) async {
     final pdf = pw.Document();
@@ -185,7 +185,7 @@ class PdfInvoiceService {
                             pw.Container(
                               padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: pw.BoxDecoration(
-                                color: PdfColors.teal50,
+                                color: PdfColors.blue50,
                                 borderRadius: pw.BorderRadius.circular(4),
                                 border: pw.Border.all(color: _primaryTeal, width: 0.8),
                               ),

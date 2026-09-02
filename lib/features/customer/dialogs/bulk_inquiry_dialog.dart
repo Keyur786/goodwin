@@ -140,12 +140,12 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
-              color: Color(0xFFCCFBF1),
+              color: Color(0xFFDBEAFE),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.check_circle_rounded,
-              color: Color(0xFF0F766E),
+              color: Color(0xFF2563EB),
               size: 54,
             ),
           ),
@@ -181,7 +181,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
             ),
             child: const Row(
               children: [
-                Icon(Icons.headset_mic_rounded, color: Color(0xFF0F766E), size: 24),
+                Icon(Icons.headset_mic_rounded, color: Color(0xFF2563EB), size: 24),
                 SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -208,7 +208,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
             child: FilledButton(
               onPressed: () => Navigator.pop(context),
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF0F766E),
+                backgroundColor: const Color(0xFF2563EB),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: const Text(
@@ -246,12 +246,12 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFCCFBF1),
+                    color: const Color(0xFFDBEAFE),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.inventory_2_rounded,
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                     size: 24,
                   ),
                 ),
@@ -330,12 +330,12 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
                     ),
                   ),
                   selected: isSelected,
-                  selectedColor: const Color(0xFF0F766E),
+                  selectedColor: const Color(0xFF2563EB),
                   backgroundColor: const Color(0xFFF8FAFC),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                     side: BorderSide(
-                      color: isSelected ? const Color(0xFF0F766E) : const Color(0xFFE2E8F0),
+                      color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
                     ),
                   ),
                   showCheckmark: false,
@@ -458,7 +458,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
               child: FilledButton(
                 onPressed: _isSubmitting ? null : _handleSubmit,
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0F766E),
+                  backgroundColor: const Color(0xFF2563EB),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: _isSubmitting

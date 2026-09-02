@@ -45,18 +45,46 @@ class DemoProduct {
   factory DemoProduct.fromProductModel(
     ProductModel p, [
     String categoryName = '',
+    Map<String, String>? categoryMap,
   ]) {
     final firstImg = p.images.isNotEmpty
         ? p.images.first
         : 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=900&q=80';
+
+    String resolvedCategory = categoryName.trim();
+    if (resolvedCategory.isEmpty && categoryMap != null) {
+      resolvedCategory = categoryMap[p.categoryId] ??
+          categoryMap[p.categoryId.toLowerCase()] ??
+          categoryMap[p.categoryId.trim()] ??
+          '';
+    }
+    if (resolvedCategory.isEmpty) {
+      if (p.categoryId.startsWith('cat_')) {
+        final raw = p.categoryId
+            .replaceFirst('cat_', '')
+            .replaceAll('_', ' ')
+            .replaceAll('-', ' ');
+        resolvedCategory = raw
+            .split(' ')
+            .where((w) => w.isNotEmpty)
+            .map((w) => '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+            .join(' ')
+            .trim();
+        if (resolvedCategory.toLowerCase() == 'home') {
+          resolvedCategory = 'Home & Kitchen';
+        }
+      } else {
+        resolvedCategory = p.categoryId.trim();
+      }
+    }
+    if (resolvedCategory.isEmpty) {
+      resolvedCategory = 'General';
+    }
+
     return DemoProduct(
       id: p.id,
       name: p.name,
-      category: categoryName.isNotEmpty
-          ? categoryName
-          : (p.categoryId.startsWith('cat_')
-                ? p.categoryId.replaceAll('cat_', '').toUpperCase()
-                : p.categoryId),
+      category: resolvedCategory,
       image: firstImg,
       images: p.images.isNotEmpty ? p.images : [firstImg],
       price: p.wholesalePrice,

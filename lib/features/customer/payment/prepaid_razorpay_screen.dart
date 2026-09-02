@@ -352,7 +352,7 @@ class _PrepaidDeliveryRazorpayPageState
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         icon: const Icon(
           Icons.check_circle_rounded,
-          color: Color(0xFF0F766E),
+          color: Color(0xFF2563EB),
           size: 52,
         ),
         title: const Text(
@@ -655,7 +655,7 @@ class _PrepaidDeliveryRazorpayPageState
                               children: [
                                 Icon(
                                   Icons.account_balance_wallet_rounded,
-                                  color: Color(0xFF0F766E),
+                                  color: Color(0xFF2563EB),
                                   size: 20,
                                 ),
                                 SizedBox(width: 8),

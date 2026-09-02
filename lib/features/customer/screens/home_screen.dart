@@ -104,6 +104,87 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   Timer? _favoritesDebounceTimer;
   Timer? _searchDebounceTimer;
   Timer? _loadingTimeoutTimer;
+  List<ProductModel> _rawFirestoreProducts = [];
+  List<CategoryModel> _firestoreCategoryList = [];
+
+  bool _isProductMatchingCategory(DemoProduct product, String targetCategory) {
+    if (targetCategory == 'All') return true;
+    final cleanTarget = targetCategory.trim().toLowerCase();
+    final cleanProductCat = product.category.trim().toLowerCase();
+
+    if (cleanProductCat == cleanTarget) return true;
+
+    // Normalization comparison for punctuation and prefix differences
+    final normTarget = cleanTarget
+        .replaceAll('&', 'and')
+        .replaceAll(RegExp(r'[^a-z0-9]'), '');
+    final normProduct = cleanProductCat
+        .replaceAll('&', 'and')
+        .replaceAll(RegExp(r'[^a-z0-9]'), '')
+        .replaceFirst('cat', '');
+
+    if (normTarget.isNotEmpty &&
+        (normTarget == normProduct ||
+            normTarget.contains(normProduct) ||
+            normProduct.contains(normTarget))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  void _updateCategoryTabsAndProducts() {
+    final Map<String, String> catMap = {};
+    for (final c in _firestoreCategoryList) {
+      catMap[c.id] = c.name;
+      catMap[c.id.toLowerCase()] = c.name;
+      catMap[c.slug.toLowerCase()] = c.name;
+      catMap[c.name.toLowerCase()] = c.name;
+    }
+
+    if (_rawFirestoreProducts.isNotEmpty) {
+      products = _rawFirestoreProducts
+          .map((p) => DemoProduct.fromProductModel(p, '', catMap))
+          .toList();
+    } else if (products.isNotEmpty) {
+      products = products
+          .map(
+            (p) => DemoProduct(
+              id: p.id,
+              name: p.name,
+              category: catMap[p.category] ??
+                  catMap[p.category.toLowerCase()] ??
+                  p.category,
+              image: p.image,
+              images: p.images,
+              price: p.price,
+              originalPrice: p.originalPrice,
+              subtitle: p.subtitle,
+              description: p.description,
+              tags: p.tags,
+              availableQty: p.availableQty,
+              variants: p.variants,
+            ),
+          )
+          .toList();
+    }
+
+    final Set<String> catNames = {};
+    for (final c in _firestoreCategoryList) {
+      if (c.name.trim().isNotEmpty) catNames.add(c.name.trim());
+    }
+    for (final p in products) {
+      if (p.category.trim().isNotEmpty && p.category.trim() != 'All') {
+        catNames.add(p.category.trim());
+      }
+    }
+
+    if (catNames.isNotEmpty) {
+      final sortedCats = catNames.toList()
+        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+      categoryTabs = ['All', ...sortedCats];
+    }
+  }
 
   @override
   void initState() {
@@ -112,6 +193,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     if (widget.initialProducts != null && widget.initialProducts!.isNotEmpty) {
       products = List.from(widget.initialProducts!);
       isLoadingProducts = false;
+      _updateCategoryTabsAndProducts();
     }
     _initFirebaseData();
   }
@@ -171,17 +253,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             if (mounted) {
               setState(() {
                 isLoadingProducts = false;
-                products = firestoreProducts
-                    .map((p) => DemoProduct.fromProductModel(p))
-                    .toList();
-
-                if (categoryTabs.length <= 1 && products.isNotEmpty) {
-                  final dynamicCats =
-                      products.map((p) => p.category).toSet().toList()..sort(
-                        (a, b) => a.toLowerCase().compareTo(b.toLowerCase()),
-                      );
-                  categoryTabs = ['All', ...dynamicCats];
-                }
+                _rawFirestoreProducts = firestoreProducts;
+                _updateCategoryTabsAndProducts();
               });
               if (currentUser != null && currentUser!.cart.isNotEmpty) {
                 _syncCartFromUserData(currentUser!.cart);
@@ -204,11 +277,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         ) {
           if (firestoreCategories.isNotEmpty && mounted) {
             setState(() {
-              final catNames =
-                  firestoreCategories.map((c) => c.name).toSet().toList()..sort(
-                    (a, b) => a.toLowerCase().compareTo(b.toLowerCase()),
-                  );
-              categoryTabs = ['All', ...catNames];
+              _firestoreCategoryList = firestoreCategories;
+              _updateCategoryTabsAndProducts();
             });
           }
         });
@@ -374,9 +444,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         : rawQuery.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
 
     final list = products.where((product) {
-      final matchesCategory =
-          selectedCategory == 'All' ||
-          product.category.toLowerCase() == selectedCategory.toLowerCase();
+      final matchesCategory = _isProductMatchingCategory(product, selectedCategory);
 
       final matchesSearch =
           tokens.isEmpty ||
@@ -501,60 +569,6 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     NotificationController().checkFavoriteStockAlerts(
       products: products,
       favoriteIds: favoriteIds,
-      onNewAlert: (alert) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.warning_amber_rounded,
-                  color: Color(0xFFFBBF24),
-                  size: 22,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        alert.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13,
-                        ),
-                      ),
-                      Text(
-                        'Only ${alert.stockQuantity} units left in stock!',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            action: SnackBarAction(
-              label: 'View',
-              textColor: const Color(0xFF99F6E4),
-              onPressed: () {
-                final matched = products.firstWhere(
-                  (p) => p.id == alert.productId,
-                  orElse: () => products.first,
-                );
-                openProduct(matched);
-              },
-            ),
-            backgroundColor: const Color(0xFF0F172A),
-            duration: const Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -712,7 +726,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             content: Text('Removed "${item.displayName}" from cart'),
             action: SnackBarAction(
               label: 'Undo',
-              textColor: const Color(0xFF99F6E4),
+              textColor: const Color(0xFFBFDBFE),
               onPressed: () {
                 setState(() => cart.add(item));
                 _saveCartToFirestore();
@@ -910,7 +924,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         leading: Icon(
                           option.icon,
                           color: isSelected
-                              ? const Color(0xFF0F766E)
+                              ? const Color(0xFF2563EB)
                               : const Color(0xFF64748B),
                         ),
                         title: Text(
@@ -920,20 +934,20 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                 ? FontWeight.w800
                                 : FontWeight.w600,
                             color: isSelected
-                                ? const Color(0xFF0F766E)
+                                ? const Color(0xFF2563EB)
                                 : const Color(0xFF1E293B),
                           ),
                         ),
                         trailing: isSelected
                             ? const Icon(
                                 Icons.check_circle_rounded,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                               )
                             : null,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        tileColor: isSelected ? const Color(0xFFF0FDFA) : null,
+                        tileColor: isSelected ? const Color(0xFFEFF6FF) : null,
                         onTap: () {
                           setState(() => selectedSortOption = option);
                           Navigator.pop(sheetCtx);
@@ -1043,14 +1057,14 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         return ChoiceChip(
                           label: Text(preset['label'] as String),
                           selected: isSelected,
-                          selectedColor: const Color(0xFFCCFBF1),
+                          selectedColor: const Color(0xFFDBEAFE),
                           labelStyle: TextStyle(
                             fontSize: 12,
                             fontWeight: isSelected
                                 ? FontWeight.w800
                                 : FontWeight.w600,
                             color: isSelected
-                                ? const Color(0xFF0F766E)
+                                ? const Color(0xFF2563EB)
                                 : const Color(0xFF334155),
                           ),
                           onSelected: (_) {
@@ -1091,7 +1105,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         ),
                       ),
                       value: tempInStock,
-                      activeThumbColor: const Color(0xFF0F766E),
+                      activeThumbColor: const Color(0xFF2563EB),
                       onChanged: (val) {
                         setSheetState(() => tempInStock = val);
                       },
@@ -1102,14 +1116,14 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         FilterChip(
                           label: const Text('Featured Items'),
                           selected: tempFeatured,
-                          selectedColor: const Color(0xFFCCFBF1),
+                          selectedColor: const Color(0xFFDBEAFE),
                           labelStyle: TextStyle(
                             fontSize: 12,
                             fontWeight: tempFeatured
                                 ? FontWeight.w800
                                 : FontWeight.w600,
                             color: tempFeatured
-                                ? const Color(0xFF0F766E)
+                                ? const Color(0xFF2563EB)
                                 : const Color(0xFF334155),
                           ),
                           onSelected: (val) {
@@ -1120,14 +1134,14 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                         FilterChip(
                           label: const Text('Best Sellers'),
                           selected: tempBestSeller,
-                          selectedColor: const Color(0xFFCCFBF1),
+                          selectedColor: const Color(0xFFDBEAFE),
                           labelStyle: TextStyle(
                             fontSize: 12,
                             fontWeight: tempBestSeller
                                 ? FontWeight.w800
                                 : FontWeight.w600,
                             color: tempBestSeller
-                                ? const Color(0xFF0F766E)
+                                ? const Color(0xFF2563EB)
                                 : const Color(0xFF334155),
                           ),
                           onSelected: (val) {
@@ -1154,7 +1168,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       },
                       style: FilledButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
-                        backgroundColor: const Color(0xFF0F766E),
+                        backgroundColor: const Color(0xFF2563EB),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -1217,14 +1231,14 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F766E), Color(0xFF042F2E)],
+          colors: [Color(0xFF2563EB), Color(0xFF1E3A8A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F766E).withAlpha(45),
+            color: const Color(0xFF2563EB).withAlpha(45),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -1241,7 +1255,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF14B8A6),
+                  color: const Color(0xFF3B82F6),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Row(
@@ -1264,7 +1278,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               const Spacer(),
               const Icon(
                 Icons.local_shipping_outlined,
-                color: Color(0xFF99F6E4),
+                color: Color(0xFFBFDBFE),
                 size: 22,
               ),
             ],
@@ -1283,7 +1297,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           const Text(
             'Direct factory shipments & full carton lots from our Katargam warehouse with 100% GST invoicing.',
             style: TextStyle(
-              color: Color(0xFFCCFBF1),
+              color: Color(0xFFDBEAFE),
               fontSize: 13,
               height: 1.35,
             ),
@@ -1305,7 +1319,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF0F766E),
+                  foregroundColor: const Color(0xFF2563EB),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
@@ -1331,7 +1345,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF5EEAD4), width: 1.2),
+                  side: const BorderSide(color: Color(0xFF93C5FD), width: 1.2),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 10,
@@ -1378,7 +1392,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     Text(
                       'All Categories',
                       style: TextStyle(
-                        color: Color(0xFF0F766E),
+                        color: Color(0xFF2563EB),
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
                       ),
@@ -1386,7 +1400,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     Icon(
                       Icons.chevron_right_rounded,
                       size: 18,
-                      color: Color(0xFF0F766E),
+                      color: Color(0xFF2563EB),
                     ),
                   ],
                 ),
@@ -1404,7 +1418,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             itemBuilder: (context, index) {
               final cat = categories[index];
               final icon = _getCategoryIcon(cat);
-              final count = products.where((p) => p.category == cat).length;
+              final count = products.where((p) => _isProductMatchingCategory(p, cat)).length;
 
               return InkWell(
                 onTap: () {
@@ -1439,13 +1453,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFCCFBF1),
+                          color: Color(0xFFDBEAFE),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           icon,
                           size: 22,
-                          color: const Color(0xFF0F766E),
+                          color: const Color(0xFF2563EB),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -1496,8 +1510,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             Expanded(
               child: _ActionCardItem(
                 icon: Icons.grid_view_rounded,
-                iconBg: const Color(0xFFCCFBF1),
-                iconColor: const Color(0xFF0F766E),
+                iconBg: const Color(0xFFDBEAFE),
+                iconColor: const Color(0xFF2563EB),
                 title: 'Full Catalog',
                 subtitle: 'Browse all products',
                 onTap: () => setState(() => selectedIndex = 1),
@@ -1575,7 +1589,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 ),
                 child: const Icon(
                   Icons.warehouse_rounded,
-                  color: Color(0xFF0F766E),
+                  color: Color(0xFF2563EB),
                   size: 24,
                 ),
               ),
@@ -1748,7 +1762,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF0F766E),
+                        color: Color(0xFF2563EB),
                       ),
                     ),
                   ],
@@ -1817,7 +1831,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               Expanded(
                 child: _AssuranceFeatureCard(
                   icon: Icons.shield_rounded,
-                  iconColor: Color(0xFF0F766E),
+                  iconColor: Color(0xFF2563EB),
                   title: 'Grade-A Inspection',
                   description: 'Laboratory moisture & grade testing',
                 ),
@@ -1934,7 +1948,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.headset_mic_rounded, color: Color(0xFF0F766E)),
+            Icon(Icons.headset_mic_rounded, color: Color(0xFF2563EB)),
             SizedBox(width: 10),
             Text('Trade Support Desk'),
           ],
@@ -2014,7 +2028,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
         prefixIcon: const Icon(
           Icons.search_rounded,
-          color: Color(0xFF0F766E),
+          color: Color(0xFF2563EB),
           size: 20,
         ),
         suffixIcon: homeSearchQuery.isEmpty
@@ -2048,7 +2062,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF0F766E), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5),
         ),
       ),
     );
@@ -2062,13 +2076,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: const Color(0xFFCCFBF1),
+              color: const Color(0xFFDBEAFE),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               _getCategoryIcon(category),
               size: 15,
-              color: const Color(0xFF0F766E),
+              color: const Color(0xFF2563EB),
             ),
           ),
           const SizedBox(width: 8),
@@ -2234,21 +2248,21 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFFE6FFFA),
+        color: const Color(0xFFEFF6FF),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF99F6E4)),
+        border: Border.all(color: const Color(0xFFBFDBFE)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: const Color(0xFF0F766E)),
+          Icon(icon, size: 12, color: const Color(0xFF2563EB)),
           const SizedBox(width: 4),
           Text(
             label,
             style: const TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0F766E),
+              color: Color(0xFF2563EB),
             ),
           ),
           const SizedBox(width: 2),
@@ -2259,7 +2273,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               child: Icon(
                 Icons.close_rounded,
                 size: 13,
-                color: Color(0xFF0F766E),
+                color: Color(0xFF2563EB),
               ),
             ),
           ),
@@ -2339,7 +2353,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                   color:
                                       (hasActiveFilterOrSearch ||
                                           hasMoreProducts)
-                                      ? const Color(0xFF0F766E)
+                                      ? const Color(0xFF2563EB)
                                       : const Color(0xFF64748B),
                                 ),
                               ),
@@ -2360,13 +2374,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                   decoration: BoxDecoration(
                                     color: selectedSortOption !=
                                             ProductSortOption.featured
-                                        ? const Color(0xFFCCFBF1)
+                                        ? const Color(0xFFDBEAFE)
                                         : const Color(0xFFF1F5F9),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       color: selectedSortOption !=
                                               ProductSortOption.featured
-                                          ? const Color(0xFF0F766E)
+                                          ? const Color(0xFF2563EB)
                                           : const Color(0xFFE2E8F0),
                                     ),
                                   ),
@@ -2378,7 +2392,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                         size: 13,
                                         color: selectedSortOption !=
                                                 ProductSortOption.featured
-                                            ? const Color(0xFF0F766E)
+                                            ? const Color(0xFF2563EB)
                                             : const Color(0xFF475569),
                                       ),
                                       const SizedBox(width: 4),
@@ -2395,7 +2409,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                               : FontWeight.w600,
                                           color: selectedSortOption !=
                                                   ProductSortOption.featured
-                                              ? const Color(0xFF0F766E)
+                                              ? const Color(0xFF2563EB)
                                               : const Color(0xFF334155),
                                         ),
                                       ),
@@ -2422,12 +2436,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: !filterCriteria.isDefault
-                                        ? const Color(0xFFCCFBF1)
+                                        ? const Color(0xFFDBEAFE)
                                         : const Color(0xFFF1F5F9),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       color: !filterCriteria.isDefault
-                                          ? const Color(0xFF0F766E)
+                                          ? const Color(0xFF2563EB)
                                           : const Color(0xFFE2E8F0),
                                     ),
                                   ),
@@ -2438,7 +2452,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                         Icons.tune_rounded,
                                         size: 13,
                                         color: !filterCriteria.isDefault
-                                            ? const Color(0xFF0F766E)
+                                            ? const Color(0xFF2563EB)
                                             : const Color(0xFF475569),
                                       ),
                                       const SizedBox(width: 4),
@@ -2452,7 +2466,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                               ? FontWeight.w800
                                               : FontWeight.w600,
                                           color: !filterCriteria.isDefault
-                                              ? const Color(0xFF0F766E)
+                                              ? const Color(0xFF2563EB)
                                               : const Color(0xFF334155),
                                         ),
                                       ),
@@ -2495,7 +2509,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                 ),
                               ),
                               selected: isSelected,
-                              selectedColor: const Color(0xFF0F766E),
+                              selectedColor: const Color(0xFF2563EB),
                               backgroundColor: const Color(0xFFF8FAFC),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -2505,7 +2519,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                 borderRadius: BorderRadius.circular(10),
                                 side: BorderSide(
                                   color: isSelected
-                                      ? const Color(0xFF0F766E)
+                                      ? const Color(0xFF2563EB)
                                       : const Color(0xFFE2E8F0),
                                 ),
                               ),
@@ -2564,7 +2578,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       children: [
                         CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Color(0xFF0F766E),
+                            Color(0xFF2563EB),
                           ),
                         ),
                         SizedBox(height: 12),
@@ -2647,7 +2661,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                 });
                               },
                               style: FilledButton.styleFrom(
-                                backgroundColor: const Color(0xFF0F766E),
+                                backgroundColor: const Color(0xFF2563EB),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -2672,7 +2686,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                 await _productRepository.seedDemoData();
                               },
                               style: FilledButton.styleFrom(
-                                backgroundColor: const Color(0xFF0F766E),
+                                backgroundColor: const Color(0xFF2563EB),
                               ),
                               icon: const Icon(Icons.cloud_upload_outlined),
                               label: const Text('Seed Products to Firebase'),
@@ -2699,7 +2713,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF0F766E),
+                                      Color(0xFF2563EB),
                                     ),
                                   ),
                                 ),
@@ -2726,7 +2740,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                   product.category);
 
                       final categoryCount = products
-                          .where((p) => p.category == product.category)
+                          .where((p) => _isProductMatchingCategory(p, product.category))
                           .length;
 
                       return Column(
@@ -2822,7 +2836,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         title: 'Your Cart is Empty',
         description: 'Add wholesale items from the catalog. They will stay saved in your account across all your devices.',
         buttonText: 'Start Shopping',
-        themeColor: const Color(0xFF0F766E),
+        themeColor: const Color(0xFF2563EB),
         onAction: () => setState(() => selectedIndex = 0),
       );
     }
@@ -2871,7 +2885,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                             Text(
                               '₹${cartItem.unitPrice.toStringAsFixed(0)} / unit',
                               style: const TextStyle(
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                                 fontWeight: FontWeight.w700,
                                 fontSize: 12,
                               ),
@@ -2955,7 +2969,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 15,
-                                          color: Color(0xFF0F766E),
+                                          color: Color(0xFF2563EB),
                                         ),
                                       ),
                                     ),
@@ -3000,7 +3014,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                             style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 16,
-                              color: Color(0xFF0F766E),
+                              color: Color(0xFF2563EB),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -3056,7 +3070,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F766E),
+                      color: Color(0xFF2563EB),
                     ),
                   ),
                 ],
@@ -3147,7 +3161,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF0F766E), Color(0xFF115E59)],
+                    colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -3248,7 +3262,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F766E),
+                      color: Color(0xFF2563EB),
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -3317,12 +3331,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF0F766E).withAlpha(25),
+                color: const Color(0xFF2563EB).withAlpha(25),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.storefront_rounded,
-                color: Color(0xFF0F766E),
+                color: Color(0xFF2563EB),
                 size: 19,
               ),
             ),
@@ -3372,7 +3386,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 icon: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F766E),
+                    color: const Color(0xFF2563EB),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -3412,7 +3426,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             icon: totalCartItemCount > 0
                 ? Badge.count(
                     count: totalCartItemCount,
-                    backgroundColor: const Color(0xFF0F766E),
+                    backgroundColor: const Color(0xFF2563EB),
                     textColor: Colors.white,
                     child: const Icon(Icons.shopping_bag_outlined),
                   )
@@ -3420,7 +3434,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             selectedIcon: totalCartItemCount > 0
                 ? Badge.count(
                     count: totalCartItemCount,
-                    backgroundColor: const Color(0xFF0F766E),
+                    backgroundColor: const Color(0xFF2563EB),
                     textColor: Colors.white,
                     child: const Icon(Icons.shopping_bag_rounded),
                   )
@@ -3833,7 +3847,7 @@ class _WarehouseDetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: const Color(0xFF0F766E)),
+        Icon(icon, size: 16, color: const Color(0xFF2563EB)),
         const SizedBox(width: 8),
         Text(
           '$label: ',

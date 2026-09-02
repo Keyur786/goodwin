@@ -202,7 +202,7 @@ class _FullScreenImageViewerDialogState
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: isSelected
-                                ? const Color(0xFF0F766E)
+                                ? const Color(0xFF2563EB)
                                 : Colors.white24,
                             width: isSelected ? 2.5 : 1,
                           ),

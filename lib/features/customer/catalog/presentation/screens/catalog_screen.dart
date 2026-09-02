@@ -21,7 +21,7 @@ class CatalogScreen extends ConsumerWidget {
             icon: ref.watch(cartItemCountProvider) > 0
                 ? Badge.count(
                     count: ref.watch(cartItemCountProvider),
-                    backgroundColor: const Color(0xFF0F766E),
+                    backgroundColor: const Color(0xFF2563EB),
                     textColor: Colors.white,
                     child: const Icon(Icons.shopping_bag_rounded),
                   )

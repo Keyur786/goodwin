@@ -33,7 +33,7 @@ class DrawerProfileItem extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         leading: Icon(
           icon,
-          color: isDestructive ? Colors.red.shade600 : const Color(0xFF0F766E),
+          color: isDestructive ? Colors.red.shade600 : const Color(0xFF2563EB),
           size: 22,
         ),
         title: Text(
@@ -413,7 +413,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F766E),
+                            color: Color(0xFF2563EB),
                             letterSpacing: 1,
                           ),
                         ),
@@ -434,7 +434,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF0F766E),
+                              color: Color(0xFF2563EB),
                             ),
                           ),
                         ),
@@ -463,7 +463,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             Icon(
                               Icons.workspace_premium_rounded,
-                              color: Color(0xFF0F766E),
+                              color: Color(0xFF2563EB),
                               size: 22,
                             ),
                             SizedBox(width: 8),
@@ -515,7 +515,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                               ),
                             ),
                           ],
@@ -555,7 +555,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ? FontWeight.w800
                                       : FontWeight.w500,
                                   color: _user?.tier == CustomerTier.silver
-                                      ? const Color(0xFF0F766E)
+                                      ? const Color(0xFF2563EB)
                                       : const Color(0xFF94A3B8),
                                 ),
                               ),
@@ -697,7 +697,7 @@ class ProfileOption extends StatelessWidget {
         side: const BorderSide(color: Color(0xFFF1F5F9), width: 1.2),
       ),
       child: ListTile(
-        leading: Icon(icon, color: const Color(0xFF0F766E)),
+        leading: Icon(icon, color: const Color(0xFF2563EB)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
         subtitle: Text(subtitle),
         trailing: const Icon(

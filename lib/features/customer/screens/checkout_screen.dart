@@ -96,7 +96,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         icon: const Icon(
           Icons.check_circle_rounded,
-          color: Color(0xFF0F766E),
+          color: Color(0xFF2563EB),
           size: 48,
         ),
         title: const Text(
@@ -113,9 +113,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF0FDFA),
+                color: const Color(0xFFEFF6FF),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFCCFBF1)),
+                border: Border.all(color: const Color(0xFFDBEAFE)),
               ),
               child: Center(
                 child: Text(
@@ -124,7 +124,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 4,
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                   ),
                 ),
               ),
@@ -145,7 +145,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   style: const TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 18,
-                    color: Color(0xFF0F766E),
+                    color: Color(0xFF2563EB),
                   ),
                 ),
               ],
@@ -225,7 +225,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           style: const TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 15,
-                            color: Color(0xFF0F766E),
+                            color: Color(0xFF2563EB),
                           ),
                         ),
                       ),
@@ -245,9 +245,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0FDFA),
+                      color: const Color(0xFFEFF6FF),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFCCFBF1)),
+                      border: Border.all(color: const Color(0xFFDBEAFE)),
                     ),
                     child: Column(
                       children: [
@@ -257,7 +257,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             Icon(
                               Icons.storefront_rounded,
                               size: 16,
-                              color: Color(0xFF0F766E),
+                              color: Color(0xFF2563EB),
                             ),
                             SizedBox(width: 6),
                             Text(
@@ -265,7 +265,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                               ),
                             ),
                           ],
@@ -277,7 +277,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 4,
-                            color: Color(0xFF0F766E),
+                            color: Color(0xFF2563EB),
                           ),
                         ),
                       ],
@@ -312,7 +312,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                               ),
                             ),
                           ],
@@ -431,10 +431,10 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDFA),
+                    color: const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFF99F6E4),
+                      color: const Color(0xFFBFDBFE),
                       width: 1.5,
                     ),
                   ),
@@ -443,7 +443,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0F766E),
+                          color: const Color(0xFF2563EB),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -470,7 +470,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                               'Katargam Branch, Surat • Pay Cash/UPI on collection',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFF0F766E),
+                                color: Color(0xFF2563EB),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -480,7 +480,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
                       const Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 16,
-                        color: Color(0xFF0F766E),
+                        color: Color(0xFF2563EB),
                       ),
                     ],
                   ),

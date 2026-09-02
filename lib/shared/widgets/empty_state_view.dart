@@ -16,7 +16,7 @@ class EmptyStateView extends StatelessWidget {
     required this.description,
     required this.buttonText,
     required this.onAction,
-    this.themeColor = const Color(0xFF0F766E),
+    this.themeColor = const Color(0xFF2563EB),
   });
 
   @override

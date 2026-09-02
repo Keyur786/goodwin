@@ -119,7 +119,7 @@ class QuantityAddControls extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 14.5,
-                      color: Color(0xFF0F766E),
+                      color: Color(0xFF2563EB),
                     ),
                   ),
                 ),
@@ -154,7 +154,7 @@ class QuantityAddControls extends StatelessWidget {
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
               minimumSize: const Size(0, 34),
-              backgroundColor: const Color(0xFF0F766E),
+              backgroundColor: const Color(0xFF2563EB),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -294,7 +294,7 @@ class ModernProductCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF0F766E),
+                            color: Color(0xFF2563EB),
                           ),
                         ),
                         Container(

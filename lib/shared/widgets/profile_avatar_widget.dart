@@ -81,14 +81,14 @@ class ProfileAvatarWidget extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const LinearGradient(
-              colors: [Color(0xFF0F766E), Color(0xFF115E59)],
+              colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             border: Border.all(color: Colors.white, width: 2.5),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF0F766E).withAlpha(40),
+                color: const Color(0xFF2563EB).withAlpha(40),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -103,7 +103,7 @@ class ProfileAvatarWidget extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF0F766E),
+                color: const Color(0xFF2563EB),
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
                 boxShadow: [
@@ -141,7 +141,7 @@ class ProfileAvatarWidget extends StatelessWidget {
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
-          colors: [Color(0xFF0F766E), Color(0xFF115E59)],
+          colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -233,7 +233,7 @@ Future<void> showProfilePhotoPickerSheet({
                     child: PhotoOptionButton(
                       icon: Icons.camera_alt_rounded,
                       label: 'Camera',
-                      color: const Color(0xFF0F766E),
+                      color: const Color(0xFF2563EB),
                       onTap: () async {
                         Navigator.pop(sheetContext);
                         await pickFromSource(ImageSource.camera);
@@ -286,7 +286,7 @@ Future<void> showProfilePhotoPickerSheet({
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: isSelected
-                                ? const Color(0xFF0F766E)
+                                ? const Color(0xFF2563EB)
                                 : Colors.transparent,
                             width: 2.5,
                           ),

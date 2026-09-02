@@ -49,9 +49,9 @@ class CustomerOrdersScreen extends StatelessWidget {
         label = 'DELIVERED';
         icon = Icons.check_circle_rounded;
       } else {
-        bgColor = const Color(0xFFCCFBF1);
-        textColor = const Color(0xFF0F766E);
-        borderColor = const Color(0xFF99F6E4);
+        bgColor = const Color(0xFFDBEAFE);
+        textColor = const Color(0xFF2563EB);
+        borderColor = const Color(0xFFBFDBFE);
         label = 'CONFIRMED';
         icon = Icons.storefront_rounded;
       }
@@ -292,9 +292,9 @@ class CustomerOrdersScreen extends StatelessWidget {
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF0FDFA),
+                            color: const Color(0xFFEFF6FF),
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0xFFCCFBF1)),
+                            border: Border.all(color: const Color(0xFFDBEAFE)),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -304,7 +304,7 @@ class CustomerOrdersScreen extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.qr_code_2_rounded,
-                                      color: Color(0xFF0F766E),
+                                      color: Color(0xFF2563EB),
                                       size: 26,
                                     ),
                                     SizedBox(width: 10),
@@ -318,7 +318,7 @@ class CustomerOrdersScreen extends StatelessWidget {
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w700,
-                                              color: Color(0xFF0F766E),
+                                              color: Color(0xFF2563EB),
                                               letterSpacing: 0.5,
                                             ),
                                           ),
@@ -348,7 +348,7 @@ class CustomerOrdersScreen extends StatelessWidget {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: const Color(0xFF99F6E4),
+                                    color: const Color(0xFFBFDBFE),
                                   ),
                                 ),
                                 child: Text(
@@ -357,7 +357,7 @@ class CustomerOrdersScreen extends StatelessWidget {
                                     fontSize: 18,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 1.2,
-                                    color: Color(0xFF0F766E),
+                                    color: Color(0xFF2563EB),
                                   ),
                                 ),
                               ),
@@ -422,7 +422,7 @@ class CustomerOrdersScreen extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
-                              color: Color(0xFF0F766E),
+                              color: Color(0xFF2563EB),
                             ),
                           ),
                         ],
@@ -435,8 +435,8 @@ class CustomerOrdersScreen extends StatelessWidget {
                           icon: const Icon(Icons.receipt_long_rounded, size: 18),
                           label: const Text('View Wholesale Invoice / PO'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF0F766E),
-                            side: const BorderSide(color: Color(0xFF0F766E)),
+                            foregroundColor: const Color(0xFF2563EB),
+                            side: const BorderSide(color: Color(0xFF2563EB)),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -468,9 +468,9 @@ class CustomerOrdersScreen extends StatelessWidget {
                                 ),
                                 label: const Text('Edit Items'),
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(0xFF0F766E),
+                                  foregroundColor: const Color(0xFF2563EB),
                                   side: const BorderSide(
-                                    color: Color(0xFF0F766E),
+                                    color: Color(0xFF2563EB),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 10,
