@@ -1,12 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/product_model.dart';
 import 'package:goodwin/models/user_model.dart';
 
 enum AnalyticsTimeFilter {
   today('Today'),
+  yesterday('Yesterday'),
   week('7 Days'),
   month('30 Days'),
-  allTime('All Time');
+  allTime('All Time'),
+  custom('Custom');
 
   const AnalyticsTimeFilter(this.label);
   final String label;
@@ -23,6 +26,7 @@ class CustomerSalesMetric {
     required this.orderCount,
     required this.averageOrderValue,
     this.lastOrderDate,
+    this.orderIds = const [],
   });
 
   final String customerId;
@@ -34,6 +38,7 @@ class CustomerSalesMetric {
   final int orderCount;
   final double averageOrderValue;
   final DateTime? lastOrderDate;
+  final List<String> orderIds;
 }
 
 class ProductSalesMetric {
@@ -43,6 +48,7 @@ class ProductSalesMetric {
     this.imageUrl,
     required this.unitsSold,
     required this.revenue,
+    this.orderCount = 0,
   });
 
   final String productId;
@@ -50,11 +56,14 @@ class ProductSalesMetric {
   final String? imageUrl;
   final int unitsSold;
   final double revenue;
+  final int orderCount;
 }
 
 class DashboardAnalyticsData {
   const DashboardAnalyticsData({
     required this.timeFilter,
+    this.customDateRange,
+    required this.filteredOrders,
     required this.totalRevenue,
     required this.totalOrders,
     required this.completedOrders,
@@ -82,6 +91,8 @@ class DashboardAnalyticsData {
   });
 
   final AnalyticsTimeFilter timeFilter;
+  final DateTimeRange? customDateRange;
+  final List<OrderModel> filteredOrders;
   final double totalRevenue;
   final int totalOrders;
   final int completedOrders;
@@ -118,6 +129,28 @@ class DashboardAnalyticsData {
 
   // Inquiries
   final int pendingInquiriesCount;
+
+  String get rangeDescription {
+    switch (timeFilter) {
+      case AnalyticsTimeFilter.today:
+        return 'Today';
+      case AnalyticsTimeFilter.yesterday:
+        return 'Yesterday';
+      case AnalyticsTimeFilter.week:
+        return 'Last 7 Days';
+      case AnalyticsTimeFilter.month:
+        return 'Last 30 Days';
+      case AnalyticsTimeFilter.allTime:
+        return 'All Time';
+      case AnalyticsTimeFilter.custom:
+        if (customDateRange != null) {
+          final s = customDateRange!.start;
+          final e = customDateRange!.end;
+          return '${s.day}/${s.month}/${s.year} - ${e.day}/${e.month}/${e.year}';
+        }
+        return 'Custom Range';
+    }
+  }
 }
 
 class AdminAnalyticsService {
@@ -127,21 +160,29 @@ class AdminAnalyticsService {
     required List<ProductModel> catalogProducts,
     required List<Map<String, dynamic>> inquiries,
     AnalyticsTimeFilter filter = AnalyticsTimeFilter.month,
+    DateTimeRange? customRange,
   }) {
     final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final yesterdayStart = todayStart.subtract(const Duration(days: 1));
 
     // 1. Filter orders based on the chosen time window
     final filteredOrders = orders.where((o) {
       if (filter == AnalyticsTimeFilter.allTime) return true;
-      final diff = now.difference(o.createdAt);
       if (filter == AnalyticsTimeFilter.today) {
-        return o.createdAt.year == now.year &&
-            o.createdAt.month == now.month &&
-            o.createdAt.day == now.day;
+        return o.createdAt.isAfter(todayStart) || o.createdAt.isAtSameMomentAs(todayStart);
+      } else if (filter == AnalyticsTimeFilter.yesterday) {
+        return (o.createdAt.isAfter(yesterdayStart) || o.createdAt.isAtSameMomentAs(yesterdayStart)) &&
+            o.createdAt.isBefore(todayStart);
       } else if (filter == AnalyticsTimeFilter.week) {
-        return diff.inDays <= 7;
+        return now.difference(o.createdAt).inDays <= 7;
       } else if (filter == AnalyticsTimeFilter.month) {
-        return diff.inDays <= 30;
+        return now.difference(o.createdAt).inDays <= 30;
+      } else if (filter == AnalyticsTimeFilter.custom && customRange != null) {
+        final start = DateTime(customRange.start.year, customRange.start.month, customRange.start.day);
+        final end = DateTime(customRange.end.year, customRange.end.month, customRange.end.day, 23, 59, 59);
+        return (o.createdAt.isAfter(start) || o.createdAt.isAtSameMomentAs(start)) &&
+            (o.createdAt.isBefore(end) || o.createdAt.isAtSameMomentAs(end));
       }
       return true;
     }).toList();
@@ -206,6 +247,7 @@ class AdminAnalyticsService {
       );
       existingCust.totalSpend += order.totalAmount;
       existingCust.orderCount++;
+      existingCust.orderIds.add(order.id);
       if (existingCust.lastOrderDate == null ||
           order.createdAt.isAfter(existingCust.lastOrderDate!)) {
         existingCust.lastOrderDate = order.createdAt;
@@ -224,6 +266,7 @@ class AdminAnalyticsService {
         );
         pAgg.units += item.quantity;
         pAgg.revenue += item.totalPrice;
+        pAgg.orderIds.add(order.id);
         if (pAgg.imageUrl == null && item.imageUrl != null) {
           pAgg.imageUrl = item.imageUrl;
         }
@@ -259,6 +302,7 @@ class AdminAnalyticsService {
         orderCount: agg.orderCount,
         averageOrderValue: aov,
         lastOrderDate: agg.lastOrderDate,
+        orderIds: agg.orderIds,
       ));
     }
 
@@ -295,6 +339,7 @@ class AdminAnalyticsService {
         imageUrl: p.imageUrl,
         unitsSold: p.units,
         revenue: p.revenue,
+        orderCount: p.orderIds.length,
       );
     }).toList();
     topProducts.sort((a, b) => b.revenue.compareTo(a.revenue));
@@ -313,6 +358,8 @@ class AdminAnalyticsService {
 
     return DashboardAnalyticsData(
       timeFilter: filter,
+      customDateRange: customRange,
+      filteredOrders: filteredOrders,
       totalRevenue: totalRevenue,
       totalOrders: filteredOrders.length,
       completedOrders: completedOrders,
@@ -334,7 +381,7 @@ class AdminAnalyticsService {
       goldTierCount: goldCount,
       silverTierSpend: silverSpend,
       silverTierCount: silverCount,
-      topProducts: topProducts.take(8).toList(),
+      topProducts: topProducts.take(15).toList(),
       lowStockProducts: lowStockProducts,
       pendingInquiriesCount: pendingInquiries,
     );
@@ -349,6 +396,7 @@ class _CustomerAggregator {
   double totalSpend = 0.0;
   int orderCount = 0;
   DateTime? lastOrderDate;
+  final List<String> orderIds = [];
 }
 
 class _ProductAggregator {
@@ -358,4 +406,5 @@ class _ProductAggregator {
   String? imageUrl;
   int units = 0;
   double revenue = 0.0;
+  final Set<String> orderIds = {};
 }
