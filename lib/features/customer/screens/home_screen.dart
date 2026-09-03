@@ -237,10 +237,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         // Listen for real-time user updates (profile changes, username changes)
         _userSub = _userRepository.streamUser(firebaseUser.uid).listen((user) {
           if (user != null && mounted) {
+            final isLocalFavoritePending = _favoritesDebounceTimer?.isActive ?? false;
             setState(() {
               currentUser = user;
-              favoriteIds.clear();
-              favoriteIds.addAll(user.favorites);
+              if (!isLocalFavoritePending) {
+                favoriteIds.clear();
+                favoriteIds.addAll(user.favorites);
+              }
             });
             NotificationController().syncFromUserData(user.notifications);
             _syncCartFromUserData(user.cart);
@@ -375,12 +378,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
 
   void _saveFavoritesToFirestore() {
     if (currentUser == null) return;
+    final uid = currentUser!.id;
+    final favList = favoriteIds.toList();
+    currentUser = currentUser!.copyWith(favorites: favList);
     _favoritesDebounceTimer?.cancel();
-    _favoritesDebounceTimer = Timer(const Duration(milliseconds: 350), () {
-      if (!mounted || currentUser == null) return;
-      unawaited(
-        _userRepository.syncFavorites(currentUser!.id, favoriteIds.toList()),
-      );
+    _favoritesDebounceTimer = Timer(const Duration(milliseconds: 200), () {
+      if (!mounted) return;
+      unawaited(_userRepository.syncFavorites(uid, favList));
     });
   }
 

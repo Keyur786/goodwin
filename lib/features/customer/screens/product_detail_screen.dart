@@ -41,16 +41,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   ProductVariantModel? _selectedVariant;
   late final PageController _imagePageController;
+  late bool _isFavorite;
 
   @override
   void initState() {
     super.initState();
+    _isFavorite = widget.isFavorite;
     _imagePageController = PageController();
     if (widget.product.hasVariants) {
       _selectedVariant = widget.product.variants.firstWhere(
         (v) => v.availableQty > 0,
         orElse: () => widget.product.variants.first,
       );
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isFavorite != widget.isFavorite) {
+      _isFavorite = widget.isFavorite;
     }
   }
 
@@ -82,10 +92,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         title: const Text('Product Details'),
         actions: [
           IconButton(
-            onPressed: () => widget.onToggleFavorite(product.id),
+            onPressed: () {
+              setState(() {
+                _isFavorite = !_isFavorite;
+              });
+              widget.onToggleFavorite(product.id);
+            },
             icon: Icon(
-              widget.isFavorite ? Icons.favorite : LucideIcons.heart,
-              color: widget.isFavorite
+              _isFavorite ? Icons.favorite : LucideIcons.heart,
+              color: _isFavorite
                   ? Colors.red.shade600
                   : const Color(0xFF475569),
             ),

@@ -270,17 +270,22 @@ class ModernProductCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        IconButton(
-                          onPressed: onToggleFavorite,
-                          icon: Icon(
-                            isFavorite ? Icons.favorite : LucideIcons.heart,
-                            color: isFavorite
-                                ? Colors.red.shade600
-                                : const Color(0xFF94A3B8),
-                            size: 20,
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: onToggleFavorite,
+                            borderRadius: BorderRadius.circular(20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Icon(
+                                isFavorite ? Icons.favorite : LucideIcons.heart,
+                                color: isFavorite
+                                    ? Colors.red.shade600
+                                    : const Color(0xFF94A3B8),
+                                size: 21,
+                              ),
+                            ),
                           ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
                         ),
                       ],
                     ),
