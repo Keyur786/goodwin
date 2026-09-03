@@ -18,6 +18,8 @@ class DrawerProfileItem extends StatelessWidget {
     required this.action,
     required this.onSelected,
     this.isDestructive = false,
+    this.showBadge = false,
+    this.badgeText,
   });
 
   final IconData icon;
@@ -25,6 +27,8 @@ class DrawerProfileItem extends StatelessWidget {
   final ProfileAction action;
   final ValueChanged<ProfileAction> onSelected;
   final bool isDestructive;
+  final bool showBadge;
+  final String? badgeText;
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +37,36 @@ class DrawerProfileItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        leading: Icon(
-          icon,
-          color: isDestructive ? Colors.red.shade600 : const Color(0xFF2563EB),
-          size: 22,
+        leading: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Icon(
+              icon,
+              color: isDestructive ? Colors.red.shade600 : const Color(0xFF2563EB),
+              size: 22,
+            ),
+            if (showBadge)
+              Positioned(
+                top: -2,
+                right: -2,
+                child: Container(
+                  width: 9,
+                  height: 9,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFEF4444).withAlpha(120),
+                        blurRadius: 4,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
         ),
         title: Text(
           label,
@@ -46,13 +76,35 @@ class DrawerProfileItem extends StatelessWidget {
             fontSize: 14,
           ),
         ),
-        trailing: const Icon(
-          LucideIcons.chevronRight,
-          size: 14,
-          color: Color(0xFF94A3B8),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (badgeText != null && badgeText!.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badgeText!,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            const Icon(
+              LucideIcons.chevronRight,
+              size: 14,
+              color: Color(0xFF94A3B8),
+            ),
+          ],
         ),
         onTap: () {
-          Navigator.of(context).pop();
+          Navigator.pop(context);
           onSelected(action);
         },
       ),

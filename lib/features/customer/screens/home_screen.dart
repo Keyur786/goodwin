@@ -3234,11 +3234,26 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   action: ProfileAction.allOrders,
                   onSelected: handleProfileAction,
                 ),
-                DrawerProfileItem(
-                  icon: LucideIcons.messageSquare,
-                  label: 'Bulk Quotes',
-                  action: ProfileAction.adminBulkQuotes,
-                  onSelected: handleProfileAction,
+                StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: FirestoreProductRepository().streamAllBulkInquiries(),
+                  builder: (context, inqSnap) {
+                    final inquiries = inqSnap.data ?? [];
+                    final unreadCount = inquiries.where((inq) {
+                      final isUnread = inq['unreadByAdmin'] == true;
+                      final isPending = inq['status'] == 'pending';
+                      return isUnread || isPending;
+                    }).length;
+                    final hasUpdate = unreadCount > 0;
+
+                    return DrawerProfileItem(
+                      icon: LucideIcons.messageSquare,
+                      label: 'Bulk Quotes',
+                      action: ProfileAction.adminBulkQuotes,
+                      onSelected: handleProfileAction,
+                      showBadge: hasUpdate,
+                      badgeText: hasUpdate ? '$unreadCount' : null,
+                    );
+                  },
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -3258,11 +3273,24 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 action: ProfileAction.orders,
                 onSelected: handleProfileAction,
               ),
-              DrawerProfileItem(
-                icon: LucideIcons.messageSquare,
-                label: 'My Bulk Quotes',
-                action: ProfileAction.bulkQuotes,
-                onSelected: handleProfileAction,
+              StreamBuilder<List<Map<String, dynamic>>>(
+                stream: currentUser != null
+                    ? FirestoreProductRepository().streamMyBulkInquiries(currentUser!.id)
+                    : const Stream.empty(),
+                builder: (context, myInqSnap) {
+                  final myInquiries = myInqSnap.data ?? [];
+                  final unreadCount = myInquiries.where((inq) => inq['unreadByUser'] == true).length;
+                  final hasUpdate = unreadCount > 0;
+
+                  return DrawerProfileItem(
+                    icon: LucideIcons.messageSquare,
+                    label: 'My Bulk Quotes',
+                    action: ProfileAction.bulkQuotes,
+                    onSelected: handleProfileAction,
+                    showBadge: hasUpdate,
+                    badgeText: hasUpdate ? '$unreadCount' : null,
+                  );
+                },
               ),
               DrawerProfileItem(
                 icon: LucideIcons.mapPin,
@@ -3292,6 +3320,54 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         ),
       ),
       appBar: AppBar(
+        leading: Builder(
+          builder: (drawerCtx) {
+            return StreamBuilder<List<Map<String, dynamic>>>(
+              stream: isAdmin
+                  ? FirestoreProductRepository().streamAllBulkInquiries()
+                  : (currentUser != null
+                      ? FirestoreProductRepository().streamMyBulkInquiries(currentUser!.id)
+                      : const Stream.empty()),
+              builder: (context, snap) {
+                final inqs = snap.data ?? [];
+                final hasUnread = isAdmin
+                    ? inqs.any((inq) => inq['unreadByAdmin'] == true || inq['status'] == 'pending')
+                    : inqs.any((inq) => inq['unreadByUser'] == true);
+
+                return IconButton(
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(LucideIcons.menu, size: 22),
+                      if (hasUnread)
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1.5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFEF4444).withAlpha(150),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  onPressed: () => Scaffold.of(drawerCtx).openDrawer(),
+                );
+              },
+            );
+          },
+        ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
