@@ -1307,13 +1307,16 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Bulk Orders &\nQuotation',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              height: 1.25,
+          const FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Bulk Orders & Quotation',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
           const SizedBox(height: 6),
