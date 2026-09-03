@@ -1308,7 +1308,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           ),
           const SizedBox(height: 12),
           const Text(
-            'Bulk Orders &\nCustom Quotations',
+            'Bulk Orders &\nQuotation',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
