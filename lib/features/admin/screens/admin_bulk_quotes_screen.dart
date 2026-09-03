@@ -20,6 +20,25 @@ class AdminBulkQuotesScreen extends StatelessWidget {
         foregroundColor: const Color(0xFF0F172A),
         elevation: 0,
         surfaceTintColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.checkCheck, size: 20, color: Color(0xFF2563EB)),
+            tooltip: 'Mark all as read',
+            onPressed: () async {
+              await FirestoreProductRepository().markAllInquiriesReadByAdmin();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('All bulk quote notifications cleared'),
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+          ),
+          const SizedBox(width: 4),
+        ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(height: 1),
@@ -61,7 +80,18 @@ class AdminBulkQuotesScreen extends StatelessWidget {
               final inq = inquiries[index];
               return _InquiryCard(
                 inquiry: inq,
-                onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => _AdminQuoteChatScreen(inquiry: inq))),
+                onTap: () {
+                  final id = inq['id']?.toString() ?? '';
+                  if (id.isNotEmpty) {
+                    FirestoreProductRepository().markInquiryReadByAdmin(id);
+                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => _AdminQuoteChatScreen(inquiry: inq),
+                    ),
+                  );
+                },
               );
             },
           );

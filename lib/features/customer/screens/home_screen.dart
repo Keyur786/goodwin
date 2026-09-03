@@ -3239,9 +3239,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   builder: (context, inqSnap) {
                     final inquiries = inqSnap.data ?? [];
                     final unreadCount = inquiries.where((inq) {
-                      final isUnread = inq['unreadByAdmin'] == true;
-                      final isPending = inq['status'] == 'pending';
-                      return isUnread || isPending;
+                      return inq['unreadByAdmin'] == true;
                     }).length;
                     final hasUpdate = unreadCount > 0;
 
@@ -3331,7 +3329,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               builder: (context, snap) {
                 final inqs = snap.data ?? [];
                 final hasUnread = isAdmin
-                    ? inqs.any((inq) => inq['unreadByAdmin'] == true || inq['status'] == 'pending')
+                    ? inqs.any((inq) => inq['unreadByAdmin'] == true)
                     : inqs.any((inq) => inq['unreadByUser'] == true);
 
                 return IconButton(

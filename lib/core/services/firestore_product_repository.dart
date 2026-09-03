@@ -267,9 +267,27 @@ class FirestoreProductRepository {
 
   // --- Mark read by admin ---
   Future<void> markInquiryReadByAdmin(String inquiryId) async {
-    await _firestore.collection('bulk_inquiries').doc(inquiryId).update({
-      'unreadByAdmin': false,
-    });
+    try {
+      await _firestore.collection('bulk_inquiries').doc(inquiryId).update({
+        'unreadByAdmin': false,
+      });
+    } catch (_) {}
+  }
+
+  // --- Mark all inquiries read by admin ---
+  Future<void> markAllInquiriesReadByAdmin() async {
+    try {
+      final snap = await _firestore
+          .collection('bulk_inquiries')
+          .where('unreadByAdmin', isEqualTo: true)
+          .get();
+      if (snap.docs.isEmpty) return;
+      final batch = _firestore.batch();
+      for (final doc in snap.docs) {
+        batch.update(doc.reference, {'unreadByAdmin': false});
+      }
+      await batch.commit();
+    } catch (_) {}
   }
 
   // --- Mark read by user ---
