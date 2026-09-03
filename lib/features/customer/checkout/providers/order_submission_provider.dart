@@ -24,6 +24,7 @@ class OrderSubmissionController extends Notifier<AsyncValue<OrderModel?>> {
               productName: item.product.name,
               sku: item.product.sku,
               variant: item.variant,
+              imageUrl: item.product.images.isNotEmpty ? item.product.images.first : null,
               unitPrice: item.unitPrice,
               quantity: item.quantity,
             ),

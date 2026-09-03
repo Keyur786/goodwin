@@ -65,6 +65,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 productName: c.product.name,
                 variant: c.selectedVariant?.name,
                 sku: c.selectedVariant?.sku ?? '',
+                imageUrl: c.product.image,
                 unitPrice: c.unitPrice,
                 quantity: c.quantity,
               ),

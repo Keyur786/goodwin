@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/services/firestore_order_repository.dart';
+import 'package:goodwin/core/utils/product_image_resolver.dart';
 import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
+import 'package:goodwin/shared/widgets/product_image_widget.dart';
 import 'package:goodwin/shared/widgets/wholesale_invoice_sheet.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -483,19 +485,30 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                           const SizedBox(height: 12),
 
                           // Items List
-                          ...order.items.map(
-                            (it) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
+                          ...order.items.map((it) {
+                            final img = resolveOrderItemImage(it);
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: ProductImageWidget(
+                                      imageSrc: img,
+                                      width: 36,
+                                      height: 36,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       '${it.quantity}x ${it.productName}',
                                       style: const TextStyle(
                                         fontSize: 13,
-                                        color: Color(0xFF475569),
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF334155),
                                       ),
                                     ),
                                   ),
@@ -503,13 +516,14 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                     '₹${(it.unitPrice * it.quantity).toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF0F172A),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
+                            );
+                          }),
                           const Divider(height: 18),
 
                           // Total
@@ -537,7 +551,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton.icon(
-                              onPressed: () => showWholesaleInvoiceModal(context, order),
+                              onPressed: () => showWholesaleInvoiceModal(context, order, isAdmin: true),
                               icon: const Icon(LucideIcons.receipt, size: 16),
                               label: const Text('View Wholesale Invoice / PO'),
                               style: OutlinedButton.styleFrom(
@@ -1087,19 +1101,30 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                           const SizedBox(height: 12),
 
                           // Items List
-                          ...order.items.map(
-                            (it) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
+                          ...order.items.map((it) {
+                            final img = resolveOrderItemImage(it);
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: ProductImageWidget(
+                                      imageSrc: img,
+                                      width: 36,
+                                      height: 36,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       '${it.quantity}x ${it.productName}',
                                       style: const TextStyle(
                                         fontSize: 13,
-                                        color: Color(0xFF475569),
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF334155),
                                       ),
                                     ),
                                   ),
@@ -1107,13 +1132,14 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                                     '₹${(it.unitPrice * it.quantity).toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF0F172A),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
+                            );
+                          }),
                           const Divider(height: 18),
 
                           // Total
@@ -1137,7 +1163,24 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () => showWholesaleInvoiceModal(context, order, isAdmin: true),
+                              icon: const Icon(LucideIcons.receipt, size: 16),
+                              label: const Text('View Wholesale Invoice / PO'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF2563EB),
+                                side: const BorderSide(color: Color(0xFF2563EB)),
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
 
                           // 3-Option Status Toggle for Online: Confirmed, In Delivery, Delivered
                           Container(

@@ -2,24 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:goodwin/core/services/pdf_invoice_service.dart';
+import 'package:goodwin/core/utils/product_image_resolver.dart';
 import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
+import 'package:goodwin/shared/widgets/product_image_widget.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-void showWholesaleInvoiceModal(BuildContext context, OrderModel order) {
+void showWholesaleInvoiceModal(
+  BuildContext context,
+  OrderModel order, {
+  bool isAdmin = true,
+}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => WholesaleInvoiceSheet(order: order),
+    builder: (ctx) => WholesaleInvoiceSheet(
+      order: order,
+      isAdmin: isAdmin,
+    ),
   );
 }
 
 class WholesaleInvoiceSheet extends StatelessWidget {
   final OrderModel order;
+  final bool isAdmin;
 
-  const WholesaleInvoiceSheet({super.key, required this.order});
+  const WholesaleInvoiceSheet({
+    super.key,
+    required this.order,
+    this.isAdmin = true,
+  });
 
   String _formatCurrency(double amount) {
     return '₹${amount.toStringAsFixed(amount.truncateToDouble() == amount ? 0 : 2)}';
@@ -129,12 +143,20 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(LucideIcons.printer, color: Color(0xFF2563EB), size: 22),
+                      icon: const Icon(
+                        LucideIcons.printer,
+                        color: Color(0xFF2563EB),
+                        size: 22,
+                      ),
                       tooltip: 'Print / Save PDF',
                       onPressed: () => _handleDownloadPdf(context),
                     ),
                     IconButton(
-                      icon: const Icon(LucideIcons.share2, color: Color(0xFF2563EB), size: 20),
+                      icon: const Icon(
+                        LucideIcons.share2,
+                        color: Color(0xFF2563EB),
+                        size: 20,
+                      ),
                       tooltip: 'Share PDF',
                       onPressed: () => _handleSharePdf(context),
                     ),
@@ -266,24 +288,41 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                     // Itemized List
                     ...order.items.map((item) {
                       final hasVariant = item.variant != null && item.variant!.isNotEmpty;
+                      final img = resolveOrderItemImage(item);
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFF1F5F9)),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
                         ),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: ProductImageWidget(
+                                imageSrc: img,
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     item.productName,
-                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13.5,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   if (hasVariant)
                                     Padding(
@@ -304,7 +343,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 3),
                                   Text(
                                     '${item.quantity} units @ ${_formatCurrency(item.unitPrice)}',
                                     style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
@@ -312,6 +351,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 8),
                             Text(
                               _formatCurrency(item.totalPrice),
                               style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A)),
@@ -389,7 +429,7 @@ class WholesaleInvoiceSheet extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () => _handleSharePdf(context),
-                            icon: const Icon(LucideIcons.share2, size: 16),
+                            icon: const Icon(LucideIcons.share2, size: 16, color: Color(0xFF2563EB)),
                             label: const Text('Share PDF'),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: const Color(0xFF2563EB),

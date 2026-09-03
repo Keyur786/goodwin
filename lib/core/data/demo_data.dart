@@ -216,6 +216,7 @@ class DemoData {
           productName: 'Transparent Umbrella',
           sku: 'UMB-TR-001',
           variant: 'Standard',
+          imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401',
           unitPrice: 90,
           quantity: 1,
         ),

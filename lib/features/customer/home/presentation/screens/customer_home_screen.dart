@@ -56,8 +56,8 @@ class CustomerHomeScreen extends ConsumerWidget {
                                 key: ValueKey('favorite-toggle-${product.id}'),
                                 onPressed: () => ref.read(favoriteProductIdsProvider.notifier).toggle(product.id),
                                 icon: Icon(
-                                  LucideIcons.heart,
-                                  color: isFavorite ? Colors.red : null,
+                                  isFavorite ? Icons.favorite : LucideIcons.heart,
+                                  color: isFavorite ? Colors.red.shade600 : null,
                                 ),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
@@ -112,8 +112,8 @@ class CustomerHomeScreen extends ConsumerWidget {
                       key: ValueKey('favorite-toggle-${product.id}'),
                       onPressed: () => ref.read(favoriteProductIdsProvider.notifier).toggle(product.id),
                       icon: Icon(
-                        LucideIcons.heart,
-                        color: isFavorite ? Colors.red : null,
+                        isFavorite ? Icons.favorite : LucideIcons.heart,
+                        color: isFavorite ? Colors.red.shade600 : null,
                       ),
                     ),
                   ],

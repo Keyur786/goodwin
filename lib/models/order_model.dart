@@ -17,6 +17,7 @@ class OrderItemModel {
     required this.productName,
     this.sku = '',
     this.variant,
+    this.imageUrl,
     required this.unitPrice,
     required this.quantity,
   });
@@ -25,6 +26,7 @@ class OrderItemModel {
   final String productName;
   final String sku;
   final String? variant;
+  final String? imageUrl;
   final double unitPrice;
   final int quantity;
 
@@ -35,6 +37,7 @@ class OrderItemModel {
     String? productName,
     String? sku,
     String? variant,
+    String? imageUrl,
     double? unitPrice,
     int? quantity,
   }) {
@@ -43,6 +46,7 @@ class OrderItemModel {
       productName: productName ?? this.productName,
       sku: sku ?? this.sku,
       variant: variant ?? this.variant,
+      imageUrl: imageUrl ?? this.imageUrl,
       unitPrice: unitPrice ?? this.unitPrice,
       quantity: quantity ?? this.quantity,
     );
@@ -53,6 +57,7 @@ class OrderItemModel {
         'productName': productName,
         'sku': sku,
         'variant': variant,
+        if (imageUrl != null) 'imageUrl': imageUrl,
         'unitPrice': unitPrice,
         'quantity': quantity,
       };
@@ -142,6 +147,7 @@ class OrderModel {
               productName: map['productName']?.toString() ?? 'Product',
               sku: map['sku']?.toString() ?? '',
               variant: map['variant']?.toString(),
+              imageUrl: map['imageUrl']?.toString() ?? map['image']?.toString(),
               unitPrice: (map['unitPrice'] as num?)?.toDouble() ?? 0.0,
               quantity: (map['quantity'] as num?)?.toInt() ?? 1,
             );

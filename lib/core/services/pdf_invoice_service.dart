@@ -1,4 +1,6 @@
-import 'dart:typed_data';
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:goodwin/core/utils/product_image_resolver.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -17,6 +19,18 @@ class PdfInvoiceService {
     final dateFormat = DateFormat('dd MMM yyyy, hh:mm a');
     final orderNo = order.orderNumber.isNotEmpty ? order.orderNumber : order.id;
     final totalUnits = order.items.fold<int>(0, (sum, i) => sum + i.quantity);
+
+    // Pre-load product images for the PDF table
+    final Map<String, pw.ImageProvider> itemImages = {};
+    for (final item in order.items) {
+      final imgUrl = resolveOrderItemImage(item);
+      if (imgUrl.isNotEmpty && !itemImages.containsKey(item.productId)) {
+        final img = await _loadPdfImage(imgUrl);
+        if (img != null) {
+          itemImages[item.productId] = img;
+        }
+      }
+    }
 
     pw.Font? regularFont;
     pw.Font? boldFont;
@@ -226,18 +240,18 @@ class PdfInvoiceService {
                   bottom: const pw.BorderSide(color: _borderSlate, width: 1),
                 ),
                 columnWidths: const {
-                  0: pw.FlexColumnWidth(4),
-                  1: pw.FlexColumnWidth(2.5),
+                  0: pw.FlexColumnWidth(4.5),
+                  1: pw.FlexColumnWidth(2.2),
                   2: pw.FlexColumnWidth(2),
-                  3: pw.FlexColumnWidth(1.5),
-                  4: pw.FlexColumnWidth(2.5),
+                  3: pw.FlexColumnWidth(1.2),
+                  4: pw.FlexColumnWidth(2.3),
                 },
                 children: [
                   // Table Header
                   pw.TableRow(
                     decoration: const pw.BoxDecoration(color: _lightBg),
                     children: [
-                      _buildTableCell('Item Description', isHeader: true, align: pw.TextAlign.left),
+                      _buildProductCell('Item Description', isHeader: true),
                       _buildTableCell('Variation / Pack', isHeader: true, align: pw.TextAlign.left),
                       _buildTableCell('Unit Price', isHeader: true, align: pw.TextAlign.right),
                       _buildTableCell('Qty', isHeader: true, align: pw.TextAlign.center),
@@ -249,9 +263,10 @@ class PdfInvoiceService {
                     final variantName = item.variant != null && item.variant!.isNotEmpty
                         ? item.variant!
                         : '-';
+                    final img = itemImages[item.productId];
                     return pw.TableRow(
                       children: [
-                        _buildTableCell(item.productName, align: pw.TextAlign.left, isBold: true),
+                        _buildProductCell(item.productName, image: img),
                         _buildTableCell(variantName, align: pw.TextAlign.left),
                         _buildTableCell('Rs. ${item.unitPrice.toStringAsFixed(0)}', align: pw.TextAlign.right),
                         _buildTableCell('${item.quantity}', align: pw.TextAlign.center),
@@ -371,6 +386,105 @@ class PdfInvoiceService {
           fontWeight: isHeader || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
           color: isHeader ? _mutedSlate : _darkSlate,
         ),
+      ),
+    );
+  }
+
+  static Future<pw.ImageProvider?> _loadPdfImage(String rawUrl) async {
+    if (rawUrl.isEmpty) return null;
+    try {
+      if (rawUrl.startsWith('data:image')) {
+        final commaIndex = rawUrl.indexOf(',');
+        final base64Str = commaIndex != -1 ? rawUrl.substring(commaIndex + 1) : rawUrl;
+        final bytes = base64Decode(base64Str);
+        return pw.MemoryImage(bytes);
+      }
+      if (rawUrl.startsWith('assets/')) {
+        final data = await rootBundle.load(rawUrl);
+        return pw.MemoryImage(data.buffer.asUint8List());
+      }
+      return await networkImage(rawUrl);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static pw.Widget _buildProductCell(
+    String productName, {
+    pw.ImageProvider? image,
+    bool isHeader = false,
+  }) {
+    if (isHeader) {
+      return pw.Padding(
+        padding: const pw.EdgeInsets.symmetric(vertical: 7, horizontal: 6),
+        child: pw.Text(
+          productName,
+          style: pw.TextStyle(
+            fontSize: 8.5,
+            fontWeight: pw.FontWeight.bold,
+            color: _mutedSlate,
+          ),
+        ),
+      );
+    }
+
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
+        children: [
+          if (image != null)
+            pw.Container(
+              width: 26,
+              height: 26,
+              margin: const pw.EdgeInsets.only(right: 6),
+              decoration: pw.BoxDecoration(
+                borderRadius: pw.BorderRadius.circular(4),
+                border: pw.Border.all(color: _borderSlate, width: 0.5),
+              ),
+              child: pw.ClipRRect(
+                horizontalRadius: 4,
+                verticalRadius: 4,
+                child: pw.Image(
+                  image,
+                  width: 26,
+                  height: 26,
+                  fit: pw.BoxFit.cover,
+                ),
+              ),
+            )
+          else
+            pw.Container(
+              width: 26,
+              height: 26,
+              margin: const pw.EdgeInsets.only(right: 6),
+              decoration: pw.BoxDecoration(
+                color: _lightBg,
+                borderRadius: pw.BorderRadius.circular(4),
+                border: pw.Border.all(color: _borderSlate, width: 0.5),
+              ),
+              child: pw.Center(
+                child: pw.Text(
+                  productName.isNotEmpty ? productName[0].toUpperCase() : 'P',
+                  style: pw.TextStyle(
+                    fontSize: 10,
+                    fontWeight: pw.FontWeight.bold,
+                    color: _mutedSlate,
+                  ),
+                ),
+              ),
+            ),
+          pw.Expanded(
+            child: pw.Text(
+              productName,
+              style: pw.TextStyle(
+                fontSize: 9,
+                fontWeight: pw.FontWeight.bold,
+                color: _darkSlate,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

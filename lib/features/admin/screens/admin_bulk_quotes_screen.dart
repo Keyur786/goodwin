@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
+import 'package:goodwin/core/utils/image_upload_helper.dart';
+import 'package:goodwin/shared/widgets/full_screen_image_viewer.dart';
+import 'package:goodwin/shared/widgets/product_image_widget.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:intl/intl.dart';
 
@@ -205,6 +208,47 @@ class _AdminQuoteChatScreenState extends State<_AdminQuoteChatScreen> {
     }
   }
 
+  Future<void> _pickAndSendPhoto() async {
+    if (_sending || _status == 'closed') return;
+    final source = await showPhotoSourceActionSheet(context);
+    if (source == null || !mounted) return;
+
+    setState(() => _sending = true);
+    try {
+      final photoUrl = await pickAndUploadChatPhoto(
+        context,
+        source,
+        folder: 'inquiry_chats/${widget.inquiry['id']}',
+      );
+      if (photoUrl == null || !mounted) return;
+
+      final caption = _textController.text.trim();
+      _textController.clear();
+
+      await _repo.sendInquiryMessage(
+        inquiryId: widget.inquiry['id'] as String,
+        senderId: 'admin',
+        senderName: 'Goodwin Admin',
+        text: caption,
+        isAdmin: true,
+        imageUrl: photoUrl,
+      );
+      setState(() => _status = 'replied');
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
   Future<void> _toggleStatus() async {
     final newStatus = _status == 'closed' ? 'replied' : 'closed';
     await _repo.updateInquiryStatus(widget.inquiry['id'] as String, newStatus);
@@ -264,7 +308,14 @@ class _AdminQuoteChatScreenState extends State<_AdminQuoteChatScreen> {
               },
             ),
           ),
-          _ComposeBar(controller: _textController, sending: _sending, disabled: isClosed, onSend: _send, placeholder: isClosed ? 'This inquiry is closed' : 'Type a reply to the customer…'),
+          _ComposeBar(
+            controller: _textController,
+            sending: _sending,
+            disabled: isClosed,
+            onSend: _send,
+            onAttachPhoto: _pickAndSendPhoto,
+            placeholder: isClosed ? 'This inquiry is closed' : 'Type a reply to the customer…',
+          ),
         ],
       ),
     );
@@ -276,17 +327,60 @@ class _InquirySummaryBanner extends StatelessWidget {
   final Map<String, dynamic> inquiry;
   @override
   Widget build(BuildContext context) {
+    final photoUrl = inquiry['photoUrl'] as String? ?? '';
     return Container(
       width: double.infinity,
       color: const Color(0xFFEFF6FF),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Wrap(
-        spacing: 16, runSpacing: 4,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SummaryChip(label: '📦 Product', value: inquiry['categoryOrProduct'] as String? ?? '—'),
-          _SummaryChip(label: '🔢 Qty', value: inquiry['quantityRange'] as String? ?? '—'),
-          _SummaryChip(label: '📞 Phone', value: inquiry['phone'] as String? ?? '—'),
-          if ((inquiry['notes'] as String? ?? '').isNotEmpty) _SummaryChip(label: '📝 Notes', value: inquiry['notes'] as String),
+          Wrap(
+            spacing: 16,
+            runSpacing: 4,
+            children: [
+              _SummaryChip(label: '📦 Product', value: inquiry['categoryOrProduct'] as String? ?? '—'),
+              _SummaryChip(label: '🔢 Qty', value: inquiry['quantityRange'] as String? ?? '—'),
+              _SummaryChip(label: '📞 Phone', value: inquiry['phone'] as String? ?? '—'),
+              if ((inquiry['notes'] as String? ?? '').isNotEmpty) _SummaryChip(label: '📝 Notes', value: inquiry['notes'] as String),
+            ],
+          ),
+          if (photoUrl.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => showDialog<void>(
+                context: context,
+                builder: (_) => FullScreenImageViewerDialog(
+                  images: [photoUrl],
+                  productName: inquiry['categoryOrProduct'] as String? ?? 'Sample Photo',
+                ),
+              ),
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: ProductImageWidget(
+                      imageSrc: photoUrl,
+                      width: 38,
+                      height: 38,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '📷 Attached Sample / Photo (Tap to view)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF2563EB),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -312,6 +406,9 @@ class _ChatBubble extends StatelessWidget {
     final sentAt = message['sentAt'];
     String timeStr = '';
     if (sentAt is Timestamp) timeStr = DateFormat('hh:mm a').format(sentAt.toDate());
+    final imageUrl = message['imageUrl'] as String? ?? '';
+    final text = message['text'] as String? ?? '';
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -335,8 +432,40 @@ class _ChatBubble extends StatelessWidget {
                 crossAxisAlignment: isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
                   Text(message['senderName'] as String? ?? '', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: isSentByMe ? Colors.white70 : const Color(0xFF2563EB))),
-                  const SizedBox(height: 3),
-                  Text(message['text'] as String? ?? '', style: TextStyle(fontSize: 14, color: isSentByMe ? Colors.white : const Color(0xFF0F172A), height: 1.4)),
+                  if (imageUrl.isNotEmpty) ...[
+                    GestureDetector(
+                      onTap: () {
+                        showDialog<void>(
+                          context: context,
+                          builder: (_) => FullScreenImageViewerDialog(
+                            images: [imageUrl],
+                            productName: 'Photo Attachment',
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 6, bottom: 4),
+                        constraints: const BoxConstraints(maxHeight: 220, maxWidth: 260),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSentByMe ? Colors.white24 : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(11),
+                          child: ProductImageWidget(
+                            imageSrc: imageUrl,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (text.isNotEmpty) ...[
+                    const SizedBox(height: 3),
+                    Text(text, style: TextStyle(fontSize: 14, color: isSentByMe ? Colors.white : const Color(0xFF0F172A), height: 1.4)),
+                  ],
                   const SizedBox(height: 4),
                   Text(timeStr, style: TextStyle(fontSize: 10, color: isSentByMe ? Colors.white60 : const Color(0xFF94A3B8))),
                 ],
@@ -354,20 +483,34 @@ class _ChatBubble extends StatelessWidget {
 }
 
 class _ComposeBar extends StatelessWidget {
-  const _ComposeBar({required this.controller, required this.sending, required this.disabled, required this.onSend, required this.placeholder});
+  const _ComposeBar({
+    required this.controller,
+    required this.sending,
+    required this.disabled,
+    required this.onSend,
+    required this.onAttachPhoto,
+    required this.placeholder,
+  });
   final TextEditingController controller;
   final bool sending;
   final bool disabled;
   final VoidCallback onSend;
+  final VoidCallback onAttachPhoto;
   final String placeholder;
+
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Container(
-      padding: EdgeInsets.fromLTRB(12, 10, 12, 10 + bottomInset),
+      padding: EdgeInsets.fromLTRB(8, 10, 12, 10 + bottomInset),
       decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: Color(0xFFE2E8F0)))),
       child: Row(
         children: [
+          IconButton(
+            icon: const Icon(LucideIcons.camera, color: Color(0xFF2563EB), size: 22),
+            tooltip: 'Send Photo',
+            onPressed: disabled ? null : (sending ? null : onAttachPhoto),
+          ),
           Expanded(
             child: TextField(
               controller: controller,

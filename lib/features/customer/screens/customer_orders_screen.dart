@@ -3,9 +3,10 @@ import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/services/firestore_order_repository.dart';
+import 'package:goodwin/core/utils/product_image_resolver.dart';
 import 'package:goodwin/features/admin/dialogs/edit_order_dialog.dart';
 import 'package:goodwin/models/order_model.dart';
-import 'package:goodwin/shared/widgets/wholesale_invoice_sheet.dart';
+import 'package:goodwin/shared/widgets/product_image_widget.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CustomerOrdersScreen extends StatelessWidget {
@@ -372,36 +373,80 @@ class CustomerOrdersScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      ...order.items.map(
-                        (item) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
+                      ...order.items.map((item) {
+                        final img = resolveOrderItemImage(item);
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  '${item.productName} × ${item.quantity}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                    color: Color(0xFF1E293B),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: ProductImageWidget(
+                                  imageSrc: img,
+                                  width: 44,
+                                  height: 44,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.productName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13.5,
+                                        color: Color(0xFF1E293B),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Qty: ${item.quantity}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF64748B),
+                                          ),
+                                        ),
+                                        if (item.variant != null && item.variant!.isNotEmpty) ...[
+                                          const Text(
+                                            ' • ',
+                                            style: TextStyle(color: Color(0xFF94A3B8)),
+                                          ),
+                                          Text(
+                                            item.variant!,
+                                            style: const TextStyle(
+                                              fontSize: 11.5,
+                                              color: Color(0xFF2563EB),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
                               Text(
                                 '₹${item.totalPrice.toStringAsFixed(0)}',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w800,
                                   fontSize: 14,
                                   color: Color(0xFF0F172A),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                       const Divider(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -422,23 +467,6 @@ class CustomerOrdersScreen extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () => showWholesaleInvoiceModal(context, order),
-                          icon: const Icon(LucideIcons.receiptText, size: 18),
-                          label: const Text('View Wholesale Invoice / PO'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF2563EB),
-                            side: const BorderSide(color: Color(0xFF2563EB)),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
                       ),
                       if (!order.isOnlineOrder &&
                           order.orderStatus != OrderStatus.pickedUp &&

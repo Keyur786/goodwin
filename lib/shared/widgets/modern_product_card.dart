@@ -273,7 +273,7 @@ class ModernProductCard extends StatelessWidget {
                         IconButton(
                           onPressed: onToggleFavorite,
                           icon: Icon(
-                            LucideIcons.heart,
+                            isFavorite ? Icons.favorite : LucideIcons.heart,
                             color: isFavorite
                                 ? Colors.red.shade600
                                 : const Color(0xFF94A3B8),

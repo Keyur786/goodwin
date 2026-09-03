@@ -26,6 +26,7 @@ import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
 import 'package:goodwin/shared/widgets/empty_state_view.dart';
 import 'package:goodwin/shared/widgets/modern_product_card.dart';
+import 'package:goodwin/shared/widgets/pickup_location_modal.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
 import 'package:goodwin/shared/widgets/profile_avatar_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -855,8 +856,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       return;
     }
 
+    if (action == ProfileAction.addresses) {
+      showPickupLocationModal(context);
+      return;
+    }
+
     final message = switch (action) {
-      ProfileAction.addresses => 'Warehouse pickup: Katargam Branch, Surat.',
       ProfileAction.help => 'Support is available at support@goodwin.com.',
       _ => '',
     };
@@ -1237,12 +1242,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         _buildAccountTierCard(),
         const SizedBox(height: 20),
 
-        // 6. Wholesale Quality & Trade Compliance Card
+        // 6. Quality & Trade Assurance Card
         _buildQualityAssuranceGrid(),
-        const SizedBox(height: 20),
-
-        // 7. Direct Trade Desk Support Card
-        _buildTradeSupportCard(),
       ],
     );
   }
@@ -1286,7 +1287,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                     Icon(LucideIcons.shieldCheck, size: 14, color: Colors.white),
                     SizedBox(width: 4),
                     Text(
-                      'WHOLESALE TRADE SUPPLY',
+                      'DIRECT FACTORY SUPPLY',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 10.5,
@@ -1307,7 +1308,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           ),
           const SizedBox(height: 12),
           const Text(
-            'Wholesale Bulk Orders &\nCustom Quotations',
+            'Bulk Orders &\nCustom Quotations',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -1317,7 +1318,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Direct factory shipments & full carton lots from our Katargam warehouse with 100% GST invoicing.',
+            'Direct factory shipments & full carton lots from our Katargam warehouse.',
             style: TextStyle(
               color: Color(0xFFDBEAFE),
               fontSize: 13,
@@ -1329,15 +1330,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             children: [
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: () => showBulkOrderInquiryDialog(
-                    context: context,
-                    currentUser: currentUser,
-                  ),
-                  icon: const Icon(LucideIcons.messageSquare, size: 15),
+                  onPressed: () => setState(() => selectedIndex = 1),
+                  icon: const Icon(LucideIcons.shoppingBag, size: 15),
                   label: const FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      'Request Bulk Quote',
+                      'Place Order',
                       style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 12.5,
@@ -1360,16 +1358,20 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => setState(() => selectedIndex = 1),
+                  onPressed: () => showBulkOrderInquiryDialog(
+                    context: context,
+                    currentUser: currentUser,
+                    catalogProducts: products,
+                  ),
                   icon: const Icon(
-                    LucideIcons.layoutGrid,
+                    LucideIcons.messageSquare,
                     size: 15,
                     color: Colors.white,
                   ),
                   label: const FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      'Explore Catalog',
+                      'Request Bulk Quote',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -1580,12 +1582,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _ActionCardItem(
-                icon: LucideIcons.headphones,
+                icon: LucideIcons.mapPin,
                 iconBg: const Color(0xFFDCFCE7),
                 iconColor: const Color(0xFF16A34A),
-                title: 'Trade Desk',
-                subtitle: '+91 99045 79700',
-                onTap: _showTradeSupportDialog,
+                title: 'Pickup Hub',
+                subtitle: 'Katargam Branch',
+                onTap: () => showPickupLocationModal(context),
               ),
             ),
           ],
@@ -1677,7 +1679,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           ),
           const SizedBox(height: 14),
           const Text(
-            'Direct warehouse self-pickup and rapid freight loading available for wholesale orders.',
+            'Direct bay self-pickup and rapid freight loading available on all confirmed lots.',
             style: TextStyle(
               fontSize: 13,
               color: Color(0xFF475569),
@@ -1708,7 +1710,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 SizedBox(height: 8),
                 _WarehouseDetailRow(
                   icon: LucideIcons.phoneCall,
-                  label: 'Warehouse Desk',
+                  label: 'Dispatch Desk',
                   value: '+91 99045 79700',
                 ),
               ],
@@ -1754,7 +1756,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Wholesale Partnership',
+                      'Trade Partnership Tier',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
@@ -1762,7 +1764,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       ),
                     ),
                     Text(
-                      currentUser?.shopName ?? 'Verified Wholesale Account',
+                      currentUser?.shopName ?? 'Verified Business Account',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF64748B),
@@ -1852,7 +1854,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Goodwin Wholesale Assurance',
+            'Goodwin Quality Assurance',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
@@ -1873,10 +1875,10 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               SizedBox(width: 12),
               Expanded(
                 child: _AssuranceFeatureCard(
-                  icon: LucideIcons.receiptText,
+                  icon: LucideIcons.truck,
                   iconColor: Color(0xFF2563EB),
-                  title: '100% Tax Compliant',
-                  description: 'Instant computerized GST invoices',
+                  title: 'Same-Day Dispatch',
+                  description: 'Priority bay pickup & fast logistics',
                 ),
               ),
             ],
@@ -1897,118 +1899,11 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 child: _AssuranceFeatureCard(
                   icon: LucideIcons.packageCheck,
                   iconColor: Color(0xFFD97706),
-                  title: 'Wholesale Packing',
+                  title: 'Export-Grade Packaging',
                   description: 'Multi-layer moisture lock cartons',
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTradeSupportCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFBBF7D0)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-              color: Color(0xFFDCFCE7),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              LucideIcons.headphones,
-              color: Color(0xFF16A34A),
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Dedicated Trade Desk Support',
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF14532D),
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Phone & WhatsApp: +91 99045 79700',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF15803D),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          FilledButton(
-            onPressed: _showTradeSupportDialog,
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF16A34A),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text(
-              'Contact',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showTradeSupportDialog() {
-    showDialog<void>(
-      context: context,
-      builder: (dialogCtx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(LucideIcons.headphones, color: Color(0xFF2563EB)),
-            SizedBox(width: 10),
-            Text('Trade Support Desk'),
-          ],
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Goodwin Wholesale Central Desk',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-            ),
-            SizedBox(height: 8),
-            Text('📍 Katargam Branch, Surat, Gujarat'),
-            SizedBox(height: 4),
-            Text('📞 Phone & WhatsApp: +91 99045 79700'),
-            SizedBox(height: 4),
-            Text('🕒 Hours: 9:00 AM - 8:00 PM (Mon - Sat)'),
-            SizedBox(height: 4),
-            Text('✉️ Email: support@goodwin.com'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Close'),
           ),
         ],
       ),

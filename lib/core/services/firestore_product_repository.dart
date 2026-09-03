@@ -147,6 +147,8 @@ class FirestoreProductRepository {
     required String quantityRange,
     String notes = '',
     String? userId,
+    String? photoUrl,
+    String? productId,
   }) async {
     final inquiryId = 'inq_${DateTime.now().millisecondsSinceEpoch}';
     await _firestore.collection('bulk_inquiries').doc(inquiryId).set({
@@ -158,6 +160,8 @@ class FirestoreProductRepository {
       'categoryOrProduct': categoryOrProduct.trim(),
       'quantityRange': quantityRange.trim(),
       'notes': notes.trim(),
+      'photoUrl': photoUrl?.trim() ?? '',
+      'productId': productId?.trim() ?? '',
       'status': 'pending',
       'unreadByAdmin': true,
       'unreadByUser': false,
@@ -215,9 +219,21 @@ class FirestoreProductRepository {
     required String senderName,
     required String text,
     required bool isAdmin,
+    String? imageUrl,
   }) async {
     final msgId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
     final batch = _firestore.batch();
+
+    final data = <String, dynamic>{
+      'id': msgId,
+      'senderId': senderId,
+      'senderName': senderName,
+      'text': text.trim(),
+      'sentAt': FieldValue.serverTimestamp(),
+    };
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      data['imageUrl'] = imageUrl;
+    }
 
     // Write message doc
     final msgRef = _firestore
@@ -225,21 +241,22 @@ class FirestoreProductRepository {
         .doc(inquiryId)
         .collection('messages')
         .doc(msgId);
-    batch.set(msgRef, {
-      'id': msgId,
-      'senderId': senderId,
-      'senderName': senderName,
-      'text': text.trim(),
-      'sentAt': FieldValue.serverTimestamp(),
-    });
+    batch.set(msgRef, data);
+
+    String preview;
+    if (text.trim().isNotEmpty) {
+      final t = text.trim();
+      final body = t.length > 50 ? '${t.substring(0, 50)}…' : t;
+      preview = (imageUrl != null && imageUrl.isNotEmpty) ? '📷 $body' : body;
+    } else {
+      preview = '📷 Photo';
+    }
 
     // Update parent inquiry
     final inquiryRef = _firestore.collection('bulk_inquiries').doc(inquiryId);
     batch.update(inquiryRef, {
       'lastMessageAt': FieldValue.serverTimestamp(),
-      'lastMessagePreview': text.trim().length > 60
-          ? '${text.trim().substring(0, 60)}…'
-          : text.trim(),
+      'lastMessagePreview': preview,
       'status': isAdmin ? 'replied' : 'pending',
       'unreadByAdmin': !isAdmin,
       'unreadByUser': isAdmin,

@@ -84,7 +84,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           IconButton(
             onPressed: () => widget.onToggleFavorite(product.id),
             icon: Icon(
-              LucideIcons.heart,
+              widget.isFavorite ? Icons.favorite : LucideIcons.heart,
               color: widget.isFavorite
                   ? Colors.red.shade600
                   : const Color(0xFF475569),

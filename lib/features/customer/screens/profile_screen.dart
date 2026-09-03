@@ -6,6 +6,7 @@ import 'package:goodwin/core/services/firestore_user_repository.dart';
 import 'package:goodwin/features/customer/screens/customer_orders_screen.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
+import 'package:goodwin/shared/widgets/pickup_location_modal.dart';
 import 'package:goodwin/shared/widgets/profile_avatar_widget.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -624,15 +625,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: LucideIcons.mapPin,
             title: 'Pickup location',
             subtitle: 'Katargam Branch, Surat (Ready for pickup)',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Primary pickup location: Katargam Branch, Surat',
-                  ),
-                ),
-              );
-            },
+            onTap: () => showPickupLocationModal(context),
           ),
           _ProfileOption(
             icon: LucideIcons.receiptText,
