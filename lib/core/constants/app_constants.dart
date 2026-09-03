@@ -4,6 +4,7 @@ enum ProfileAction {
   profile,
   orders,
   bulkQuotes,
+  adminDashboard,
   manageProducts,
   allOrders,
   adminBulkQuotes,

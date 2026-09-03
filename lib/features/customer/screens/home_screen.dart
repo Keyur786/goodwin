@@ -7,6 +7,7 @@ import 'package:goodwin/core/services/firestore_user_repository.dart';
 import 'package:goodwin/core/state/notification_controller.dart';
 import 'package:goodwin/core/utils/quantity_dialog.dart';
 import 'package:goodwin/features/admin/dialogs/add_edit_product_dialog.dart';
+import 'package:goodwin/features/admin/dashboard/presentation/screens/admin_dashboard_screen.dart';
 import 'package:goodwin/features/admin/screens/admin_all_orders_screen.dart';
 import 'package:goodwin/features/admin/screens/admin_bulk_quotes_screen.dart';
 import 'package:goodwin/features/admin/screens/admin_product_manager_screen.dart';
@@ -783,6 +784,15 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
       await Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (_) => CustomerOrdersScreen(userId: uid),
+        ),
+      );
+      return;
+    }
+
+    if (action == ProfileAction.adminDashboard) {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => const AdminDashboardScreen(),
         ),
       );
       return;
@@ -3205,6 +3215,12 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                       letterSpacing: 1.2,
                     ),
                   ),
+                ),
+                DrawerProfileItem(
+                  icon: LucideIcons.layoutDashboard,
+                  label: 'Analytics & Sales Dashboard',
+                  action: ProfileAction.adminDashboard,
+                  onSelected: handleProfileAction,
                 ),
                 DrawerProfileItem(
                   icon: LucideIcons.packagePlus,

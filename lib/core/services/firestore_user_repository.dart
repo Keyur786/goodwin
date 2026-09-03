@@ -352,4 +352,29 @@ class FirestoreUserRepository {
       // Logging can be added here
     }
   }
+
+  Stream<List<AppUser>> streamAllCustomers() {
+    return _firestore.collection('users').snapshots().map((snap) {
+      final users = snap.docs.map((d) {
+        final data = d.data();
+        return AppUser.fromJson({'id': d.id, ...data});
+      }).toList();
+      users.sort((a, b) => b.totalPurchases.compareTo(a.totalPurchases));
+      return users;
+    });
+  }
+
+  Future<List<AppUser>> getAllCustomers() async {
+    try {
+      final snap = await _firestore.collection('users').get();
+      final users = snap.docs.map((d) {
+        final data = d.data();
+        return AppUser.fromJson({'id': d.id, ...data});
+      }).toList();
+      users.sort((a, b) => b.totalPurchases.compareTo(a.totalPurchases));
+      return users;
+    } catch (_) {
+      return [];
+    }
+  }
 }

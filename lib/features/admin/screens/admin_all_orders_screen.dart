@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/services/firestore_order_repository.dart';
 import 'package:goodwin/core/utils/product_image_resolver.dart';
+import 'package:goodwin/features/admin/dashboard/presentation/screens/admin_dashboard_screen.dart';
 import 'package:goodwin/models/order_model.dart';
 import 'package:goodwin/models/user_model.dart';
 import 'package:goodwin/shared/widgets/customer_tier_badge.dart';
@@ -114,6 +115,20 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
         backgroundColor: const Color(0xFFF8FAFC),
         appBar: AppBar(
           title: const Text('All Placed Orders'),
+          actions: [
+            IconButton(
+              icon: const Icon(LucideIcons.layoutDashboard, color: Color(0xFF2563EB)),
+              tooltip: 'Analytics & Sales Dashboard',
+              onPressed: () {
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const AdminDashboardScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 4),
+          ],
           bottom: const TabBar(
             indicatorColor: Color(0xFF2563EB),
             indicatorWeight: 3,
