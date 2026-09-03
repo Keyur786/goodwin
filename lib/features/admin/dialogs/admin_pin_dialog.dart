@@ -1,9 +1,26 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Authorized Admin Security PINs
-const Set<String> _authorizedAdminPins = {'9904', '7860', '1234'};
+/// Salted cryptographic hashes for authorized administrator PINs.
+/// Plaintext PINs are never stored in the compiled client binary.
+const String _kPinSalt = 'gw_admin_sec_salt_2026_';
+const String _kPinSuffix = '_#katargam_';
+
+const Set<String> _authorizedAdminPinHashes = {
+  '5360a1ef94c50921c66545b3c843533502caa6a9996b07b7f5fda74dd92366a5', // 9904
+  'ab1d27d656c1c7a0aa78f05fb221d50359df39c4a869d926c06b5e94881cfbab', // 7860
+  'ff570b3a63d9e7e9720e151b9219e4731ed0b1b4b0eba8737c80c516e13d4d57', // 1234
+};
+
+bool _verifyPinHash(String pin) {
+  final salted = '$_kPinSalt${pin.trim()}$_kPinSuffix';
+  final hash = sha256.convert(utf8.encode(salted)).toString();
+  return _authorizedAdminPinHashes.contains(hash);
+}
 
 /// Shows a 4-digit security PIN verification modal for sensitive administrative actions.
 Future<bool?> showAdminPinDialog(
@@ -39,6 +56,9 @@ class _AdminPinDialogWidgetState extends State<_AdminPinDialogWidget> {
   final FocusNode _focusNode = FocusNode();
   String? _errorMessage;
   bool _isResetting = false;
+  int _failedAttempts = 0;
+  int _lockoutSeconds = 0;
+  Timer? _lockoutTimer;
 
   @override
   void initState() {
@@ -50,28 +70,64 @@ class _AdminPinDialogWidgetState extends State<_AdminPinDialogWidget> {
 
   @override
   void dispose() {
+    _lockoutTimer?.cancel();
     _pinController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
   void _verifyPin(String enteredPin) {
+    if (_lockoutSeconds > 0) return;
+
     final pin = enteredPin.trim();
     if (pin.length < 4) {
       setState(() => _errorMessage = 'Please enter all 4 digits');
       return;
     }
 
-    if (_authorizedAdminPins.contains(pin)) {
+    final isValid = _verifyPinHash(pin);
+
+    // Immediately zero-out controller buffer
+    _isResetting = true;
+    _pinController.clear();
+    _isResetting = false;
+
+    if (isValid) {
       Navigator.pop(context, true);
     } else {
-      _isResetting = true;
-      _pinController.clear();
-      _isResetting = false;
-      setState(() {
-        _errorMessage = 'Incorrect PIN. Please try again.';
-      });
-      _focusNode.requestFocus();
+      _failedAttempts++;
+      if (_failedAttempts >= 5) {
+        setState(() {
+          _lockoutSeconds = 30;
+          _errorMessage = 'Too many failed attempts. Locked for 30s.';
+        });
+        _lockoutTimer?.cancel();
+        _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+          if (_lockoutSeconds <= 1) {
+            timer.cancel();
+            if (mounted) {
+              setState(() {
+                _lockoutSeconds = 0;
+                _failedAttempts = 0;
+                _errorMessage = null;
+              });
+              _focusNode.requestFocus();
+            }
+          } else {
+            if (mounted) {
+              setState(() {
+                _lockoutSeconds--;
+                _errorMessage = 'Too many failed attempts. Locked for ${_lockoutSeconds}s.';
+              });
+            }
+          }
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'Incorrect PIN. ${5 - _failedAttempts} attempts remaining.';
+        });
+        _focusNode.requestFocus();
+      }
     }
   }
 
