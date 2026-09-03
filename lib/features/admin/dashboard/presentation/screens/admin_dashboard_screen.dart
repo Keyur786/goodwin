@@ -80,7 +80,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Business & Sales Analytics',
+              'Dashboard',
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
             ),
             Text(

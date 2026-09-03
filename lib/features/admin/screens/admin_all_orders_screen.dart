@@ -118,7 +118,7 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
           actions: [
             IconButton(
               icon: const Icon(LucideIcons.layoutDashboard, color: Color(0xFF2563EB)),
-              tooltip: 'Analytics & Sales Dashboard',
+              tooltip: 'Dashboard',
               onPressed: () {
                 Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(

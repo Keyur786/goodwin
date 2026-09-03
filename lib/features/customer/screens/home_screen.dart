@@ -3218,7 +3218,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 ),
                 DrawerProfileItem(
                   icon: LucideIcons.layoutDashboard,
-                  label: 'Analytics & Sales Dashboard',
+                  label: 'Dashboard',
                   action: ProfileAction.adminDashboard,
                   onSelected: handleProfileAction,
                 ),
