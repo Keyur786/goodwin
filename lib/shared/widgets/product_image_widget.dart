@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -22,16 +23,17 @@ class ProductImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final src = imageSrc.trim();
     Widget imageContent;
 
-    if (imageSrc.isEmpty) {
+    if (src.isEmpty) {
       imageContent = _buildPlaceholder();
-    } else if (imageSrc.startsWith('data:image')) {
+    } else if (src.startsWith('data:image')) {
       try {
-        final commaIndex = imageSrc.indexOf(',');
+        final commaIndex = src.indexOf(',');
         final base64Str = commaIndex != -1
-            ? imageSrc.substring(commaIndex + 1)
-            : imageSrc;
+            ? src.substring(commaIndex + 1)
+            : src;
         final bytes = base64Decode(base64Str);
         imageContent = Image.memory(
           bytes,
@@ -43,24 +45,44 @@ class ProductImageWidget extends StatelessWidget {
       } catch (_) {
         imageContent = _buildPlaceholder();
       }
-    } else if (imageSrc.startsWith('assets/')) {
+    } else if (src.startsWith('assets/')) {
       imageContent = Image.asset(
-        imageSrc,
+        src,
         width: width,
         height: height,
         fit: fit,
         errorBuilder: (_, _, _) => _buildPlaceholder(),
       );
+    } else if (kIsWeb) {
+      // On Web, Image.network uses browser native image loading, bypassing CORS restrictions
+      // that cause CachedNetworkImage to fail.
+      imageContent = Image.network(
+        src,
+        width: width,
+        height: height,
+        fit: fit,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildLoadingSkeleton();
+        },
+        errorBuilder: (_, _, _) => _buildPlaceholder(),
+      );
     } else {
       imageContent = CachedNetworkImage(
-        imageUrl: imageSrc,
+        imageUrl: src,
         width: width,
         height: height,
         fit: fit,
         fadeInDuration: const Duration(milliseconds: 200),
         fadeOutDuration: const Duration(milliseconds: 150),
         placeholder: (context, url) => _buildLoadingSkeleton(),
-        errorWidget: (context, url, error) => _buildPlaceholder(),
+        errorWidget: (context, url, error) => Image.network(
+          src,
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (_, _, _) => _buildPlaceholder(),
+        ),
       );
     }
 
