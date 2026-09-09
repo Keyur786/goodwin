@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -88,6 +90,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   !phoneUser.name.startsWith('Reseller ')));
 
       _isExistingUser = isAlreadyRegistered;
+
+      final isDesktop = !kIsWeb &&
+          (defaultTargetPlatform == TargetPlatform.windows ||
+              defaultTargetPlatform == TargetPlatform.macOS ||
+              defaultTargetPlatform == TargetPlatform.linux);
+
+      if (isDesktop) {
+        // Desktop environment: carrier SMS verification is unsupported by Firebase C++ SDK.
+        // Route to OTP screen to allow verification with static code 123456.
+        setState(() {
+          _verificationId = 'desktop_static_verification_id';
+          _isLoading = false;
+          _currentStep = _AuthStep.otp;
+        });
+        return;
+      }
 
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: formattedNumber,
@@ -182,34 +200,38 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       User? firebaseUser;
-      if (_verificationId != null) {
-        final credential = PhoneAuthProvider.credential(
-          verificationId: _verificationId!,
-          smsCode: otp,
-        );
-        final userCred = await FirebaseAuth.instance.signInWithCredential(
-          credential,
-        );
-        firebaseUser = userCred.user;
-      } else {
-        final userCred = await FirebaseAuth.instance.signInAnonymously();
-        firebaseUser = userCred.user;
-      }
+      final rawPhone = _phoneController.text.trim();
+      final userRepo = FirestoreUserRepository();
 
-      if (firebaseUser != null) {
-        _authenticatedUserId = firebaseUser.uid;
-        final rawPhone = _phoneController.text.trim();
-        final userRepo = FirestoreUserRepository();
+      if (_verificationId == 'desktop_static_verification_id') {
+        if (otp != '123456') {
+          setState(() {
+            _isLoading = false;
+            _errorMessage =
+                'Invalid code. For desktop sign-in, enter verification code: 123456';
+          });
+          return;
+        }
 
-        // Check if user is already present and completed setup
+        try {
+          final userCred = await FirebaseAuth.instance.signInAnonymously();
+          firebaseUser = userCred.user;
+        } catch (_) {
+          // Graceful fallback for offline desktop testing
+        }
+
+        final effectiveUid = firebaseUser?.uid ?? 'desktop_${rawPhone}_user';
+        _authenticatedUserId = effectiveUid;
+
         final isPresent = await userRepo.isUserAlreadyPresent(
-          userId: firebaseUser.uid,
+          userId: effectiveUid,
           phone: rawPhone,
         );
 
-        if (isPresent) {
-          // Finish setup at step 2 and take user directly to the home screen
-          await userRepo.getOrCreateUser(firebaseUser);
+        if (isPresent || _isExistingUser) {
+          if (firebaseUser != null) {
+            await userRepo.getOrCreateUser(firebaseUser);
+          }
           if (mounted) {
             setState(() => _isLoading = false);
             widget.onLoginSuccess();
@@ -218,12 +240,14 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         // New user: proceed to step 3 (Profile Setup)
-        final user = await userRepo.getOrCreateUser(firebaseUser);
-        if (user.name.isNotEmpty && !user.name.startsWith('Reseller ')) {
-          _nameController.text = user.name;
-        }
-        if (user.email != null && user.email!.isNotEmpty) {
-          _emailController.text = user.email!;
+        if (firebaseUser != null) {
+          final user = await userRepo.getOrCreateUser(firebaseUser);
+          if (user.name.isNotEmpty && !user.name.startsWith('Reseller ')) {
+            _nameController.text = user.name;
+          }
+          if (user.email != null && user.email!.isNotEmpty) {
+            _emailController.text = user.email!;
+          }
         }
 
         if (mounted) {
@@ -662,7 +686,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'We have sent a 6-digit verification code to +91 ${_phoneController.text}.',
+          !kIsWeb &&
+                  (defaultTargetPlatform == TargetPlatform.windows ||
+                      defaultTargetPlatform == TargetPlatform.macOS ||
+                      defaultTargetPlatform == TargetPlatform.linux)
+              ? 'Desktop Mode: Enter static code 123456 to verify +91 ${_phoneController.text}.'
+              : 'We have sent a 6-digit verification code to +91 ${_phoneController.text}.',
           style: const TextStyle(
             fontSize: 14,
             color: Color(0xFF64748B),

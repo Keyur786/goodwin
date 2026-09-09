@@ -1,0 +1,73 @@
+name: Build Windows Setup Installer
+
+on:
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+  push:
+    branches:
+      - main
+    paths:
+      - 'lib/**'
+      - 'windows/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/build_windows_setup.yml'
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows-setup:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Add Inno Setup to PATH
+        run: echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Verify Flutter & Inno Setup
+        run: |
+          flutter --version
+          iscc /?
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Flutter Windows Desktop Release
+        run: flutter build windows --release
+
+      - name: Compile Windows Setup Installer (.exe)
+        run: iscc windows\installer\goodwin_setup.iss
+
+      - name: Upload Setup Executable Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Goodwin_Windows_Setup
+          path: build/windows/installer/Goodwin_Windows_Setup.exe
+          if-no-files-found: error
+
+      - name: Create GitHub Release (Only on Tags)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/windows/installer/Goodwin_Windows_Setup.exe
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

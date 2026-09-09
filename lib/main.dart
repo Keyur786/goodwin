@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:goodwin/app.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
+import 'package:goodwin/firebase_options.dart';
 
 // Exports for modular access & backward compatibility
 export 'package:goodwin/app.dart';
@@ -44,7 +45,9 @@ export 'package:goodwin/core/state/favorites_controller.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     // Enable offline persistence caching for smooth offline browsing
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
