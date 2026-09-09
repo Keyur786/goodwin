@@ -42,7 +42,7 @@ jobs:
       - name: Verify Flutter & Inno Setup
         run: |
           flutter --version
-          iscc /?
+          where iscc
 
       - name: Get Flutter dependencies
         run: flutter pub get
@@ -56,15 +56,15 @@ jobs:
       - name: Upload Setup Executable Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Goodwin_Windows_Setup
-          path: build/windows/installer/Goodwin_Windows_Setup.exe
+          name: GoodWin_Windows_Setup
+          path: build/windows/installer/GoodWin_Windows_Setup.exe
           if-no-files-found: error
 
       - name: Create GitHub Release (Only on Tags)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: build/windows/installer/Goodwin_Windows_Setup.exe
+          files: build/windows/installer/GoodWin_Windows_Setup.exe
           draft: false
           prerelease: false
           generate_release_notes: true
