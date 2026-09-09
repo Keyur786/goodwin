@@ -96,11 +96,12 @@ class _LoginScreenState extends State<LoginScreen> {
               defaultTargetPlatform == TargetPlatform.macOS ||
               defaultTargetPlatform == TargetPlatform.linux);
 
-      if (isDesktop) {
-        // Desktop environment: carrier SMS verification is unsupported by Firebase C++ SDK.
-        // Route to OTP screen to allow verification with static code 123456.
+      final isSuperAdmin = FirestoreUserRepository.isSuperAdminPhone(rawNumber);
+
+      if (isDesktop || isSuperAdmin) {
+        // Desktop environment or Goodwin Super Admin: SMS is bypassed, route to OTP screen with static code 123456.
         setState(() {
-          _verificationId = 'desktop_static_verification_id';
+          _verificationId = 'static_verification_id';
           _isLoading = false;
           _currentStep = _AuthStep.otp;
         });
@@ -203,34 +204,56 @@ class _LoginScreenState extends State<LoginScreen> {
       final rawPhone = _phoneController.text.trim();
       final userRepo = FirestoreUserRepository();
 
-      if (_verificationId == 'desktop_static_verification_id') {
+      final isSuperAdmin = FirestoreUserRepository.isSuperAdminPhone(rawPhone);
+
+      if (_verificationId == 'static_verification_id' ||
+          _verificationId == 'desktop_static_verification_id' ||
+          (isSuperAdmin && otp == '123456')) {
         if (otp != '123456') {
           setState(() {
             _isLoading = false;
             _errorMessage =
-                'Invalid code. For desktop sign-in, enter verification code: 123456';
+                'Invalid code. Please enter verification code: 123456';
           });
           return;
         }
 
         try {
-          final userCred = await FirebaseAuth.instance.signInAnonymously();
+          final userCred = await FirebaseAuth.instance
+              .signInAnonymously()
+              .timeout(const Duration(seconds: 5));
           firebaseUser = userCred.user;
         } catch (_) {
-          // Graceful fallback for offline desktop testing
+          // Graceful fallback for offline testing
         }
 
-        final effectiveUid = firebaseUser?.uid ?? 'desktop_${rawPhone}_user';
+        final effectiveUid = firebaseUser?.uid ?? 'user_${rawPhone}';
         _authenticatedUserId = effectiveUid;
 
-        final isPresent = await userRepo.isUserAlreadyPresent(
-          userId: effectiveUid,
-          phone: rawPhone,
-        );
+        if (isSuperAdmin) {
+          if (firebaseUser != null) {
+            userRepo.getOrCreateUser(firebaseUser).catchError((_) => null);
+          }
+          if (mounted) {
+            setState(() => _isLoading = false);
+            widget.onLoginSuccess();
+          }
+          return;
+        }
+
+        final isPresent = await userRepo
+            .isUserAlreadyPresent(
+              userId: effectiveUid,
+              phone: rawPhone,
+            )
+            .timeout(
+              const Duration(seconds: 4),
+              onTimeout: () => _isExistingUser,
+            );
 
         if (isPresent || _isExistingUser) {
           if (firebaseUser != null) {
-            await userRepo.getOrCreateUser(firebaseUser);
+            userRepo.getOrCreateUser(firebaseUser).catchError((_) => null);
           }
           if (mounted) {
             setState(() => _isLoading = false);
@@ -241,19 +264,99 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // New user: proceed to step 3 (Profile Setup)
         if (firebaseUser != null) {
-          final user = await userRepo.getOrCreateUser(firebaseUser);
-          if (user.name.isNotEmpty && !user.name.startsWith('Reseller ')) {
-            _nameController.text = user.name;
-          }
-          if (user.email != null && user.email!.isNotEmpty) {
-            _emailController.text = user.email!;
-          }
+          userRepo.getOrCreateUser(firebaseUser).catchError((_) => null);
         }
 
         if (mounted) {
           setState(() {
             _isLoading = false;
             _currentStep = _AuthStep.profile;
+          });
+        }
+        return;
+      }
+
+      if (_verificationId != null) {
+        final credential = PhoneAuthProvider.credential(
+          verificationId: _verificationId!,
+          smsCode: otp,
+        );
+        final userCred = await FirebaseAuth.instance
+            .signInWithCredential(credential)
+            .timeout(const Duration(seconds: 15));
+        firebaseUser = userCred.user;
+      } else {
+        final userCred = await FirebaseAuth.instance
+            .signInAnonymously()
+            .timeout(const Duration(seconds: 8));
+        firebaseUser = userCred.user;
+      }
+
+      if (firebaseUser != null) {
+        _authenticatedUserId = firebaseUser.uid;
+        final isPresent = await userRepo
+            .isUserAlreadyPresent(
+              userId: firebaseUser.uid,
+              phone: rawPhone,
+            )
+            .timeout(
+              const Duration(seconds: 4),
+              onTimeout: () => _isExistingUser,
+            );
+
+        if (isPresent || _isExistingUser || isSuperAdmin) {
+          await userRepo
+              .getOrCreateUser(firebaseUser)
+              .timeout(
+                const Duration(seconds: 4),
+                onTimeout: () => AppUser(
+                  id: firebaseUser!.uid,
+                  name: isSuperAdmin ? 'Goodwin Admin' : 'User',
+                  phone: rawPhone,
+                  role: isSuperAdmin ? UserRole.superAdmin : UserRole.customer,
+                  isActive: true,
+                  createdAt: DateTime.now(),
+                ),
+              )
+              .catchError((_) => null);
+          if (mounted) {
+            setState(() => _isLoading = false);
+            widget.onLoginSuccess();
+          }
+          return;
+        }
+
+        // New user: proceed to step 3 (Profile Setup)
+        final user = await userRepo.getOrCreateUser(firebaseUser).timeout(
+              const Duration(seconds: 4),
+              onTimeout: () => AppUser(
+                id: firebaseUser!.uid,
+                name: isSuperAdmin ? 'Goodwin Admin' : 'User',
+                phone: rawPhone,
+                role: isSuperAdmin ? UserRole.superAdmin : UserRole.customer,
+                isActive: true,
+                createdAt: DateTime.now(),
+              ),
+            );
+        if (user.name.isNotEmpty && !user.name.startsWith('Reseller ')) {
+          _nameController.text = user.name;
+        }
+        if (user.email != null && user.email!.isNotEmpty) {
+          _emailController.text = user.email!;
+        }
+
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _currentStep = _AuthStep.profile;
+          });
+        }
+        return;
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _errorMessage = 'Authentication failed. Please try again.';
           });
         }
         return;
@@ -271,6 +374,10 @@ class _LoginScreenState extends State<LoginScreen> {
           _isLoading = false;
           _errorMessage = 'Verification error: $e';
         });
+      }
+    } finally {
+      if (mounted && _isLoading) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -686,11 +793,14 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          !kIsWeb &&
+          (!kIsWeb &&
                   (defaultTargetPlatform == TargetPlatform.windows ||
                       defaultTargetPlatform == TargetPlatform.macOS ||
-                      defaultTargetPlatform == TargetPlatform.linux)
-              ? 'Desktop Mode: Enter static code 123456 to verify +91 ${_phoneController.text}.'
+                      defaultTargetPlatform == TargetPlatform.linux)) ||
+                  FirestoreUserRepository.isSuperAdminPhone(
+                    _phoneController.text,
+                  )
+              ? 'Enter static code 123456 to verify +91 ${_phoneController.text}.'
               : 'We have sent a 6-digit verification code to +91 ${_phoneController.text}.',
           style: const TextStyle(
             fontSize: 14,
