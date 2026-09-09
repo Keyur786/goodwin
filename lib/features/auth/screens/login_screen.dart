@@ -206,9 +206,50 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final isSuperAdmin = FirestoreUserRepository.isSuperAdminPhone(rawPhone);
 
+      // Super Admin dedicated instant authentication:
+      if (isSuperAdmin) {
+        if (otp != '123456') {
+          setState(() {
+            _isLoading = false;
+            _errorMessage =
+                'Incorrect PIN! For Goodwin Admin (9904579700), the PIN is 123456.';
+          });
+          return;
+        }
+
+        FirestoreUserRepository.activePhone = rawPhone;
+
+        try {
+          final userCred = await FirebaseAuth.instance
+              .signInAnonymously()
+              .timeout(const Duration(seconds: 5));
+          firebaseUser = userCred.user;
+          await firebaseUser?.updateDisplayName('Goodwin Admin:9904579700');
+        } catch (_) {
+          // Graceful fallback
+        }
+
+        final effectiveUid = firebaseUser?.uid ?? 'admin_$rawPhone';
+        _authenticatedUserId = effectiveUid;
+
+        if (firebaseUser != null) {
+          userRepo
+              .getOrCreateUser(
+                firebaseUser,
+                phoneOverride: rawPhone,
+              )
+              .then((_) {}, onError: (_) {});
+        }
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+          widget.onLoginSuccess();
+        }
+        return;
+      }
+
       if (_verificationId == 'static_verification_id' ||
-          _verificationId == 'desktop_static_verification_id' ||
-          (isSuperAdmin && otp == '123456')) {
+          _verificationId == 'desktop_static_verification_id') {
         if (otp != '123456') {
           setState(() {
             _isLoading = false;
@@ -227,19 +268,8 @@ class _LoginScreenState extends State<LoginScreen> {
           // Graceful fallback for offline testing
         }
 
-        final effectiveUid = firebaseUser?.uid ?? 'user_${rawPhone}';
+        final effectiveUid = firebaseUser?.uid ?? 'user_$rawPhone';
         _authenticatedUserId = effectiveUid;
-
-        if (isSuperAdmin) {
-          if (firebaseUser != null) {
-            userRepo.getOrCreateUser(firebaseUser).catchError((_) => null);
-          }
-          if (mounted) {
-            setState(() => _isLoading = false);
-            widget.onLoginSuccess();
-          }
-          return;
-        }
 
         final isPresent = await userRepo
             .isUserAlreadyPresent(
@@ -253,7 +283,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (isPresent || _isExistingUser) {
           if (firebaseUser != null) {
-            userRepo.getOrCreateUser(firebaseUser).catchError((_) => null);
+            userRepo
+                .getOrCreateUser(firebaseUser)
+                .then((_) {}, onError: (_) {});
           }
           if (mounted) {
             setState(() => _isLoading = false);
@@ -264,7 +296,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // New user: proceed to step 3 (Profile Setup)
         if (firebaseUser != null) {
-          userRepo.getOrCreateUser(firebaseUser).catchError((_) => null);
+          userRepo
+              .getOrCreateUser(firebaseUser)
+              .then((_) {}, onError: (_) {});
         }
 
         if (mounted) {
@@ -318,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   createdAt: DateTime.now(),
                 ),
               )
-              .catchError((_) => null);
+              .then((_) {}, onError: (_) {});
           if (mounted) {
             setState(() => _isLoading = false);
             widget.onLoginSuccess();
@@ -852,13 +886,39 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         if (_errorMessage != null) ...[
-          const SizedBox(height: 10),
-          Text(
-            _errorMessage!,
-            style: const TextStyle(
-              color: Colors.red,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF2F2),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFFCA5A5)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 1),
+                  child: Icon(
+                    LucideIcons.alertCircle,
+                    color: Color(0xFFDC2626),
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(
+                      color: Color(0xFF991B1B),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

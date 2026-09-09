@@ -88,6 +88,9 @@ class FirestoreUserRepository {
     });
   }
 
+  /// Active phone number authenticated in the current session.
+  static String? activePhone;
+
   /// Check if a phone number belongs to the Goodwin Super Admin.
   static bool isSuperAdminPhone(String? phone) {
     if (phone == null) return false;
@@ -96,8 +99,19 @@ class FirestoreUserRepository {
   }
 
   /// Gets existing user or creates a new user profile with a unique 6-alphabet username.
-  Future<AppUser> getOrCreateUser(User firebaseUser) async {
-    final phone = firebaseUser.phoneNumber ?? '';
+  Future<AppUser> getOrCreateUser(User firebaseUser, {String? phoneOverride}) async {
+    String phone = phoneOverride ?? '';
+    if (phone.isEmpty && firebaseUser.phoneNumber != null && firebaseUser.phoneNumber!.isNotEmpty) {
+      phone = firebaseUser.phoneNumber!;
+    }
+    if (phone.isEmpty && activePhone != null && activePhone!.isNotEmpty) {
+      phone = activePhone!;
+    }
+    if (phone.isEmpty && firebaseUser.displayName != null && firebaseUser.displayName!.contains(':')) {
+      final parts = firebaseUser.displayName!.split(':');
+      if (parts.length >= 2) phone = parts.last.trim();
+    }
+
     final isSpecialAdmin = isSuperAdminPhone(phone);
     final targetRole = isSpecialAdmin ? UserRole.superAdmin : UserRole.customer;
 
@@ -105,18 +119,22 @@ class FirestoreUserRepository {
       final doc = await _firestore.collection('users').doc(firebaseUser.uid).get();
       if (doc.exists && doc.data() != null) {
         final existing = AppUser.fromJson({'id': doc.id, ...doc.data()!});
-        final shouldUpdateRole = isSpecialAdmin && existing.role != UserRole.superAdmin;
+        final existingPhone = existing.phone;
+        final resolvedAdmin = isSpecialAdmin || isSuperAdminPhone(existingPhone);
+        final shouldUpdateRole = resolvedAdmin && existing.role != UserRole.superAdmin;
         final needsUsername = existing.username == null || existing.username!.isEmpty;
+        final needsPhone = resolvedAdmin && (existing.phone.isEmpty || !isSuperAdminPhone(existing.phone));
 
-        if (needsUsername || shouldUpdateRole) {
+        if (needsUsername || shouldUpdateRole || needsPhone) {
           final uniqueUsername = existing.username?.isNotEmpty == true
               ? existing.username!
-              : await generateUniqueUsername();
+              : (resolvedAdmin ? 'ADMIN' : await generateUniqueUsername());
           final updatedData = <String, dynamic>{
             if (needsUsername) 'username': uniqueUsername,
             if (shouldUpdateRole) 'role': UserRole.superAdmin.name,
-            if (existing.name.isEmpty)
-              'name': isSpecialAdmin ? 'Goodwin Admin' : 'Reseller $uniqueUsername',
+            if (needsPhone) 'phone': '+919904579700',
+            if (existing.name.isEmpty || (resolvedAdmin && existing.name.startsWith('Reseller ')))
+              'name': resolvedAdmin ? 'Goodwin Admin' : 'Reseller $uniqueUsername',
           };
           await updateUser(
             userId: firebaseUser.uid,
@@ -124,21 +142,24 @@ class FirestoreUserRepository {
           );
           return existing.copyWith(
             username: uniqueUsername,
-            role: isSpecialAdmin ? UserRole.superAdmin : existing.role,
-            name: existing.name.isEmpty
-                ? (isSpecialAdmin ? 'Goodwin Admin' : 'Reseller $uniqueUsername')
+            role: resolvedAdmin ? UserRole.superAdmin : existing.role,
+            phone: needsPhone ? '+919904579700' : existing.phone,
+            name: existing.name.isEmpty || (resolvedAdmin && existing.name.startsWith('Reseller '))
+                ? (resolvedAdmin ? 'Goodwin Admin' : 'Reseller $uniqueUsername')
                 : existing.name,
           );
         }
-        return existing;
+        return resolvedAdmin && existing.role != UserRole.superAdmin
+            ? existing.copyWith(role: UserRole.superAdmin)
+            : existing;
       }
 
       // Create new user profile with a random unique 6-alphabet username
-      final uniqueUsername = await generateUniqueUsername();
+      final uniqueUsername = isSpecialAdmin ? 'ADMIN' : await generateUniqueUsername();
       final newUser = AppUser(
         id: firebaseUser.uid,
         name: isSpecialAdmin ? 'Goodwin Admin' : 'Reseller $uniqueUsername',
-        phone: phone,
+        phone: isSpecialAdmin && phone.isEmpty ? '+919904579700' : phone,
         username: uniqueUsername,
         role: targetRole,
         isActive: true,
@@ -151,11 +172,11 @@ class FirestoreUserRepository {
       return newUser;
     } catch (e) {
       // Fallback in-memory user if offline or uninitialized
-      final fallbackUsername = generateRandomAlphabetCode(6);
+      final fallbackUsername = isSpecialAdmin ? 'ADMIN' : generateRandomAlphabetCode(6);
       return AppUser(
         id: firebaseUser.uid,
         name: isSpecialAdmin ? 'Goodwin Admin' : 'Reseller $fallbackUsername',
-        phone: phone,
+        phone: isSpecialAdmin && phone.isEmpty ? '+919904579700' : phone,
         username: fallbackUsername,
         role: targetRole,
         isActive: true,
