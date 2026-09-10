@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -179,45 +180,47 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     });
   }
 
+  Future<String> _uploadBytesOrFallback(
+    Uint8List bytes,
+    String folder,
+    String prefix,
+  ) async {
+    try {
+      final fileName = '${prefix}_${DateTime.now().microsecondsSinceEpoch}.jpg';
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child(folder)
+          .child(fileName);
+      final uploadTask = await storageRef.putData(
+        bytes,
+        SettableMetadata(contentType: 'image/jpeg'),
+      ).timeout(const Duration(seconds: 4));
+      return await uploadTask.ref.getDownloadURL().timeout(const Duration(seconds: 4));
+    } catch (_) {
+      // Instant compact fallback if Cloud Storage bucket uninitialized or offline
+      return 'data:image/jpeg;base64,${base64Encode(bytes)}';
+    }
+  }
+
   Future<void> _pickImageFromDevice(ImageSource source) async {
     final picker = ImagePicker();
     try {
       if (source == ImageSource.gallery) {
-        // Multi-image selection from Gallery
+        // Multi-image selection from Gallery (compact size: ~30KB)
         final pickedList = await picker.pickMultiImage(
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 85,
+          maxWidth: 800,
+          maxHeight: 800,
+          imageQuality: 70,
         );
         if (pickedList.isNotEmpty) {
           setState(() => _isUploadingPhoto = true);
           for (final picked in pickedList) {
             final bytes = await picked.readAsBytes();
-            try {
-              final fileName =
-                  'prod_${DateTime.now().microsecondsSinceEpoch}.jpg';
-              final storageRef = FirebaseStorage.instance
-                  .ref()
-                  .child('products')
-                  .child(fileName);
-              final uploadTask = await storageRef.putData(
-                bytes,
-                SettableMetadata(contentType: 'image/jpeg'),
-              );
-              final downloadUrl = await uploadTask.ref.getDownloadURL();
-              if (mounted) {
-                setState(() {
-                  _selectedImages.add(downloadUrl);
-                });
-              }
-            } catch (_) {
-              final base64String =
-                  'data:image/jpeg;base64,${base64Encode(bytes)}';
-              if (mounted) {
-                setState(() {
-                  _selectedImages.add(base64String);
-                });
-              }
+            final result = await _uploadBytesOrFallback(bytes, 'products', 'prod');
+            if (mounted) {
+              setState(() {
+                _selectedImages.add(result);
+              });
             }
           }
           if (mounted) {
@@ -228,40 +231,19 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
         // Single image capture from Camera
         final picked = await picker.pickImage(
           source: ImageSource.camera,
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 85,
+          maxWidth: 800,
+          maxHeight: 800,
+          imageQuality: 70,
         );
         if (picked != null) {
           setState(() => _isUploadingPhoto = true);
           final bytes = await picked.readAsBytes();
-          try {
-            final fileName =
-                'prod_${DateTime.now().microsecondsSinceEpoch}.jpg';
-            final storageRef = FirebaseStorage.instance
-                .ref()
-                .child('products')
-                .child(fileName);
-            final uploadTask = await storageRef.putData(
-              bytes,
-              SettableMetadata(contentType: 'image/jpeg'),
-            );
-            final downloadUrl = await uploadTask.ref.getDownloadURL();
-            if (mounted) {
-              setState(() {
-                _selectedImages.add(downloadUrl);
-                _isUploadingPhoto = false;
-              });
-            }
-          } catch (_) {
-            final base64String =
-                'data:image/jpeg;base64,${base64Encode(bytes)}';
-            if (mounted) {
-              setState(() {
-                _selectedImages.add(base64String);
-                _isUploadingPhoto = false;
-              });
-            }
+          final result = await _uploadBytesOrFallback(bytes, 'products', 'prod');
+          if (mounted) {
+            setState(() {
+              _selectedImages.add(result);
+              _isUploadingPhoto = false;
+            });
           }
         }
       }
@@ -282,67 +264,31 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     try {
       if (source == ImageSource.gallery) {
         final pickedList = await picker.pickMultiImage(
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 85,
+          maxWidth: 800,
+          maxHeight: 800,
+          imageQuality: 70,
         );
         if (pickedList.isNotEmpty) {
           for (final picked in pickedList) {
             final bytes = await picked.readAsBytes();
-            try {
-              final fileName =
-                  'var_${DateTime.now().microsecondsSinceEpoch}.jpg';
-              final storageRef = FirebaseStorage.instance
-                  .ref()
-                  .child('products')
-                  .child(fileName);
-              final uploadTask = await storageRef.putData(
-                bytes,
-                SettableMetadata(contentType: 'image/jpeg'),
-              );
-              final downloadUrl = await uploadTask.ref.getDownloadURL();
-              if (mounted) {
-                setState(() => variant.images.add(downloadUrl));
-              }
-            } catch (_) {
-              final base64String =
-                  'data:image/jpeg;base64,${base64Encode(bytes)}';
-              if (mounted) {
-                setState(() => variant.images.add(base64String));
-              }
+            final result = await _uploadBytesOrFallback(bytes, 'products', 'var');
+            if (mounted) {
+              setState(() => variant.images.add(result));
             }
           }
         }
       } else {
         final picked = await picker.pickImage(
           source: ImageSource.camera,
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 85,
+          maxWidth: 800,
+          maxHeight: 800,
+          imageQuality: 70,
         );
         if (picked != null) {
           final bytes = await picked.readAsBytes();
-          try {
-            final fileName =
-                'var_${DateTime.now().microsecondsSinceEpoch}.jpg';
-            final storageRef = FirebaseStorage.instance
-                .ref()
-                .child('products')
-                .child(fileName);
-            final uploadTask = await storageRef.putData(
-              bytes,
-              SettableMetadata(contentType: 'image/jpeg'),
-            );
-            final downloadUrl = await uploadTask.ref.getDownloadURL();
-            if (mounted) {
-              setState(() => variant.images.add(downloadUrl));
-            }
-          } catch (_) {
-            final base64String =
-                'data:image/jpeg;base64,${base64Encode(bytes)}';
-            if (mounted) {
-              setState(() => variant.images.add(base64String));
-            }
+          final result = await _uploadBytesOrFallback(bytes, 'products', 'var');
+          if (mounted) {
+            setState(() => variant.images.add(result));
           }
         }
       }

@@ -134,9 +134,9 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
     try {
       final picked = await picker.pickImage(
         source: source,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 82,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 70,
       );
       if (picked == null) return;
 
@@ -148,8 +148,8 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
         final uploadTask = await storageRef.putData(
           bytes,
           SettableMetadata(contentType: 'image/jpeg'),
-        );
-        final downloadUrl = await uploadTask.ref.getDownloadURL();
+        ).timeout(const Duration(seconds: 4));
+        final downloadUrl = await uploadTask.ref.getDownloadURL().timeout(const Duration(seconds: 4));
         if (mounted) {
           setState(() {
             _photoUrl = downloadUrl;

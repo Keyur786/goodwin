@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:goodwin/app.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
@@ -48,6 +49,11 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Prevent 10-minute retry loops if Storage bucket is not yet provisioned
+    try {
+      FirebaseStorage.instance.setMaxUploadRetryTime(const Duration(seconds: 5));
+      FirebaseStorage.instance.setMaxOperationRetryTime(const Duration(seconds: 5));
+    } catch (_) {}
     // Enable offline persistence caching for smooth offline browsing
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,

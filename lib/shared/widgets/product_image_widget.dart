@@ -108,16 +108,46 @@ class ProductImageWidget extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
+    final isCompact = (height != null && height! < 70) || (width != null && width! < 70);
     return Container(
       width: width,
       height: height,
-      color: const Color(0xFFF1F5F9),
-      child: const Center(
-        child: Icon(
-          LucideIcons.package,
-          color: Color(0xFF94A3B8),
-          size: 24,
-        ),
+      color: const Color(0xFFF8FAFC),
+      child: Center(
+        child: isCompact
+            ? const Icon(
+                LucideIcons.package,
+                color: Color(0xFF94A3B8),
+                size: 20,
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEFF6FF),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      LucideIcons.package,
+                      color: Color(0xFF2563EB),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'GoodWin',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF64748B),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }

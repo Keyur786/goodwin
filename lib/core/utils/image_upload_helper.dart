@@ -72,9 +72,9 @@ Future<String?> pickAndUploadChatPhoto(
   try {
     final picked = await picker.pickImage(
       source: source,
-      maxWidth: 1200,
-      maxHeight: 1200,
-      imageQuality: 80,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 70,
     );
     if (picked == null) return null;
 
@@ -85,8 +85,8 @@ Future<String?> pickAndUploadChatPhoto(
       final uploadTask = await storageRef.putData(
         bytes,
         SettableMetadata(contentType: 'image/jpeg'),
-      );
-      return await uploadTask.ref.getDownloadURL();
+      ).timeout(const Duration(seconds: 4));
+      return await uploadTask.ref.getDownloadURL().timeout(const Duration(seconds: 4));
     } catch (_) {
       // Fallback to base64 data URI if storage offline or unconfigured
       return 'data:image/jpeg;base64,${base64Encode(bytes)}';
