@@ -339,20 +339,21 @@ class _LoginScreenState extends State<LoginScreen> {
             );
 
         if (isPresent || _isExistingUser || isSuperAdmin) {
-          await userRepo
-              .getOrCreateUser(firebaseUser)
-              .timeout(
-                const Duration(seconds: 4),
-                onTimeout: () => AppUser(
-                  id: firebaseUser!.uid,
-                  name: isSuperAdmin ? 'Goodwin Admin' : 'User',
-                  phone: rawPhone,
-                  role: isSuperAdmin ? UserRole.superAdmin : UserRole.customer,
-                  isActive: true,
-                  createdAt: DateTime.now(),
-                ),
-              )
-              .then((_) {}, onError: (_) {});
+          try {
+            await userRepo
+                .getOrCreateUser(firebaseUser)
+                .timeout(
+                  const Duration(seconds: 4),
+                  onTimeout: () => AppUser(
+                    id: firebaseUser!.uid,
+                    name: isSuperAdmin ? 'Goodwin Admin' : 'User',
+                    phone: rawPhone,
+                    role: isSuperAdmin ? UserRole.superAdmin : UserRole.customer,
+                    isActive: true,
+                    createdAt: DateTime.now(),
+                  ),
+                );
+          } catch (_) {}
           if (mounted) {
             setState(() => _isLoading = false);
             widget.onLoginSuccess();
