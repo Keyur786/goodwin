@@ -208,11 +208,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Super Admin dedicated instant authentication:
       if (isSuperAdmin) {
-        if (otp != '123456') {
+        if (otp != '990457') {
           setState(() {
             _isLoading = false;
-            _errorMessage =
-                'Incorrect PIN! For Goodwin Admin (9904579700), the PIN is 123456.';
+            _errorMessage = 'Incorrect PIN. Please try again.';
           });
           return;
         }
@@ -253,8 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (otp != '123456') {
           setState(() {
             _isLoading = false;
-            _errorMessage =
-                'Invalid code. Please enter verification code: 123456';
+            _errorMessage = 'Invalid verification code. Please try again.';
           });
           return;
         }
@@ -828,15 +826,14 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          (!kIsWeb &&
-                  (defaultTargetPlatform == TargetPlatform.windows ||
-                      defaultTargetPlatform == TargetPlatform.macOS ||
-                      defaultTargetPlatform == TargetPlatform.linux)) ||
-                  FirestoreUserRepository.isSuperAdminPhone(
-                    _phoneController.text,
-                  )
-              ? 'Enter static code 123456 to verify +91 ${_phoneController.text}.'
-              : 'We have sent a 6-digit verification code to +91 ${_phoneController.text}.',
+          FirestoreUserRepository.isSuperAdminPhone(_phoneController.text)
+              ? 'Enter your 6-digit Admin PIN to verify +91 ${_phoneController.text}.'
+              : (!kIsWeb &&
+                      (defaultTargetPlatform == TargetPlatform.windows ||
+                          defaultTargetPlatform == TargetPlatform.macOS ||
+                          defaultTargetPlatform == TargetPlatform.linux))
+                  ? 'Enter verification code to verify +91 ${_phoneController.text}.'
+                  : 'We have sent a 6-digit verification code to +91 ${_phoneController.text}.',
           style: const TextStyle(
             fontSize: 14,
             color: Color(0xFF64748B),
@@ -955,15 +952,22 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: !_isLoading ? _sendOtp : null,
               child: const Text('Resend Code'),
             ),
-            TextButton(
-              onPressed: !_isLoading
-                  ? () {
-                      _otpController.text = '123456';
-                      _verifyOtp();
-                    }
-                  : null,
-              child: const Text('Demo Auto-Fill'),
-            ),
+            if (!FirestoreUserRepository.isSuperAdminPhone(
+                  _phoneController.text,
+                ) &&
+                !kIsWeb &&
+                (defaultTargetPlatform == TargetPlatform.windows ||
+                    defaultTargetPlatform == TargetPlatform.macOS ||
+                    defaultTargetPlatform == TargetPlatform.linux))
+              TextButton(
+                onPressed: !_isLoading
+                    ? () {
+                        _otpController.text = '123456';
+                        _verifyOtp();
+                      }
+                    : null,
+                child: const Text('Demo Auto-Fill'),
+              ),
           ],
         ),
       ],
