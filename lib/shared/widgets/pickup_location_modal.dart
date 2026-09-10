@@ -16,9 +16,9 @@ void showPickupLocationModal(BuildContext context) {
 class PickupLocationModalSheet extends StatelessWidget {
   const PickupLocationModalSheet({super.key});
 
-  static const String googleMapsUrl = 'https://maps.app.goo.gl/LmpwtV8DvEvTWDJB8?g_st=ic';
-  static const double latitude = 21.229728;
-  static const double longitude = 72.8146004;
+  static const String googleMapsUrl = 'https://maps.app.goo.gl/dfw8Z2kGUrPRGMoP7?g_st=ic';
+  static const double latitude = 21.229275;
+  static const double longitude = 72.820000;
   static const String directionsUrl =
       'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude';
   static const String fullAddress =
@@ -458,7 +458,7 @@ class PickupLocationModalSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
-                  '21.2297° N, 72.8146° E',
+                  '21.2293° N, 72.8200° E',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
