@@ -752,9 +752,16 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     if (shouldRemove == true) {
       removeFromCart(item);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(
           SnackBar(
             content: Text('Removed "${item.displayName}" from cart'),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            duration: const Duration(seconds: 2),
             action: SnackBarAction(
               label: 'Undo',
               textColor: const Color(0xFFBFDBFE),
@@ -763,7 +770,6 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                 _saveCartToFirestore();
               },
             ),
-            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -2028,6 +2034,13 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
               _displayedProductCount = _batchSize;
             });
           }
+        });
+      },
+      onSubmitted: (value) {
+        _searchDebounceTimer?.cancel();
+        setState(() {
+          homeSearchQuery = value;
+          _displayedProductCount = _batchSize;
         });
       },
       textInputAction: TextInputAction.search,
@@ -3466,6 +3479,14 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   }
                 });
               }
+            });
+          },
+          onSubmitted: (value) {
+            _searchDebounceTimer?.cancel();
+            setState(() {
+              homeSearchQuery = value;
+              _displayedProductCount = _batchSize;
+              selectedIndex = 1;
             });
           },
           cartItemCount: totalCartItemCount,

@@ -11,6 +11,7 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
     required this.onSelectTab,
     required this.searchController,
     required this.onSearchChanged,
+    this.onSubmitted,
     required this.cartItemCount,
     required this.cartTotalAmount,
     required this.favoriteCount,
@@ -29,6 +30,7 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
   final ValueChanged<int> onSelectTab;
   final TextEditingController searchController;
   final ValueChanged<String> onSearchChanged;
+  final ValueChanged<String>? onSubmitted;
   final int cartItemCount;
   final double cartTotalAmount;
   final int favoriteCount;
@@ -131,33 +133,65 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
                 flex: 3,
                 child: Container(
                   height: 42,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
                   ),
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: onSearchChanged,
-                    style: const TextStyle(fontSize: 13.5, color: Color(0xFF0F172A)),
-                    decoration: InputDecoration(
-                      hintText: 'Search wholesale catalog, SKU, categories...',
-                      hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                      prefixIcon: const Icon(LucideIcons.search, size: 18, color: Color(0xFF64748B)),
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(LucideIcons.x, size: 16),
-                              onPressed: () {
-                                searchController.clear();
-                                onSearchChanged('');
-                              },
-                            )
-                          : null,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: searchController,
+                    builder: (context, textValue, child) {
+                      return TextField(
+                        controller: searchController,
+                        onChanged: onSearchChanged,
+                        onSubmitted: (val) => onSubmitted?.call(val),
+                        textInputAction: TextInputAction.search,
+                        textAlignVertical: TextAlignVertical.center,
+                        style: const TextStyle(fontSize: 13.5, color: Color(0xFF0F172A)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          hintText: 'Search wholesale catalog, SKU, categories...',
+                          hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                          prefixIcon: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => onSubmitted?.call(searchController.text),
+                              child: const Icon(LucideIcons.search, size: 18, color: Color(0xFF64748B)),
+                            ),
+                          ),
+                          suffixIcon: textValue.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(LucideIcons.x, size: 16),
+                                  splashRadius: 16,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                                  onPressed: () {
+                                    searchController.clear();
+                                    onSearchChanged('');
+                                  },
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(22),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(22),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(22),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
