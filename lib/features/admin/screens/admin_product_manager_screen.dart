@@ -24,6 +24,9 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
 
   final List<String> _categories = [
     'All',
+    'Home and Kitchen',
+    'Stationery',
+    'Medical Use',
     'Dry Fruits',
     'Spices',
     'Tea & Coffee',

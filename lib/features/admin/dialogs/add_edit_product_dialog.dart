@@ -1,10 +1,9 @@
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
 import 'package:goodwin/core/services/firestore_user_repository.dart';
+import 'package:goodwin/core/utils/image_upload_helper.dart';
 import 'package:goodwin/models/product_model.dart';
 import 'package:goodwin/shared/widgets/photo_option_button.dart';
 import 'package:goodwin/shared/widgets/product_image_widget.dart';
@@ -78,21 +77,16 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
   late final TextEditingController _stockController;
   late final TextEditingController _descController;
   late final TextEditingController _categoryController;
-  List<String> _selectedImages = [];
+  static const int _initialSlotCount = 6;
+  List<String?> _imageSlots = List.filled(_initialSlotCount, null);
   List<_VariantEditItem> _variants = [];
   bool _isUploadingPhoto = false;
   bool _isSaving = false;
 
   final List<String> _categoryOptions = [
-    'Dry Fruits',
-    'Spices',
-    'Beverages',
-    'Grocery',
-    'Staples',
-    'Snacks',
-    'Confectionery',
-    'Personal Care',
-    'Dairy',
+    'Home and Kitchen',
+    'Stationery',
+    'Medical Use',
   ];
 
   @override
@@ -114,14 +108,21 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     _stockController = TextEditingController(
       text: p != null ? p.availableQty.toString() : '50',
     );
-    _selectedImages = (p?.images.isNotEmpty == true)
+    final initialImages = (p?.images.isNotEmpty == true)
         ? List<String>.from(p!.images)
-        : [];
+        : <String>[];
+    final count = initialImages.length > _initialSlotCount
+        ? initialImages.length
+        : _initialSlotCount;
+    _imageSlots = List<String?>.filled(count, null);
+    for (int i = 0; i < initialImages.length; i++) {
+      _imageSlots[i] = initialImages[i];
+    }
     _descController = TextEditingController(text: p?.description ?? '');
     _categoryController = TextEditingController(
       text: p != null && p.categoryId.trim().isNotEmpty
           ? p.categoryId.trim()
-          : 'Dry Fruits',
+          : 'Home and Kitchen',
     );
 
     if (p?.variants.isNotEmpty == true) {
@@ -180,46 +181,67 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     });
   }
 
-  Future<String> _uploadBytesOrFallback(
-    Uint8List bytes,
-    String folder,
-    String prefix,
-  ) async {
-    try {
-      final fileName = '${prefix}_${DateTime.now().microsecondsSinceEpoch}.jpg';
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child(folder)
-          .child(fileName);
-      final uploadTask = await storageRef.putData(
-        bytes,
-        SettableMetadata(contentType: 'image/jpeg'),
-      ).timeout(const Duration(seconds: 4));
-      return await uploadTask.ref.getDownloadURL().timeout(const Duration(seconds: 4));
-    } catch (_) {
-      // Instant compact fallback if Cloud Storage bucket uninitialized or offline
-      return 'data:image/jpeg;base64,${base64Encode(bytes)}';
-    }
+  void _moveOrSwapSlots(int fromIndex, int toIndex) {
+    if (fromIndex == toIndex) return;
+    if (fromIndex < 0 || fromIndex >= _imageSlots.length) return;
+    if (toIndex < 0 || toIndex >= _imageSlots.length) return;
+    setState(() {
+      final temp = _imageSlots[fromIndex];
+      _imageSlots[fromIndex] = _imageSlots[toIndex];
+      _imageSlots[toIndex] = temp;
+    });
   }
 
-  Future<void> _pickImageFromDevice(ImageSource source) async {
+  void _clearSlot(int index) {
+    if (index < 0 || index >= _imageSlots.length) return;
+    setState(() {
+      _imageSlots[index] = null;
+    });
+  }
+
+  void _addExtraSlot() {
+    setState(() {
+      _imageSlots.add(null);
+    });
+  }
+
+  int _findFirstEmptySlot({int afterIndex = -1}) {
+    for (int i = afterIndex + 1; i < _imageSlots.length; i++) {
+      if (_imageSlots[i] == null || _imageSlots[i]!.trim().isEmpty) {
+        return i;
+      }
+    }
+    return _imageSlots.length;
+  }
+
+  Future<void> _pickImageForSlot({
+    int? specificSlot,
+    required ImageSource source,
+  }) async {
     final picker = ImagePicker();
     try {
       if (source == ImageSource.gallery) {
-        // Multi-image selection from Gallery (compact size: ~30KB)
         final pickedList = await picker.pickMultiImage(
-          maxWidth: 800,
-          maxHeight: 800,
-          imageQuality: 70,
+          maxWidth: 1200,
+          maxHeight: 1200,
+          imageQuality: 80,
         );
         if (pickedList.isNotEmpty) {
           setState(() => _isUploadingPhoto = true);
+          int targetSlot = specificSlot ?? _findFirstEmptySlot();
           for (final picked in pickedList) {
             final bytes = await picked.readAsBytes();
-            final result = await _uploadBytesOrFallback(bytes, 'products', 'prod');
+            final result =
+                await uploadBytesOrFallback(bytes, 'products', 'prod');
             if (mounted) {
               setState(() {
-                _selectedImages.add(result);
+                if (targetSlot < _imageSlots.length) {
+                  _imageSlots[targetSlot] = result;
+                  targetSlot = _findFirstEmptySlot(afterIndex: targetSlot);
+                } else {
+                  _imageSlots.add(result);
+                  targetSlot = _imageSlots.length;
+                }
               });
             }
           }
@@ -228,20 +250,25 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
           }
         }
       } else {
-        // Single image capture from Camera
         final picked = await picker.pickImage(
           source: ImageSource.camera,
-          maxWidth: 800,
-          maxHeight: 800,
-          imageQuality: 70,
+          maxWidth: 1200,
+          maxHeight: 1200,
+          imageQuality: 80,
         );
         if (picked != null) {
           setState(() => _isUploadingPhoto = true);
           final bytes = await picked.readAsBytes();
-          final result = await _uploadBytesOrFallback(bytes, 'products', 'prod');
+          final result =
+              await uploadBytesOrFallback(bytes, 'products', 'prod');
           if (mounted) {
             setState(() {
-              _selectedImages.add(result);
+              final targetSlot = specificSlot ?? _findFirstEmptySlot();
+              if (targetSlot < _imageSlots.length) {
+                _imageSlots[targetSlot] = result;
+              } else {
+                _imageSlots.add(result);
+              }
               _isUploadingPhoto = false;
             });
           }
@@ -250,8 +277,9 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     } catch (e) {
       if (mounted) {
         setState(() => _isUploadingPhoto = false);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not load image: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not load image: $e')),
+        );
       }
     }
   }
@@ -264,14 +292,15 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     try {
       if (source == ImageSource.gallery) {
         final pickedList = await picker.pickMultiImage(
-          maxWidth: 800,
-          maxHeight: 800,
-          imageQuality: 70,
+          maxWidth: 1200,
+          maxHeight: 1200,
+          imageQuality: 80,
         );
         if (pickedList.isNotEmpty) {
           for (final picked in pickedList) {
             final bytes = await picked.readAsBytes();
-            final result = await _uploadBytesOrFallback(bytes, 'products', 'var');
+            final result =
+                await uploadBytesOrFallback(bytes, 'products', 'var');
             if (mounted) {
               setState(() => variant.images.add(result));
             }
@@ -280,13 +309,14 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
       } else {
         final picked = await picker.pickImage(
           source: ImageSource.camera,
-          maxWidth: 800,
-          maxHeight: 800,
-          imageQuality: 70,
+          maxWidth: 1200,
+          maxHeight: 1200,
+          imageQuality: 80,
         );
         if (picked != null) {
           final bytes = await picked.readAsBytes();
-          final result = await _uploadBytesOrFallback(bytes, 'products', 'var');
+          final result =
+              await uploadBytesOrFallback(bytes, 'products', 'var');
           if (mounted) {
             setState(() => variant.images.add(result));
           }
@@ -294,8 +324,9 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not load image: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not load image: $e')),
+        );
       }
     }
   }
@@ -375,7 +406,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     );
   }
 
-  Future<void> _openPhotoSourcePicker() async {
+  Future<void> _openPhotoSourcePicker({int? slotIndex}) async {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -402,9 +433,13 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Add Product Photo(s)',
-                style: TextStyle(
+              Text(
+                slotIndex != null
+                    ? (slotIndex == 0
+                        ? 'Upload Cover Photo (Spot 1)'
+                        : 'Upload Photo for Spot ${slotIndex + 1}')
+                    : 'Add Product Photo(s)',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFF0F172A),
@@ -412,7 +447,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
               ),
               const SizedBox(height: 4),
               const Text(
-                'Upload photos from device gallery (single or multiple) or snap with camera.',
+                'Upload photos in any format (JPG, PNG, WebP, AVIF, etc.). Image will be normalized and placed into the slot.',
                 style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 18),
@@ -425,7 +460,10 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                       color: const Color(0xFF2563EB),
                       onTap: () async {
                         Navigator.pop(sheetCtx);
-                        await _pickImageFromDevice(ImageSource.camera);
+                        await _pickImageForSlot(
+                          specificSlot: slotIndex,
+                          source: ImageSource.camera,
+                        );
                       },
                     ),
                   ),
@@ -437,7 +475,10 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                       color: const Color(0xFF2563EB),
                       onTap: () async {
                         Navigator.pop(sheetCtx);
-                        await _pickImageFromDevice(ImageSource.gallery);
+                        await _pickImageForSlot(
+                          specificSlot: slotIndex,
+                          source: ImageSource.gallery,
+                        );
                       },
                     ),
                   ),
@@ -460,10 +501,10 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
           ? widget.product!.id
           : 'prod_${DateTime.now().millisecondsSinceEpoch}';
 
-      final images = <String>[];
-      if (_selectedImages.isNotEmpty) {
-        images.addAll(_selectedImages.where((s) => s.trim().isNotEmpty));
-      }
+      final images = _imageSlots
+          .whereType<String>()
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
       if (images.isEmpty) {
         images.add(
           'https://images.unsplash.com/photo-1509358271058-acd22cc93898?w=800&q=80',
@@ -472,7 +513,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
 
       final enteredCategory = _categoryController.text.trim().isNotEmpty
           ? _categoryController.text.trim()
-          : 'Dry Fruits';
+          : 'Home and Kitchen';
 
       final savedVariants = _variants.map((v) => v.toModel()).toList();
 
@@ -575,63 +616,95 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                                 color: Color(0xFF334155),
                               ),
                             ),
-                            if (_selectedImages.isNotEmpty) ...[
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDBEAFE),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${_imageSlots.whereType<String>().where((s) => s.trim().isNotEmpty).length} / ${_imageSlots.length}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF2563EB),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFDBEAFE),
-                                  borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (!_isUploadingPhoto)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextButton.icon(
+                                onPressed: _addExtraSlot,
+                                icon: const Icon(LucideIcons.plus, size: 13),
+                                label: const Text(
+                                  '+ Slot',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                                child: Text(
-                                  '${_selectedImages.length}',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF2563EB),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: const Color(0xFF475569),
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: () => _openPhotoSourcePicker(),
+                                icon: const Icon(
+                                  LucideIcons.imagePlus,
+                                  size: 15,
+                                ),
+                                label: const Text(
+                                  '+ Add Photo',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: const Color(0xFF2563EB),
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
                                   ),
                                 ),
                               ),
                             ],
-                          ],
-                        ),
-                        if (_selectedImages.isNotEmpty && !_isUploadingPhoto)
-                          TextButton.icon(
-                            onPressed: _openPhotoSourcePicker,
-                            icon: const Icon(
-                              LucideIcons.imagePlus,
-                              size: 16,
-                            ),
-                            label: const Text(
-                              '+ Add Photo',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            style: TextButton.styleFrom(
-                              foregroundColor: const Color(0xFF2563EB),
-                              visualDensity: VisualDensity.compact,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                            ),
                           ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Drag photos to reorder or swap. Deleting leaves a spot empty so you can upload a new replacement photo.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF64748B),
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
 
                     if (_isUploadingPhoto)
                       Container(
-                        height: 110,
+                        height: 100,
                         width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 10),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: const Color(0xFFE2E8F0)),
                         ),
                         child: const Center(
@@ -639,15 +712,15 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               SizedBox(
-                                width: 24,
-                                height: 24,
+                                width: 22,
+                                height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
                                 ),
                               ),
                               SizedBox(height: 8),
                               Text(
-                                'Processing photo(s)...',
+                                'Normalizing & uploading photo(s)...',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Color(0xFF64748B),
@@ -656,189 +729,22 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
                             ],
                           ),
                         ),
-                      )
-                    else if (_selectedImages.isNotEmpty) ...[
-                      SizedBox(
-                        height: 104,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _selectedImages.length + 1,
-                          separatorBuilder: (_, _) =>
-                              const SizedBox(width: 10),
-                          itemBuilder: (ctx, i) {
-                            if (i == _selectedImages.length) {
-                              return InkWell(
-                                onTap: _openPhotoSourcePicker,
-                                borderRadius: BorderRadius.circular(14),
-                                child: Container(
-                                  width: 90,
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEFF6FF),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: const Color(0xFFBFDBFE),
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  child: const Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        LucideIcons.imagePlus,
-                                        size: 26,
-                                        color: Color(0xFF2563EB),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Add More',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFF2563EB),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
+                      ),
 
-                            final imgUrl = _selectedImages[i];
-                            final isCover = i == 0;
-                            return Stack(
-                              children: [
-                                Container(
-                                  width: 90,
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: isCover
-                                          ? const Color(0xFF2563EB)
-                                          : const Color(0xFFE2E8F0),
-                                      width: isCover ? 2 : 1,
-                                    ),
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: ProductImageWidget(
-                                    imageSrc: imgUrl,
-                                    width: 90,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                if (isCover)
-                                  Positioned(
-                                    top: 4,
-                                    left: 4,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF2563EB),
-                                        borderRadius:
-                                            BorderRadius.circular(6),
-                                      ),
-                                      child: const Text(
-                                        'COVER',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 8.5,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                Positioned(
-                                  top: 3,
-                                  right: 3,
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedImages.removeAt(i);
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(3),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black54,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        LucideIcons.x,
-                                        size: 14,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                    // Persistent Photo Slots Grid
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _imageSlots.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.88,
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Tip: The first image (marked COVER) will be displayed as the main cover photo in the store catalog.',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF64748B),
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ] else
-                      InkWell(
-                        onTap: _openPhotoSourcePicker,
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 20,
-                            horizontal: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEFF6FF),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: const Color(0xFFBFDBFE),
-                              width: 1.5,
-                            ),
-                          ),
-                          child: const Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                LucideIcons.imagePlus,
-                                size: 38,
-                                color: Color(0xFF2563EB),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Upload Product Photos from Device',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14,
-                                  color: Color(0xFF2563EB),
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Tap to choose multiple photos from Gallery or take a Camera photo',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF64748B),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      itemBuilder: (ctx, index) => _buildPhotoSlotItem(index),
+                    ),
                     const SizedBox(height: 16),
 
                     // Product Name
@@ -1445,6 +1351,266 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhotoSlotItem(int index) {
+    final imageUrl = _imageSlots[index];
+    final isCover = index == 0;
+
+    return DragTarget<int>(
+      onWillAcceptWithDetails: (details) => details.data != index,
+      onAcceptWithDetails: (details) {
+        _moveOrSwapSlots(details.data, index);
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isDropTarget = candidateData.isNotEmpty;
+        if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+          return _buildFilledSlotCard(index, imageUrl, isCover, isDropTarget);
+        } else {
+          return _buildEmptySlotCard(index, isCover, isDropTarget);
+        }
+      },
+    );
+  }
+
+  Widget _buildFilledSlotCard(
+    int index,
+    String imageUrl,
+    bool isCover,
+    bool isDropTarget,
+  ) {
+    final cardContent = Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDropTarget
+              ? const Color(0xFF2563EB)
+              : (isCover ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0)),
+          width: isDropTarget ? 2.5 : (isCover ? 2.0 : 1.0),
+        ),
+        boxShadow: isDropTarget
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ProductImageWidget(
+            imageSrc: imageUrl,
+            fit: BoxFit.cover,
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.75),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    LucideIcons.gripHorizontal,
+                    size: 11,
+                    color: Colors.white70,
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    isCover ? 'COVER' : 'Spot ${index + 1}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isCover)
+            Positioned(
+              top: 4,
+              left: 4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2563EB),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: const Text(
+                  'MAIN',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: InkWell(
+              onTap: () => _clearSlot(index),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(3.5),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  LucideIcons.x,
+                  size: 13,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final feedbackWidget = Material(
+      color: Colors.transparent,
+      child: SizedBox(
+        width: 100,
+        height: 110,
+        child: Opacity(
+          opacity: 0.9,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF2563EB), width: 2),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: ProductImageWidget(
+              imageSrc: imageUrl,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return kIsWeb
+        ? Draggable<int>(
+            data: index,
+            feedback: feedbackWidget,
+            childWhenDragging: Opacity(
+              opacity: 0.35,
+              child: cardContent,
+            ),
+            child: cardContent,
+          )
+        : LongPressDraggable<int>(
+            data: index,
+            delay: const Duration(milliseconds: 150),
+            feedback: feedbackWidget,
+            childWhenDragging: Opacity(
+              opacity: 0.35,
+              child: cardContent,
+            ),
+            child: cardContent,
+          );
+  }
+
+  Widget _buildEmptySlotCard(int index, bool isCover, bool isDropTarget) {
+    return InkWell(
+      onTap: () => _openPhotoSourcePicker(slotIndex: index),
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: isDropTarget
+              ? const Color(0xFFDBEAFE)
+              : (isCover ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isDropTarget
+                ? const Color(0xFF2563EB)
+                : (isCover ? const Color(0xFF93C5FD) : const Color(0xFFCBD5E1)),
+            width: isDropTarget ? 2.5 : 1.5,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDropTarget
+                    ? const Color(0xFFBFDBFE)
+                    : (isCover
+                        ? const Color(0xFFDBEAFE)
+                        : const Color(0xFFF1F5F9)),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isDropTarget
+                    ? LucideIcons.arrowDownToLine
+                    : LucideIcons.imagePlus,
+                size: 20,
+                color: isDropTarget
+                    ? const Color(0xFF1D4ED8)
+                    : (isCover
+                        ? const Color(0xFF2563EB)
+                        : const Color(0xFF64748B)),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              isCover ? 'Cover Photo' : 'Spot ${index + 1}',
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+                color: isDropTarget
+                    ? const Color(0xFF1D4ED8)
+                    : (isCover
+                        ? const Color(0xFF2563EB)
+                        : const Color(0xFF334155)),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              isDropTarget ? 'Drop photo here' : '+ Upload Photo',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isDropTarget ? FontWeight.w700 : FontWeight.w500,
+                color: isDropTarget
+                    ? const Color(0xFF2563EB)
+                    : const Color(0xFF64748B),
+              ),
+            ),
+          ],
         ),
       ),
     );
