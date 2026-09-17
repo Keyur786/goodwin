@@ -3128,11 +3128,23 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            ProductImageWidget(
-              imageSrc: cartItem.displayImage,
+            Container(
               width: 68,
               height: 68,
-              borderRadius: BorderRadius.circular(12),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Center(
+                child: ProductImageWidget(
+                  imageSrc: cartItem.displayImage,
+                  width: 68,
+                  height: 68,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -4176,6 +4188,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                                         imageSrc: alert.productImage,
                                         width: 50,
                                         height: 50,
+                                        fit: BoxFit.contain,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       const SizedBox(width: 12),

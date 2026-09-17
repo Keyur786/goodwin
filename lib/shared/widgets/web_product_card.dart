@@ -38,9 +38,6 @@ class _WebProductCardState extends State<WebProductCard> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
-    final margin = product.originalPrice > product.price
-        ? (((product.originalPrice - product.price) / product.originalPrice) * 100).round()
-        : 0;
     final totalStock = product.totalAvailableQty;
     final isOutOfStock = totalStock <= 0;
 
@@ -79,47 +76,19 @@ class _WebProductCardState extends State<WebProductCard> {
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                     child: Container(
-                      height: 180,
+                      height: 185,
                       width: double.infinity,
                       color: const Color(0xFFF8FAFC),
+                      padding: const EdgeInsets.all(8),
+                      alignment: Alignment.center,
                       child: ProductImageWidget(
                         imageSrc: product.image,
-                        fit: BoxFit.cover,
-                        height: 180,
+                        fit: BoxFit.contain,
+                        height: 185,
                         width: double.infinity,
                       ),
                     ),
                   ),
-
-                  // Wholesale Discount Margin Badge (Top Left)
-                  if (margin > 0)
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF16A34A),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(30),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          '$margin% Margin',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ),
-                    ),
 
                   // Favorite Button (Top Right)
                   Positioned(
@@ -239,26 +208,6 @@ class _WebProductCardState extends State<WebProductCard> {
                               color: Color(0xFF0F172A),
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          if (product.originalPrice > product.price) ...[
-                            Text(
-                              '₹${product.originalPrice.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 12.5,
-                                color: Color(0xFF94A3B8),
-                                decoration: TextDecoration.lineThrough,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'MRP',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey.shade500,
-                              ),
-                            ),
-                          ],
                         ],
                       ),
 

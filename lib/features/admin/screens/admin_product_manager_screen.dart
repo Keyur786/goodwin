@@ -647,12 +647,24 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ProductImageWidget(
-                                  imageSrc: imageUrl,
-                                  width: 68,
-                                  height: 68,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                 Container(
+                                   width: 68,
+                                   height: 68,
+                                   padding: const EdgeInsets.all(4),
+                                   decoration: BoxDecoration(
+                                     color: const Color(0xFFF8FAFC),
+                                     borderRadius: BorderRadius.circular(10),
+                                     border: Border.all(color: const Color(0xFFE2E8F0)),
+                                   ),
+                                   child: Center(
+                                     child: ProductImageWidget(
+                                       imageSrc: imageUrl,
+                                       width: 68,
+                                       height: 68,
+                                       fit: BoxFit.contain,
+                                     ),
+                                   ),
+                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(

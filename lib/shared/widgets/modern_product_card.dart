@@ -209,7 +209,11 @@ class ModernProductCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
+                width: 96,
+                height: 96,
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: const Color(0xFFE2E8F0),
@@ -217,11 +221,13 @@ class ModernProductCard extends StatelessWidget {
                   ),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: ProductImageWidget(
-                  imageSrc: product.image,
-                  width: 96,
-                  height: 96,
-                  fit: BoxFit.cover,
+                child: Center(
+                  child: ProductImageWidget(
+                    imageSrc: product.image,
+                    width: 96,
+                    height: 96,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               const SizedBox(width: 14),

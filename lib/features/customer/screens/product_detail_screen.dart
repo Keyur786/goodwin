@@ -86,6 +86,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ? product.images
             : (product.image.isNotEmpty ? [product.image] : <String>[]));
 
+    final isWideScreen = MediaQuery.of(context).size.width >= 700;
+    final double mainImageHeight = isWideScreen ? 380.0 : 300.0;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -156,51 +159,129 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 children: [
                   // Image Showcase (Multi-Image Carousel or Single Frame)
                   if (displayImages.length > 1) ...[
-                    GestureDetector(
-                      onTap: () => _openFullScreenImageViewer(
-                        context,
-                        displayImages,
-                        initialIndex: _currentImageIndex,
-                        productName: product.name,
-                      ),
-                      child: Container(
-                        height: 250,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: const Color(0xFFE2E8F0),
-                            width: 1.2,
-                          ),
+                    Container(
+                      height: mainImageHeight,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: const Color(0xFFE2E8F0),
+                          width: 1.2,
                         ),
-                        clipBehavior: Clip.antiAlias,
-                        child: Stack(
-                          children: [
-                            PageView.builder(
-                              controller: _imagePageController,
-                              itemCount: displayImages.length,
-                              onPageChanged: (idx) {
-                                setState(() => _currentImageIndex = idx);
-                              },
-                              itemBuilder: (ctx, i) {
-                                return ProductImageWidget(
-                                  imageSrc: displayImages[i],
-                                  height: 250,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                );
-                              },
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: GestureDetector(
+                              onTap: () => _openFullScreenImageViewer(
+                                context,
+                                displayImages,
+                                initialIndex: _currentImageIndex,
+                                productName: product.name,
+                              ),
+                              child: PageView.builder(
+                                controller: _imagePageController,
+                                itemCount: displayImages.length,
+                                onPageChanged: (idx) {
+                                  setState(() => _currentImageIndex = idx);
+                                },
+                                itemBuilder: (ctx, i) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Center(
+                                      child: ProductImageWidget(
+                                        imageSrc: displayImages[i],
+                                        height: double.infinity,
+                                        width: double.infinity,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                            // Zoom tap hint badge on top right
+                          ),
+                          // Left arrow (Flipkart / Amazon style)
+                          if (_currentImageIndex > 0)
                             Positioned(
-                              top: 10,
-                              right: 12,
+                              left: 10,
+                              top: 0,
+                              bottom: 0,
+                              child: Center(
+                                child: Material(
+                                  color: Colors.white.withAlpha(235),
+                                  shape: const CircleBorder(),
+                                  elevation: 2,
+                                  child: InkWell(
+                                    customBorder: const CircleBorder(),
+                                    onTap: () {
+                                      _imagePageController.previousPage(
+                                        duration: const Duration(milliseconds: 250),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8),
+                                      child: Icon(
+                                        LucideIcons.chevronLeft,
+                                        color: Color(0xFF1E293B),
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          // Right arrow (Flipkart / Amazon style)
+                          if (_currentImageIndex < displayImages.length - 1)
+                            Positioned(
+                              right: 10,
+                              top: 0,
+                              bottom: 0,
+                              child: Center(
+                                child: Material(
+                                  color: Colors.white.withAlpha(235),
+                                  shape: const CircleBorder(),
+                                  elevation: 2,
+                                  child: InkWell(
+                                    customBorder: const CircleBorder(),
+                                    onTap: () {
+                                      _imagePageController.nextPage(
+                                        duration: const Duration(milliseconds: 250),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8),
+                                      child: Icon(
+                                        LucideIcons.chevronRight,
+                                        color: Color(0xFF1E293B),
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          // Zoom / Tap to view button badge on top right
+                          Positioned(
+                            top: 10,
+                            right: 12,
+                            child: GestureDetector(
+                              onTap: () => _openFullScreenImageViewer(
+                                context,
+                                displayImages,
+                                initialIndex: _currentImageIndex,
+                                productName: product.name,
+                              ),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
-                                  vertical: 4,
+                                  vertical: 5,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.65),
+                                  color: Colors.black.withAlpha(165),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Row(
@@ -209,11 +290,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     Icon(
                                       LucideIcons.maximize2,
                                       color: Colors.white,
-                                      size: 14,
+                                      size: 13,
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      'Tap to view',
+                                      'Full view',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 10.5,
@@ -224,41 +305,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ),
                               ),
                             ),
-                            // Photo counter on bottom right
-                            Positioned(
-                              bottom: 10,
-                              right: 12,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.65),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  '${_currentImageIndex + 1} / ${displayImages.length}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                          ),
+                          // Photo counter on bottom right
+                          Positioned(
+                            bottom: 10,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withAlpha(165),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '${_currentImageIndex + 1} / ${displayImages.length}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    // Thumbnail row
+                    const SizedBox(height: 12),
+                    // Thumbnail row (Amazon / Flipkart style gallery)
                     SizedBox(
-                      height: 48,
+                      height: 64,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: displayImages.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: 8),
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
                         itemBuilder: (ctx, i) {
                           final isSelected = _currentImageIndex == i;
                           return GestureDetector(
@@ -269,24 +350,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 curve: Curves.easeInOut,
                               );
                             },
-                            child: Container(
-                              width: 48,
-                              height: 48,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              width: 64,
+                              height: 64,
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isSelected
                                       ? const Color(0xFF2563EB)
                                       : const Color(0xFFE2E8F0),
-                                  width: isSelected ? 2.5 : 1,
+                                  width: isSelected ? 2.5 : 1.2,
                                 ),
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(0xFF2563EB).withAlpha(45),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
                               ),
                               clipBehavior: Clip.antiAlias,
-                              child: ProductImageWidget(
-                                imageSrc: displayImages[i],
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
+                              child: Center(
+                                child: ProductImageWidget(
+                                  imageSrc: displayImages[i],
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           );
@@ -304,7 +399,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         productName: product.name,
                       ),
                       child: Container(
+                        height: mainImageHeight,
+                        width: double.infinity,
                         decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
                             color: const Color(0xFFE2E8F0),
@@ -314,13 +412,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         clipBehavior: Clip.antiAlias,
                         child: Stack(
                           children: [
-                            ProductImageWidget(
-                              imageSrc: displayImages.isNotEmpty
-                                  ? displayImages.first
-                                  : product.image,
-                              height: 250,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Center(
+                                child: ProductImageWidget(
+                                  imageSrc: displayImages.isNotEmpty
+                                      ? displayImages.first
+                                      : product.image,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
                             ),
                             Positioned(
                               top: 10,
@@ -328,10 +431,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
-                                  vertical: 4,
+                                  vertical: 5,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.65),
+                                  color: Colors.black.withAlpha(165),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Row(
@@ -340,11 +443,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     Icon(
                                       LucideIcons.maximize2,
                                       color: Colors.white,
-                                      size: 14,
+                                      size: 13,
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      'Tap to view',
+                                      'Full view',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 10.5,
@@ -494,13 +597,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         width: 28,
                                         height: 28,
                                         decoration: BoxDecoration(
+                                          color: const Color(0xFFF8FAFC),
                                           borderRadius:
                                               BorderRadius.circular(6),
                                         ),
                                         clipBehavior: Clip.antiAlias,
                                         child: ProductImageWidget(
                                           imageSrc: v.images.first,
-                                          fit: BoxFit.cover,
+                                          fit: BoxFit.contain,
                                         ),
                                       ),
                                       const SizedBox(width: 8),
