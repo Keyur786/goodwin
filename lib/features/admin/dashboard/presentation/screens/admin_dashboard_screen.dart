@@ -146,23 +146,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         customRange: _customRange,
                       );
 
-                      return ListView(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
-                        children: [
-                          _buildTimeFilterBar(data),
-                          const SizedBox(height: 16),
-                          _buildExecutiveKpiCards(data, products),
-                          const SizedBox(height: 24),
-                          _buildCustomerSalesSection(data),
-                          const SizedBox(height: 24),
-                          _buildSalesAndChannelSection(data),
-                          const SizedBox(height: 24),
-                          _buildTopProductsSection(data, products),
-                          const SizedBox(height: 24),
-                          _buildOperationalAlertsSection(data),
-                          const SizedBox(height: 24),
-                          _buildQuickActionsSection(context),
-                        ],
+                      return Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1200),
+                          child: ListView(
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                            children: [
+                              _buildTimeFilterBar(data),
+                              const SizedBox(height: 16),
+                              _buildExecutiveKpiCards(data, products),
+                              const SizedBox(height: 24),
+                              _buildCustomerSalesSection(data),
+                              const SizedBox(height: 24),
+                              _buildSalesAndChannelSection(data),
+                              const SizedBox(height: 24),
+                              _buildTopProductsSection(data, products),
+                              const SizedBox(height: 24),
+                              _buildOperationalAlertsSection(data),
+                              const SizedBox(height: 24),
+                              _buildQuickActionsSection(context),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   );

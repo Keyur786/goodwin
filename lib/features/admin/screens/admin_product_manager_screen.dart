@@ -182,8 +182,11 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
               break;
           }
 
-          return Column(
-            children: [
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1160),
+              child: Column(
+                children: [
               // Top Segmented Tab Header (Active vs Recycle Bin)
               Container(
                 color: Colors.white,
@@ -821,8 +824,10 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
                       ),
               ),
             ],
-          );
-        },
+          ),
+        ),
+      );
+    },
       ),
     );
   }

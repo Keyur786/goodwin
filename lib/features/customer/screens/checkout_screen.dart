@@ -175,10 +175,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Order Checkout')),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
                   const Text(
@@ -374,7 +377,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

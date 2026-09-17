@@ -454,8 +454,11 @@ class _PrepaidDeliveryRazorpayPageState
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(title: const Text('Prepaid Delivery')),
       body: SafeArea(
-        child: Column(
-          children: [
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: Column(
+              children: [
             Expanded(
               child: Form(
                 key: _formKey,
@@ -867,7 +870,9 @@ class _PrepaidDeliveryRazorpayPageState
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

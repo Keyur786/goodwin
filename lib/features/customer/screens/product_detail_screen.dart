@@ -130,8 +130,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 880),
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           children: [
             // Main Outer Card Container with clean border
             Container(
@@ -993,7 +996,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

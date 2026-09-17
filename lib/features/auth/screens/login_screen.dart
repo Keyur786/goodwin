@@ -636,23 +636,65 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 840;
+
+    final mobileContent = SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 12),
+          _buildStepIndicator(),
+          const SizedBox(height: 36),
+          if (_currentStep == _AuthStep.phone) _buildPhoneStep(),
+          if (_currentStep == _AuthStep.otp) _buildOtpStep(),
+          if (_currentStep == _AuthStep.profile) _buildProfileStep(),
+        ],
+      ),
+    );
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 460),
+                child: Card(
+                  elevation: 0,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildStepIndicator(),
+                        const SizedBox(height: 28),
+                        if (_currentStep == _AuthStep.phone) _buildPhoneStep(),
+                        if (_currentStep == _AuthStep.otp) _buildOtpStep(),
+                        if (_currentStep == _AuthStep.profile) _buildProfileStep(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              _buildStepIndicator(),
-              const SizedBox(height: 36),
-              if (_currentStep == _AuthStep.phone) _buildPhoneStep(),
-              if (_currentStep == _AuthStep.otp) _buildOtpStep(),
-              if (_currentStep == _AuthStep.profile) _buildProfileStep(),
-            ],
-          ),
-        ),
+        child: mobileContent,
       ),
     );
   }

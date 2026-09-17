@@ -33,8 +33,11 @@ class CustomerBulkQuotesScreen extends StatelessWidget {
         ],
         bottom: const PreferredSize(preferredSize: Size.fromHeight(1), child: Divider(height: 1)),
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: FirestoreProductRepository().streamMyBulkInquiries(userId),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: StreamBuilder<List<Map<String, dynamic>>>(
+            stream: FirestoreProductRepository().streamMyBulkInquiries(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -95,7 +98,9 @@ class CustomerBulkQuotesScreen extends StatelessWidget {
           );
         },
       ),
-    );
+    ),
+  ),
+);
   }
 }
 
@@ -316,8 +321,11 @@ class _CustomerQuoteChatScreenState extends State<_CustomerQuoteChatScreen> {
         elevation: 0,
         bottom: const PreferredSize(preferredSize: Size.fromHeight(1), child: Divider(height: 1)),
       ),
-      body: Column(
-        children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: Column(
+            children: [
           // Status banner
           Builder(
             builder: (context) {
@@ -421,7 +429,9 @@ class _CustomerQuoteChatScreenState extends State<_CustomerQuoteChatScreen> {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

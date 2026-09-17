@@ -94,8 +94,11 @@ class CustomerOrdersScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Orders')),
-      body: StreamBuilder<List<OrderModel>>(
-        stream: orderRepo.streamOrdersByCustomer(effectiveUserId),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 880),
+          child: StreamBuilder<List<OrderModel>>(
+            stream: orderRepo.streamOrdersByCustomer(effectiveUserId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -588,7 +591,9 @@ class CustomerOrdersScreen extends StatelessWidget {
           );
         },
       ),
-    );
+    ),
+  ),
+);
   }
 
   Future<void> _confirmDeleteOrder(

@@ -419,8 +419,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Profile')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 740),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
         children: [
           Card(
             shape: RoundedRectangleBorder(
@@ -716,7 +719,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

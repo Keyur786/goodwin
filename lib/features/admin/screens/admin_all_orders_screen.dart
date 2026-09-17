@@ -147,8 +147,13 @@ class _AdminAllOrdersScreenState extends State<AdminAllOrdersScreen> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [_buildWarehouseOrdersView(), _buildOnlineOrdersView()],
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1160),
+            child: TabBarView(
+              children: [_buildWarehouseOrdersView(), _buildOnlineOrdersView()],
+            ),
+          ),
         ),
       ),
     );

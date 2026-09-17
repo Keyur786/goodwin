@@ -44,8 +44,11 @@ class AdminBulkQuotesScreen extends StatelessWidget {
           child: Divider(height: 1),
         ),
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: FirestoreProductRepository().streamAllBulkInquiries(),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 960),
+          child: StreamBuilder<List<Map<String, dynamic>>>(
+            stream: FirestoreProductRepository().streamAllBulkInquiries(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -97,7 +100,9 @@ class AdminBulkQuotesScreen extends StatelessWidget {
           );
         },
       ),
-    );
+    ),
+  ),
+);
   }
 }
 
@@ -314,8 +319,11 @@ class _AdminQuoteChatScreenState extends State<_AdminQuoteChatScreen> {
         ],
         bottom: const PreferredSize(preferredSize: Size.fromHeight(1), child: Divider(height: 1)),
       ),
-      body: Column(
-        children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 960),
+          child: Column(
+            children: [
           _InquirySummaryBanner(inquiry: inq),
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
@@ -348,7 +356,9 @@ class _AdminQuoteChatScreenState extends State<_AdminQuoteChatScreen> {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }
 
