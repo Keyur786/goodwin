@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:goodwin/core/services/firestore_product_repository.dart';
 import 'package:goodwin/features/admin/dialogs/add_edit_product_dialog.dart';
@@ -889,9 +890,12 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
       try {
         await _productRepo.moveToBin(product.id);
         if (mounted) {
+          messenger.hideCurrentSnackBar();
           messenger.showSnackBar(
             SnackBar(
               content: Text('Moved "${product.name}" to Recycle Bin'),
+              persist: false,
+              duration: const Duration(seconds: 2),
               action: SnackBarAction(
                 label: 'Undo',
                 textColor: const Color(0xFFBFDBFE),
@@ -903,11 +907,21 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
               ),
             ),
           );
+          Timer(const Duration(milliseconds: 2200), () {
+            if (mounted) {
+              messenger.hideCurrentSnackBar();
+            }
+          });
         }
       } catch (e) {
         if (mounted) {
+          messenger.hideCurrentSnackBar();
           messenger.showSnackBar(
-            SnackBar(content: Text('Error moving to bin: $e')),
+            SnackBar(
+              content: Text('Error moving to bin: $e'),
+              persist: false,
+              duration: const Duration(seconds: 2),
+            ),
           );
         }
       }
@@ -922,21 +936,34 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
     try {
       await _productRepo.restoreFromBin(product.id);
       if (mounted) {
+        messenger.hideCurrentSnackBar();
         messenger.showSnackBar(
           SnackBar(
             content: Text('Restored "${product.name}" to active catalog'),
             backgroundColor: const Color(0xFF2563EB),
             behavior: SnackBarBehavior.floating,
+            persist: false,
+            duration: const Duration(seconds: 2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
         );
+        Timer(const Duration(milliseconds: 2200), () {
+          if (mounted) {
+            messenger.hideCurrentSnackBar();
+          }
+        });
       }
     } catch (e) {
       if (mounted) {
+        messenger.hideCurrentSnackBar();
         messenger.showSnackBar(
-          SnackBar(content: Text('Error restoring product: $e')),
+          SnackBar(
+            content: Text('Error restoring product: $e'),
+            persist: false,
+            duration: const Duration(seconds: 2),
+          ),
         );
       }
     }
@@ -992,21 +1019,34 @@ class _AdminProductManagerScreenState extends State<AdminProductManagerScreen> {
       try {
         await _productRepo.permanentDeleteProduct(product.id);
         if (mounted) {
+          messenger.hideCurrentSnackBar();
           messenger.showSnackBar(
             SnackBar(
               content: Text('Permanently deleted "${product.name}"'),
               backgroundColor: Colors.red.shade800,
               behavior: SnackBarBehavior.floating,
+              persist: false,
+              duration: const Duration(seconds: 2),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
           );
+          Timer(const Duration(milliseconds: 2200), () {
+            if (mounted) {
+              messenger.hideCurrentSnackBar();
+            }
+          });
         }
       } catch (e) {
         if (mounted) {
+          messenger.hideCurrentSnackBar();
           messenger.showSnackBar(
-            SnackBar(content: Text('Error permanently deleting product: $e')),
+            SnackBar(
+              content: Text('Error permanently deleting product: $e'),
+              persist: false,
+              duration: const Duration(seconds: 2),
+            ),
           );
         }
       }

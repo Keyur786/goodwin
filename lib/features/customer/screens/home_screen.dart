@@ -758,6 +758,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           SnackBar(
             content: Text('Removed "${item.displayName}" from cart'),
             behavior: SnackBarBehavior.floating,
+            persist: false,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -772,6 +773,11 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             ),
           ),
         );
+        Timer(const Duration(milliseconds: 2200), () {
+          if (mounted) {
+            messenger.hideCurrentSnackBar();
+          }
+        });
       }
       return true;
     }
