@@ -335,6 +335,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 480),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -410,6 +411,7 @@ class _AddEditProductDialogState extends State<AddEditProductDialog> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 480),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

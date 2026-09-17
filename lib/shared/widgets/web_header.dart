@@ -49,6 +49,10 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 1180;
+    final isSuperCompact = screenWidth < 1050;
+
     return Container(
       height: preferredSize.height,
       decoration: const BoxDecoration(
@@ -64,7 +68,7 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: isCompact ? 16 : 24),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1360),
@@ -130,7 +134,7 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
 
               // 2. Global Search Bar (E-commerce Style)
               Expanded(
-                flex: 3,
+                flex: isCompact ? 2 : 3,
                 child: Container(
                   height: 42,
                   clipBehavior: Clip.antiAlias,
@@ -196,19 +200,21 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
 
-              const SizedBox(width: 20),
+              SizedBox(width: isCompact ? 10 : 20),
 
               // 3. Navigation Links (Home, Catalog, Favorites, Bulk Quotes)
               _HeaderNavLink(
                 label: 'Home',
                 icon: LucideIcons.house,
                 isSelected: selectedIndex == 0,
+                horizontalPadding: isCompact ? 7 : 11,
                 onTap: () => onSelectTab(0),
               ),
               _HeaderNavLink(
                 label: 'Catalog',
                 icon: LucideIcons.layoutGrid,
                 isSelected: selectedIndex == 1,
+                horizontalPadding: isCompact ? 7 : 11,
                 onTap: () => onSelectTab(1),
               ),
               _HeaderNavLink(
@@ -216,29 +222,31 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
                 icon: LucideIcons.heart,
                 isSelected: selectedIndex == 2,
                 badgeCount: favoriteCount,
+                horizontalPadding: isCompact ? 7 : 11,
                 onTap: () => onSelectTab(2),
               ),
               _HeaderNavLink(
                 label: 'Bulk Quotes',
                 icon: LucideIcons.messageSquare,
                 isSelected: false,
+                horizontalPadding: isCompact ? 7 : 11,
                 onTap: onOpenBulkQuotes,
               ),
 
-              const SizedBox(width: 12),
+              SizedBox(width: isCompact ? 8 : 12),
               const SizedBox(
                 height: 28,
                 child: VerticalDivider(color: Color(0xFFE2E8F0), width: 1),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: isCompact ? 8 : 12),
 
               // 4. Warehouse Pickup Button
               OutlinedButton.icon(
                 onPressed: onOpenPickupModal,
                 icon: const Icon(LucideIcons.mapPin, size: 15, color: Color(0xFF2563EB)),
-                label: const Text(
-                  'Katargam Hub',
-                  style: TextStyle(
+                label: Text(
+                  isCompact ? 'Pickup' : 'Katargam Hub',
+                  style: const TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF1E293B),
@@ -247,12 +255,12 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
                   backgroundColor: const Color(0xFFF8FAFC),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 8 : 12, vertical: 8),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
 
-              const SizedBox(width: 10),
+              SizedBox(width: isCompact ? 6 : 10),
 
               // 5. Notifications Bell
               ListenableBuilder(
@@ -273,7 +281,7 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
                 },
               ),
 
-              const SizedBox(width: 8),
+              SizedBox(width: isCompact ? 6 : 8),
 
               // 6. Cart Button with Amount Pill
               FilledButton.icon(
@@ -294,12 +302,12 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFF2563EB),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 10 : 14, vertical: 10),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
 
-              const SizedBox(width: 14),
+              SizedBox(width: isCompact ? 8 : 14),
 
               // 7. Admin Tools / User Profile Menu
               PopupMenuButton<String>(
@@ -324,19 +332,21 @@ class WebHeader extends StatelessWidget implements PreferredSizeWidget {
                         name: currentUser?.name ?? (isAdmin ? 'Admin' : 'User'),
                         showCameraBadge: false,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        currentUser?.name.isNotEmpty == true
-                            ? currentUser!.name
-                            : (isAdmin ? 'Goodwin Admin' : 'Reseller'),
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
+                      if (!isSuperCompact) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          currentUser?.name.isNotEmpty == true
+                              ? currentUser!.name
+                              : (isAdmin ? 'Goodwin Admin' : 'Reseller'),
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0F172A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      ],
                       const SizedBox(width: 4),
                       const Icon(LucideIcons.chevronDown, size: 14, color: Color(0xFF64748B)),
                     ],
@@ -430,6 +440,7 @@ class _HeaderNavLink extends StatefulWidget {
     required this.isSelected,
     required this.onTap,
     this.badgeCount,
+    this.horizontalPadding = 11,
   });
 
   final String label;
@@ -437,6 +448,7 @@ class _HeaderNavLink extends StatefulWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final int? badgeCount;
+  final double horizontalPadding;
 
   @override
   State<_HeaderNavLink> createState() => _HeaderNavLinkState();
@@ -456,7 +468,7 @@ class _HeaderNavLinkState extends State<_HeaderNavLink> {
         onTap: widget.onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: widget.horizontalPadding, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
             borderRadius: BorderRadius.circular(10),

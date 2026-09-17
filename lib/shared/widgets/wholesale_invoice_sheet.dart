@@ -17,6 +17,7 @@ void showWholesaleInvoiceModal(
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    constraints: const BoxConstraints(maxWidth: 720),
     backgroundColor: Colors.transparent,
     builder: (ctx) => WholesaleInvoiceSheet(
       order: order,

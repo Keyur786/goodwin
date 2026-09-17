@@ -955,6 +955,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 540),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
@@ -1064,6 +1065,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 540),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
@@ -1295,15 +1297,24 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
         _buildQuickActionHub(),
         const SizedBox(height: 20),
 
-        // 4. Central Warehouse & Dispatch Hub Card
-        _buildWarehouseHubCard(),
+        // 4. Central Warehouse & Dispatch Hub Card + Account Tier Card
+        if (isWideWeb) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: _buildWarehouseHubCard()),
+              const SizedBox(width: 20),
+              Expanded(child: _buildAccountTierCard()),
+            ],
+          ),
+        ] else ...[
+          _buildWarehouseHubCard(),
+          const SizedBox(height: 20),
+          _buildAccountTierCard(),
+        ],
         const SizedBox(height: 20),
 
-        // 5. Wholesale Account & Partner Tier Card
-        _buildAccountTierCard(),
-        const SizedBox(height: 20),
-
-        // 6. Quality & Trade Assurance Card
+        // 5. Quality & Trade Assurance Card
         _buildQualityAssuranceGrid(),
 
         if (isWideWeb) ...[
@@ -1317,6 +1328,8 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   }
 
   Widget _buildHeroBanner() {
+    final isWideWeb = MediaQuery.sizeOf(context).width >= 840;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -1397,38 +1410,34 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
+          if (isWideWeb)
+            Wrap(
+              spacing: 12,
+              runSpacing: 10,
+              children: [
+                FilledButton.icon(
                   onPressed: () => setState(() => selectedIndex = 1),
-                  icon: const Icon(LucideIcons.shoppingBag, size: 15),
-                  label: const FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'Place Order',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12.5,
-                      ),
+                  icon: const Icon(LucideIcons.shoppingBag, size: 16),
+                  label: const Text(
+                    'Place Order',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13.5,
                     ),
                   ),
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 11,
+                      horizontal: 22,
+                      vertical: 13,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
+                OutlinedButton.icon(
                   onPressed: () => showBulkOrderInquiryDialog(
                     context: context,
                     currentUser: currentUser,
@@ -1436,34 +1445,98 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
                   ),
                   icon: const Icon(
                     LucideIcons.messageSquare,
-                    size: 15,
+                    size: 16,
                     color: Colors.white,
                   ),
-                  label: const FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'Request Bulk Quote',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12.5,
-                      ),
+                  label: const Text(
+                    'Request Bulk Quote',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Color(0xFF93C5FD), width: 1.2),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 11,
+                      horizontal: 20,
+                      vertical: 13,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () => setState(() => selectedIndex = 1),
+                    icon: const Icon(LucideIcons.shoppingBag, size: 15),
+                    label: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Place Order',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF2563EB),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 11,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => showBulkOrderInquiryDialog(
+                      context: context,
+                      currentUser: currentUser,
+                      catalogProducts: products,
+                    ),
+                    icon: const Icon(
+                      LucideIcons.messageSquare,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    label: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Request Bulk Quote',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF93C5FD), width: 1.2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 11,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
@@ -1600,6 +1673,40 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   }
 
   Widget _buildQuickActionHub() {
+    final isWideWeb = MediaQuery.sizeOf(context).width >= 840;
+    final card1 = _ActionCardItem(
+      icon: LucideIcons.layoutGrid,
+      iconBg: const Color(0xFFDBEAFE),
+      iconColor: const Color(0xFF2563EB),
+      title: 'Full Catalog',
+      subtitle: 'Browse all products',
+      onTap: () => setState(() => selectedIndex = 1),
+    );
+    final card2 = _ActionCardItem(
+      icon: LucideIcons.receiptText,
+      iconBg: const Color(0xFFDBEAFE),
+      iconColor: const Color(0xFF2563EB),
+      title: 'Past Orders',
+      subtitle: 'Track dispatches',
+      onTap: () => handleProfileAction(ProfileAction.orders),
+    );
+    final card3 = _ActionCardItem(
+      icon: LucideIcons.heart,
+      iconBg: const Color(0xFFFFE4E6),
+      iconColor: const Color(0xFFE11D48),
+      title: 'Saved Items',
+      subtitle: '${favoriteIds.length} favorited lots',
+      onTap: () => setState(() => selectedIndex = 2),
+    );
+    final card4 = _ActionCardItem(
+      icon: LucideIcons.mapPin,
+      iconBg: const Color(0xFFDCFCE7),
+      iconColor: const Color(0xFF16A34A),
+      title: 'Pickup Hub',
+      subtitle: 'Katargam Branch',
+      onTap: () => showPickupLocationModal(context),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1612,57 +1719,35 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _ActionCardItem(
-                icon: LucideIcons.layoutGrid,
-                iconBg: const Color(0xFFDBEAFE),
-                iconColor: const Color(0xFF2563EB),
-                title: 'Full Catalog',
-                subtitle: 'Browse all products',
-                onTap: () => setState(() => selectedIndex = 1),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionCardItem(
-                icon: LucideIcons.receiptText,
-                iconBg: const Color(0xFFDBEAFE),
-                iconColor: const Color(0xFF2563EB),
-                title: 'Past Orders',
-                subtitle: 'Track dispatches',
-                onTap: () => handleProfileAction(ProfileAction.orders),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _ActionCardItem(
-                icon: LucideIcons.heart,
-                iconBg: const Color(0xFFFFE4E6),
-                iconColor: const Color(0xFFE11D48),
-                title: 'Saved Items',
-                subtitle: '${favoriteIds.length} favorited lots',
-                onTap: () => setState(() => selectedIndex = 2),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionCardItem(
-                icon: LucideIcons.mapPin,
-                iconBg: const Color(0xFFDCFCE7),
-                iconColor: const Color(0xFF16A34A),
-                title: 'Pickup Hub',
-                subtitle: 'Katargam Branch',
-                onTap: () => showPickupLocationModal(context),
-              ),
-            ),
-          ],
-        ),
+        if (isWideWeb)
+          Row(
+            children: [
+              Expanded(child: card1),
+              const SizedBox(width: 12),
+              Expanded(child: card2),
+              const SizedBox(width: 12),
+              Expanded(child: card3),
+              const SizedBox(width: 12),
+              Expanded(child: card4),
+            ],
+          )
+        else ...[
+          Row(
+            children: [
+              Expanded(child: card1),
+              const SizedBox(width: 12),
+              Expanded(child: card2),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: card3),
+              const SizedBox(width: 12),
+              Expanded(child: card4),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -1907,6 +1992,32 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
   }
 
   Widget _buildQualityAssuranceGrid() {
+    final isWideWeb = MediaQuery.sizeOf(context).width >= 840;
+    const card1 = _AssuranceFeatureCard(
+      icon: LucideIcons.shieldCheck,
+      iconColor: Color(0xFF2563EB),
+      title: 'Grade-A Inspection',
+      description: 'Laboratory moisture & grade testing',
+    );
+    const card2 = _AssuranceFeatureCard(
+      icon: LucideIcons.truck,
+      iconColor: Color(0xFF2563EB),
+      title: 'Same-Day Dispatch',
+      description: 'Priority bay pickup & fast logistics',
+    );
+    const card3 = _AssuranceFeatureCard(
+      icon: LucideIcons.scale,
+      iconColor: Color(0xFF7C3AED),
+      title: 'Certified Net Weight',
+      description: 'Calibrated digital scale weighing',
+    );
+    const card4 = _AssuranceFeatureCard(
+      icon: LucideIcons.packageCheck,
+      iconColor: Color(0xFFD97706),
+      title: 'Export-Grade Packaging',
+      description: 'Multi-layer moisture lock cartons',
+    );
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -1933,49 +2044,35 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          const Row(
-            children: [
-              Expanded(
-                child: _AssuranceFeatureCard(
-                  icon: LucideIcons.shieldCheck,
-                  iconColor: Color(0xFF2563EB),
-                  title: 'Grade-A Inspection',
-                  description: 'Laboratory moisture & grade testing',
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: _AssuranceFeatureCard(
-                  icon: LucideIcons.truck,
-                  iconColor: Color(0xFF2563EB),
-                  title: 'Same-Day Dispatch',
-                  description: 'Priority bay pickup & fast logistics',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Row(
-            children: [
-              Expanded(
-                child: _AssuranceFeatureCard(
-                  icon: LucideIcons.scale,
-                  iconColor: Color(0xFF7C3AED),
-                  title: 'Certified Net Weight',
-                  description: 'Calibrated digital scale weighing',
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: _AssuranceFeatureCard(
-                  icon: LucideIcons.packageCheck,
-                  iconColor: Color(0xFFD97706),
-                  title: 'Export-Grade Packaging',
-                  description: 'Multi-layer moisture lock cartons',
-                ),
-              ),
-            ],
-          ),
+          if (isWideWeb)
+            const Row(
+              children: [
+                Expanded(child: card1),
+                SizedBox(width: 12),
+                Expanded(child: card2),
+                SizedBox(width: 12),
+                Expanded(child: card3),
+                SizedBox(width: 12),
+                Expanded(child: card4),
+              ],
+            )
+          else ...[
+            const Row(
+              children: [
+                Expanded(child: card1),
+                SizedBox(width: 12),
+                Expanded(child: card2),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Row(
+              children: [
+                Expanded(child: card3),
+                SizedBox(width: 12),
+                Expanded(child: card4),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -3894,6 +3991,7 @@ class _DemoHomeScreenState extends State<DemoHomeScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 540),
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return ListenableBuilder(

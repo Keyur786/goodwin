@@ -191,6 +191,7 @@ Future<void> showProfilePhotoPickerSheet({
 
   await showModalBottomSheet<void>(
     context: context,
+    constraints: const BoxConstraints(maxWidth: 480),
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

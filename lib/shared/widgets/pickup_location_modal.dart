@@ -8,6 +8,7 @@ void showPickupLocationModal(BuildContext context) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    constraints: const BoxConstraints(maxWidth: 620),
     backgroundColor: Colors.transparent,
     builder: (ctx) => const PickupLocationModalSheet(),
   );
@@ -83,7 +84,10 @@ class PickupLocationModalSheet extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      constraints: BoxConstraints(maxHeight: screenHeight * 0.88),
+      constraints: BoxConstraints(
+        maxWidth: 620,
+        maxHeight: screenHeight * 0.88,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),

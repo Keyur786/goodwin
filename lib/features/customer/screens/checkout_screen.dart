@@ -390,6 +390,7 @@ Future<FulfillmentMethod?> showCheckoutFulfillmentSheet(
 ) async {
   return showModalBottomSheet<FulfillmentMethod>(
     context: context,
+    constraints: const BoxConstraints(maxWidth: 540),
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

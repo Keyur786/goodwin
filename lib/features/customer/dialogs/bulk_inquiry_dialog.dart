@@ -18,6 +18,7 @@ Future<void> showBulkOrderInquiryDialog({
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    constraints: const BoxConstraints(maxWidth: 680),
     backgroundColor: Colors.transparent,
     builder: (modalCtx) => BulkOrderInquirySheet(
       currentUser: currentUser,
@@ -180,6 +181,7 @@ class _BulkOrderInquirySheetState extends State<BulkOrderInquirySheet> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 580),
       backgroundColor: Colors.transparent,
       builder: (pickerCtx) => _CatalogProductPickerSheet(
         products: _availableProducts,

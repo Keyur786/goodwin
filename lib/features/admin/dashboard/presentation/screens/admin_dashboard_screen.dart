@@ -268,69 +268,82 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   // 2. Executive KPI Cards (All Clickable for Drill-down)
   // ---------------------------------------------------------------------------
   Widget _buildExecutiveKpiCards(DashboardAnalyticsData data, List<ProductModel> catalogProducts) {
+    final isDesktop = MediaQuery.sizeOf(context).width >= 840;
+
+    final kpi1 = _buildMetricCard(
+      title: 'Gross Revenue',
+      value: _currencyFormat.format(data.totalRevenue),
+      subtitle: 'Avg: ${_currencyFormat.format(data.averageOrderValue)} / ord',
+      icon: LucideIcons.indianRupee,
+      iconColor: const Color(0xFF16A34A),
+      bgColor: const Color(0xFFF0FDF4),
+      borderColor: const Color(0xFFBBF7D0),
+      onTap: () => _showRevenueBreakdownSheet(context, data),
+    );
+    final kpi2 = _buildMetricCard(
+      title: 'Total Orders',
+      value: data.totalOrders.toString(),
+      subtitle: '${data.completedOrders} Delivered • Tap to view',
+      icon: LucideIcons.shoppingBag,
+      iconColor: const Color(0xFF2563EB),
+      bgColor: const Color(0xFFEFF6FF),
+      borderColor: const Color(0xFFBFDBFE),
+      onTap: () => _showOrdersListSheet(
+        context,
+        data.filteredOrders,
+        title: 'Orders Placed (${data.rangeDescription})',
+      ),
+    );
+    final kpi3 = _buildMetricCard(
+      title: 'Active Resellers',
+      value: data.activeCustomersCount.toString(),
+      subtitle: '${data.repeatCustomersCount} Repeat • Tap for list',
+      icon: LucideIcons.users,
+      iconColor: const Color(0xFF9333EA),
+      bgColor: const Color(0xFFFAF5FF),
+      borderColor: const Color(0xFFE9D5FF),
+      onTap: () => _showResellersSheet(context, data.customerMetrics),
+    );
+    final kpi4 = _buildMetricCard(
+      title: 'Units Dispatched',
+      value: NumberFormat.compact().format(data.totalUnitsSold),
+      subtitle: 'Tap for itemized items',
+      icon: LucideIcons.boxes,
+      iconColor: const Color(0xFFEA580C),
+      bgColor: const Color(0xFFFFF7ED),
+      borderColor: const Color(0xFFFED7AA),
+      onTap: () => _showDispatchesSheet(context, data.topProducts, data.totalUnitsSold),
+    );
+
+    if (isDesktop) {
+      return Row(
+        children: [
+          Expanded(child: kpi1),
+          const SizedBox(width: 12),
+          Expanded(child: kpi2),
+          const SizedBox(width: 12),
+          Expanded(child: kpi3),
+          const SizedBox(width: 12),
+          Expanded(child: kpi4),
+        ],
+      );
+    }
+
     return Column(
       children: [
         Row(
           children: [
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Gross Revenue',
-                value: _currencyFormat.format(data.totalRevenue),
-                subtitle: 'Avg: ${_currencyFormat.format(data.averageOrderValue)} / ord',
-                icon: LucideIcons.indianRupee,
-                iconColor: const Color(0xFF16A34A),
-                bgColor: const Color(0xFFF0FDF4),
-                borderColor: const Color(0xFFBBF7D0),
-                onTap: () => _showRevenueBreakdownSheet(context, data),
-              ),
-            ),
+            Expanded(child: kpi1),
             const SizedBox(width: 12),
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Total Orders',
-                value: data.totalOrders.toString(),
-                subtitle: '${data.completedOrders} Delivered • Tap to view',
-                icon: LucideIcons.shoppingBag,
-                iconColor: const Color(0xFF2563EB),
-                bgColor: const Color(0xFFEFF6FF),
-                borderColor: const Color(0xFFBFDBFE),
-                onTap: () => _showOrdersListSheet(
-                  context,
-                  data.filteredOrders,
-                  title: 'Orders Placed (${data.rangeDescription})',
-                ),
-              ),
-            ),
+            Expanded(child: kpi2),
           ],
         ),
         const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Active Resellers',
-                value: data.activeCustomersCount.toString(),
-                subtitle: '${data.repeatCustomersCount} Repeat • Tap for list',
-                icon: LucideIcons.users,
-                iconColor: const Color(0xFF9333EA),
-                bgColor: const Color(0xFFFAF5FF),
-                borderColor: const Color(0xFFE9D5FF),
-                onTap: () => _showResellersSheet(context, data.customerMetrics),
-              ),
-            ),
+            Expanded(child: kpi3),
             const SizedBox(width: 12),
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Units Dispatched',
-                value: NumberFormat.compact().format(data.totalUnitsSold),
-                subtitle: 'Tap for itemized items',
-                icon: LucideIcons.boxes,
-                iconColor: const Color(0xFFEA580C),
-                bgColor: const Color(0xFFFFF7ED),
-                borderColor: const Color(0xFFFED7AA),
-                onTap: () => _showDispatchesSheet(context, data.topProducts, data.totalUnitsSold),
-              ),
-            ),
+            Expanded(child: kpi4),
           ],
         ),
       ],
@@ -1322,6 +1335,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 680),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
@@ -1343,6 +1357,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 680),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
@@ -1367,6 +1382,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 680),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
@@ -1460,6 +1476,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   void _showRevenueBreakdownSheet(BuildContext context, DashboardAnalyticsData data) {
     showModalBottomSheet<void>(
       context: context,
+      constraints: const BoxConstraints(maxWidth: 680),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
@@ -1553,6 +1570,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 680),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
@@ -1670,6 +1688,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 680),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -2039,11 +2058,7 @@ class _DrillDownOrdersSheetState extends State<_DrillDownOrdersSheet> {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => WholesaleInvoiceSheet(order: ord, isAdmin: true),
-                );
+                showWholesaleInvoiceModal(context, ord, isAdmin: true);
               },
               icon: const Icon(LucideIcons.fileText, size: 14),
               label: const Text('View Wholesale Invoice / PO', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800)),

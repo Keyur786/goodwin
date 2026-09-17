@@ -124,6 +124,7 @@ Future<String> uploadBytesOrFallback(
 Future<ImageSource?> showPhotoSourceActionSheet(BuildContext context) {
   return showModalBottomSheet<ImageSource>(
     context: context,
+    constraints: const BoxConstraints(maxWidth: 480),
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
